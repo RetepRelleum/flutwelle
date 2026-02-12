@@ -178,8 +178,7 @@ class Querschnitt():
                     intens=abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
                         intens=intens*-1
-                    if typq!='????????':
-                        self.intL.insertData(p,intens,v,niveauHoehe-p.z(),f'{i*10} m')
+                    self.intL.insertData(p,intens,v,niveauHoehe-p.z(),f'{i*10} m')
         self.raster.setVisibility(False)
 
     def r_ymax(self, ls, i, k, qmm, l):

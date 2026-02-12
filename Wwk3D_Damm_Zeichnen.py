@@ -97,11 +97,7 @@ class PointTool(QgsMapTool):
                     self.c_run=C_run(self.p1,self.p2,self.raster,self.dlg)
                     self.dlg.tab.setEnabled(False)
                     self.dlg.tab_2.setEnabled(True)
-                    if self.dlg.isDebug.isChecked():
-                        self.c_run.run()  
-                        self.c_run.finished(True)
-                    else:
-                        self.__task=QgsApplication.taskManager().addTask(self.c_run)
+                    self.__task=QgsApplication.taskManager().addTask(self.c_run)
                 except Exception as inst:
                     print(type(inst))    # the exception type
                     print(inst.args)     # arguments stored in .args

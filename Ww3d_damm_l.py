@@ -71,10 +71,10 @@ class DammL(Layer):
             pr.addAttributes( [QgsField("ueberlauf", QVariant.Bool)]) 
             pr.addAttributes( [QgsField("v", QVariant.Double)])    
             pr.addAttributes( [QgsField("quote", QVariant.Double)])    
-            pr.addAttributes( [QgsField("t", QVariant.Double)])   
+            pr.addAttributes( [QgsField("t", QVariant.String)])   
 
             self.damm.updateFields()
-            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#5cf305","#6c05f3"]
+            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#05e3f3","#6c05f3"]
             unique_values = ['Damm', 'Profil Damm','See','Bresche','Qerschnitt','Ueberlauf']
             n=len(unique_values)
             square = [QgsFillSymbol.createSimple({'color': colors[i],
@@ -116,7 +116,10 @@ class DammL(Layer):
      
         feature = QgsFeature()
         feature.setGeometry(ppa)
-        feature.setAttributes([type,flaecheS,flaecheM,volumen,breite,laenge,breiteU,hoehe,type_b,q,u,xvo,ki,um,ueberlauf,v,quote,t])
+        hours = t // 3600
+        minutes = (t % 3600) // 60
+        seconds = round(t % 60,2)
+        feature.setAttributes([type,flaecheS,flaecheM,volumen,breite,laenge,breiteU,hoehe,type_b,q,u,xvo,ki,um,ueberlauf,v,quote,f"{hours} Std. {minutes} Min. {seconds} Sek."])
         self.damm.startEditing()
         assert(self.damm.addFeatures([feature]))
         self.damm.commitChanges()
