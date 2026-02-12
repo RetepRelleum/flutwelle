@@ -74,7 +74,7 @@ class DammL(Layer):
             pr.addAttributes( [QgsField("t", QVariant.String)])   
 
             self.damm.updateFields()
-            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#05e3f3","#6c05f3"]
+            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#0580f3","#6c05f3"]
             unique_values = ['Damm', 'Profil Damm','See','Bresche','Qerschnitt','Ueberlauf']
             n=len(unique_values)
             square = [QgsFillSymbol.createSimple({'color': colors[i],
