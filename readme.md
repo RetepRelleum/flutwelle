@@ -9,8 +9,11 @@ Neben der Aktivierung des Plug-ins müssen die GeoTIF-Files der zu untersuchende
 
 ## Ausführen Flutwelle
 Die Flutwelle lädt die beiden Karten „Landkarte” und „Relief” von www.swisstopo.admin.ch. Danach ist das Verzeichnis der GeoTIFF-Datei auszuwählen, sofern dies nicht bereits erledigt wurde. 
+
 ![](pic/Breschenkonfigurator.png)
+
 Wird „mit See“ angewählt, werden die Länge und das Volumen hinter dem Damm berechnet. Wird „mit See“ angewählt, werden die Länge und das Volumen hinter dem Damm berechnet. Ansonsten können die Daten auch nachträglich eingegeben werden.
 Wird der Damm angewählt, kann er gezeichnet werden.
+
 ![](pic/linien.png)
 
