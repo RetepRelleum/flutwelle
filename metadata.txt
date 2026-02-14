@@ -10,7 +10,7 @@ version=0.1
 author=retep relleum
 email=retep.relleum@bluewin.ch
 
-about=Vereinfachtes Verfahren zur Berechnung einer Flutwelle mit primär eindimensionaler Ausbreitung. Die Überprüfung der Resultate ist durch den Benutzer vorzunehmen. Dieses Programm dient der Abschätzung der Flutwelle. Der Benutzer trägt die Verantwortung für etwaige Konsequenzen. Neben der Aktivierung des Plug-ins müssen die GeoTIF-Files der zu untersuchenden Region in ein Verzeichnis heruntergeladen werden. Zu finden sind die Files bei swissALTI3D  oder swissSURFACE3D sie sind jedoch vorzugweise in seperate Verzeichnisse zu speichern.
+about=Vereinfachtes Verfahren zur Berechnung einer Flutwelle mit primär eindimensionaler Ausbreitung. Dieses Programm dient der Abschätzung der Flutwelle.  Die Überprüfung der Resultate ist durch den Benutzer vorzunehmen. Der Benutzer trägt die Verantwortung für etwaige Konsequenzen. Neben der Aktivierung des Plug-ins müssen die GeoTIF-Files der zu untersuchenden Region in ein Verzeichnis heruntergeladen werden. Zu finden sind die Files bei swissALTI3D  oder swissSURFACE3D sie sind jedoch vorzugsweise in separate Verzeichnisse zu speichern.
 
 tracker=https://github.com/RetepRelleum/flutwelle
 repository=https://github.com/RetepRelleum/flutwelle
