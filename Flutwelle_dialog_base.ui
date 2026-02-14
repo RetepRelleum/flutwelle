@@ -44,7 +44,7 @@
     </sizepolicy>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -107,7 +107,7 @@
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>1. Damm</string>
+        <string>Damm</string>
        </property>
       </widget>
      </item>
@@ -184,7 +184,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>2. Querschnitte</string>
+      <string>Querschnitte</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_4">
@@ -333,7 +333,7 @@
     <widget class="QDoubleSpinBox" name="spBfm">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>230</x>
        <y>70</y>
        <width>80</width>
        <height>28</height>
@@ -371,7 +371,7 @@
     <widget class="QSpinBox" name="spBR">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>320</x>
        <y>70</y>
        <width>60</width>
        <height>28</height>
@@ -396,7 +396,7 @@
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>320</x>
        <y>50</y>
        <width>61</width>
        <height>20</height>
@@ -546,7 +546,7 @@
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>230</x>
        <y>50</y>
        <width>95</width>
        <height>21</height>
