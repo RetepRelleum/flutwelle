@@ -36,19 +36,19 @@ import math
 
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
 
 from qgis.gui import QgsMapTool,QgsVertexMarker,QgsRubberBand
 from qgis.utils import iface
 from qgis.core import *
 
-from .Wwk3D_Raster import Raster,Mupe
-from .Wwk3D_Tasks import CreateFluss
+from .Raster import Raster,Mupe
+from .Fluss_Zeichnen import CreateFluss
 
 import numpy as np
 
-class PointTool(QgsMapTool):   
+class DammZeichnen(QgsMapTool):   
     def __init__(self, canvas,dlg):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas 

@@ -32,7 +32,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 from qgis.PyQt.QtCore import QVariant
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
 
 from qgis.core import *

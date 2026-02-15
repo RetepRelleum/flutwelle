@@ -33,15 +33,15 @@ from qgis.PyQt.QtGui import QColor
 
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
 
 from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 from qgis.core import *
 
-from .Wwk3D_Raster import Raster,Mupe
-from .Ww3d_damm_l import DammL, FlussL
+from .Raster import Raster,Mupe
+from .Layer import DammL, FlussL
 
 import numpy as np
 

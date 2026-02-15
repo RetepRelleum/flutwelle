@@ -37,7 +37,7 @@ from qgis.PyQt.QtWidgets import QDialogButtonBox
 import math
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
 
 from qgis.gui import QgsMapTool

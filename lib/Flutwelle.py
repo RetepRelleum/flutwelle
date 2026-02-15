@@ -35,18 +35,18 @@ from qgis.PyQt.QtWidgets import QAction,QDialogButtonBox
 
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
-from .Flutwelle_dialog import FlutwelleDialog
+from ..Flutwelle_dialog import FlutwelleDialog
 import os.path
 
 from qgis.utils import iface
 
 from qgis.core import *
 
-from .Wwk3D_Damm_Zeichnen import PointTool
-from .Ww3d_damm_l import DammL, FlussL
-from .Wwk3D_quer import Querschnitt
+from .Damm_Zeichnen import DammZeichnen
+from .Layer import DammL, FlussL
+from .Querschnitt_Zeichnen import Querschnitt
 
 
 class Flutwelle:
@@ -196,7 +196,7 @@ class Flutwelle:
             self.iface.removeToolBarIcon(action)
 
     def buttonPressed(self):
-        self.tool = PointTool(iface.mapCanvas(), self.dlg)
+        self.tool = DammZeichnen(iface.mapCanvas(), self.dlg)
         iface.mapCanvas().setMapTool(self.tool)
     
     def buttonPressed2(self):

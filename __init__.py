@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .Flutwelle import Flutwelle
+    from .lib.Flutwelle import Flutwelle
     return Flutwelle(iface)
