@@ -1,6 +1,7 @@
 # IDE
 
 .github/
+.vscode/
 
 myscript.sh
 
