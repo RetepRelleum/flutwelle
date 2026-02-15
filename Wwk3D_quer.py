@@ -113,7 +113,9 @@ class Querschnitt(QgsTask):
     def run(self):
         ls=self.fluss.getFluss()
         t=0
+        self.dlg.progressBar.setRange(0,ls.vertexCount()-1)
         for i in range(ls.vertexCount()-1):
+            self.dlg.progressBar.setValue(i+1)
             lsl=QgsLineString()
             lsr=QgsLineString()
             lsp=QgsLineString()

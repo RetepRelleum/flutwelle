@@ -177,14 +177,14 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>290</x>
        <y>130</y>
-       <width>151</width>
-       <height>27</height>
+       <width>91</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>Querschnitte</string>
+      <string>Querschnitt</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_4">
@@ -546,7 +546,7 @@
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>230</x>
+       <x>220</x>
        <y>50</y>
        <width>95</width>
        <height>21</height>
@@ -601,6 +601,19 @@
       <string>Abfluss [m³/s]</string>
      </property>
     </widget>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>130</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
     <zorder>groupBox</zorder>
     <zorder>pushButton_2</zorder>
     <zorder>label_4</zorder>
@@ -621,6 +634,7 @@
     <zorder>sBv</zorder>
     <zorder>sBQb</zorder>
     <zorder>label_12</zorder>
+    <zorder>progressBar</zorder>
    </widget>
   </widget>
  </widget>

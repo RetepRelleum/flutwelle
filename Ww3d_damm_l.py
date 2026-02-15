@@ -56,8 +56,9 @@ class Layer:
     def getProjektGroup(self,projektGroup:QVariant.String):
         root = QgsProject.instance().layerTreeRoot()
         myOriginalGroup = root.findGroup(projektGroup ) 
+       
         if not myOriginalGroup:
-            myOriginalGroup=root.insertGroup(0,projektGroup )
+            myOriginalGroup=root.insertGroup(0,projektGroup )        
         return myOriginalGroup
 
 class DammL(Layer):
