@@ -61,9 +61,9 @@ class C_run(QgsTask):
 
     def finished(self, result):
         if result:
-            self.dlg.pushButton_2.setEnabled(True)
             damml=DammL('')
             damml.updateDlg(self.dlg)
+            self.dlg.pushButton_2.setEnabled(False)
             self.dlg.tabWidget.setCurrentIndex(1)   
             flussL=FlussL('')
             p1=flussL.getPoint(0)
@@ -73,6 +73,9 @@ class C_run(QgsTask):
             qb,fx=damml.s_b(p1,h,l,v)
             self.dlg.sBQb.setValue(qb)
             self.dlg.spBfs.setValue(fx)
+            if l>0 and v>0 and qb>0:
+                self.dlg.pushButton_2.setEnabled(True)
+          
         else:
             print("Finished Function False ")
 

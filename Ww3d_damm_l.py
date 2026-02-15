@@ -88,6 +88,8 @@ class DammL(Layer):
         else:
             self.damm=self.damm[0]
 
+
+
     def insertData(self,ppa:QgsGeometry,
                    type:QVariant.String,
                    flaecheS:QVariant.Double=0,
@@ -139,7 +141,7 @@ class DammL(Layer):
 
     def __u(self, l, v, qb, f):
         u=1
-        if v>0 and l>0 :
+        if v>0 and l>0 and f>0:
             u=1+math.log(v/(f*l))
             if u<0.6:
                 u=0.6

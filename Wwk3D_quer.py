@@ -49,45 +49,52 @@ from .Wwk3D_Tasks import C_run
 import numpy as np
 from .Ww3d_damm_l import DammL, FlussL,IntL
 
-class Querschnitt(): 
+class Querschnitt(QgsTask): 
     def __init__(self,dlg):
+        description='Flutwellenberechnung 2'
+        super().__init__(description, QgsTask.CanCancel)
         self.dlg=dlg
         self.raster=Raster(self.dlg.mQgsFileWidget.filePath())
+        self.raster.setVisibility(False)
         self.proName=dlg.lineEditProjetName.text()
         self.fluss=FlussL(self.proName)
         self.mupe=Mupe(self.raster)
         self.damm=DammL(self.proName)
         self.intL=IntL(self.proName)
+        self.vo=self.dlg.sBv.value()
+        self.qb_=self.dlg.sBQb.value()
+        self.k=self.dlg.spBR.value()
+
+    def finished(self, result):
+        if result:
+            pass
+        else:
+            print("Finished Function False ")
+
+    def run(self):
         ls=self.fluss.getFluss()
-        qb_=self.dlg.sBQb.value()
         t=0
-        
-        
         for i in range(ls.vertexCount()-1):
             lsl=QgsLineString()
             lsr=QgsLineString()
             lsp=QgsLineString()
             lsx=QgsLineString()
-          
             point0l=ls.pointN(i+1)
             point0l.setX(point0l.x()+0.001)
             point0r=point0l.clone()
             point0r.setX(point0l.x()-0.001)
             hmin=point0l.z()
             lsl.addVertex(point0l)
-        #    lsr.addVertex(point0r)
             lsx.addVertex(point0l)
             dirV=self.mupe.qgsVecDirNorm(point0l,ls.pointN(i))
             deltaHoehe=0.01
             niveauHoehe=hmin+deltaHoehe
             qm2=0
             weiter=True
-            vo=self.dlg.sBv.value()
             h1=ls.startPoint().z()
             h2=point0l.z()
-            k=self.dlg.spBR.value()
-            qm_qb,xvo,ki= self.qmax_div_qb(10*i+10,vo,(h1-h2)/(10*i+10),k)
-            qmm=qb_*qm_qb
+            qm_qb,xvo,ki= self.qmax_div_qb(10*i+10,self.vo,(h1-h2)/(10*i+10),self.k)
+            qmm=self.qb_*qm_qb
             typq=''
             
             while weiter:
@@ -112,7 +119,6 @@ class Querschnitt():
                     insr=True  
                 qm2=0
                 lt=0
-                
                 for h_ in lsr:
                     qm2+=abs(niveauHoehe-h_.z())
                     if h_.z()<(hmin+(niveauHoehe-hmin)*0.9):
@@ -121,18 +127,17 @@ class Querschnitt():
                     qm2+=abs(niveauHoehe-h_.z())
                     if h_.z()<(hmin+(niveauHoehe-hmin)*0.9):
                         lt+=1
-
                 if not insl and not insr:
                     niveauHoehe+=deltaHoehe
- #               if dlg.spBfs.value()<qm2:
- #                   break 
                 l=lsl.endPoint().distance(lsr.endPoint())
                 if lt>l:
                     lt=1
-                ymaxR,fmaxR ,umR= self.r_ymax(ls, i, k, qmm, l)
-                ymaxD,fmaxD ,umD= self.d_ymax(ls, i, k, qmm, (l/2)/(niveauHoehe-hmin))
-                ymaxT,fmaxT ,umT= self.t_ymax(ls, i, k, qmm, ((l-lt)/2)/(niveauHoehe-hmin),lt)
-                ymaxP,fmaxP ,umP= self.p_ymax(ls, i, k, qmm, l)
+                if qmm<=0:
+                    break
+                ymaxR,fmaxR ,umR= self.r_ymax(ls, i, self.k, qmm, l)
+                ymaxD,fmaxD ,umD= self.d_ymax(ls, i, self.k, qmm, (l/2)/(niveauHoehe-hmin))
+                ymaxT,fmaxT ,umT= self.t_ymax(ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin),lt)
+                ymaxP,fmaxP ,umP= self.p_ymax(ls, i, self.k, qmm, l)
                 dq=8
                 dy=0.5
                 if fmaxR<=qm2<=(fmaxR+dq) and ymaxR<=(niveauHoehe-hmin)<=(ymaxR+dy):
@@ -148,7 +153,6 @@ class Querschnitt():
                     typq='Parabel'
                     break
                 if qm2>1.5*fmaxR:
-                    print(ymaxR,niveauHoehe-hmin,qm2,l*ymaxR,ymaxD,(niveauHoehe-hmin),qm2,fmaxD)
                     typq='????????'
                     break
          
@@ -173,6 +177,8 @@ class Querschnitt():
                 elif typq=='Parabel':
                     self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,0,0,ymaxP,f'{typq} {i*10} m',qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,t)
                 elif querStr=='Ueberlauf':
+                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,t)
+                else:
                     self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,t)
                 for p in lsx:
                     intens=abs((niveauHoehe-p.z())*v)

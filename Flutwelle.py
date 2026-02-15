@@ -200,12 +200,24 @@ class Flutwelle:
         iface.mapCanvas().setMapTool(self.tool)
     
     def buttonPressed2(self):
-        self.tool2 = Querschnitt( self.dlg)
+        self.tool2 = Querschnitt(self.dlg)
+        self.tool2.run()
+        #self.__task2=QgsApplication.taskManager().addTask(self.tool2)
         
     def fileChanged(self):
         self.dlg.pushButton.setEnabled(True)
         print(self.dlg.mQgsFileWidget.filePath())
 
+
+    def check_button2(self):
+        v1=self.dlg.spBl.value()
+        v2=self.dlg.sBv.value()
+        v3=self.dlg.sBQb.value()
+        if v1>0 and v2>0 and v3>0:
+            self.dlg.pushButton_2.setEnabled(True)
+        else:
+            self.dlg.pushButton_2.setEnabled(False)
+    
     def check_button(self):
         h=self.dlg.spBh.value()
         b=self.dlg.spBb.value()
@@ -254,8 +266,11 @@ class Flutwelle:
         self.dlg.spBh.valueChanged.connect(self.check_button) 
         self.dlg.spBb.valueChanged.connect(self.check_button) 
         self.dlg.spBbu.valueChanged.connect(self.check_button) 
+        self.dlg.spBl.valueChanged.connect(self.check_button2) 
+        self.dlg.sBv.valueChanged.connect(self.check_button2) 
         self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
         self.dlg.pushButton.setEnabled(False)
+        self.dlg.pushButton_2.setEnabled(False)
         self.dlg.mQgsFileWidget.setFilePath(fp)
         self.dlg.mQgsFileWidget.fileChanged.connect(self.safeTiffPath) 
         self.dlg.tabWidget.setCurrentIndex(0)
