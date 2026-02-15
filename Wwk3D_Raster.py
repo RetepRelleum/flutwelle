@@ -51,6 +51,17 @@ import glob
 import numpy as np
 
 class Raster():
+    """
+    A class for managing raster layers in QGIS projects.
+    This class handles loading, visibility control, and value sampling from raster layers
+    organized within a "Raster" group in the QGIS layer tree. It supports dynamic loading
+    of raster files based on geographic coordinates and provides functionality for visualizing
+    specific elevation ranges.
+    Attributes:
+        rg (QgsLayerTreeGroup): The "Raster" group in the QGIS layer tree.
+        tiffPath (str): The base path where raster TIFF files are stored.
+        r_layer (QgsRasterLayer): The currently loaded raster layer.
+    """
     def __init__(self,path):
         root = QgsProject.instance().layerTreeRoot()
         self.rg = root.findGroup("Raster") 
@@ -64,6 +75,26 @@ class Raster():
         self.rg.setItemVisibilityChecked(vis)
 
     def getValue(self,p:QgsPoint):
+        def getValue(self, p: QgsPoint) -> float:
+            """
+            Retrieve the raster value at a specified point location.
+            
+            Args:
+                p (QgsPoint): A QgsPoint object representing the coordinate location
+                             from which to sample the raster value.
+            
+            Returns:
+                float: The raster value at the specified point. Returns 0 if the raster
+                       layer cannot be retrieved or if the sampling operation fails.
+            
+            Raises:
+                None
+            
+            Notes:
+                - Uses the data provider's sample method with a 1-pixel sample size.
+                - Returns 0 as a default value when the raster layer is invalid (returns 0)
+                  or when the sample operation is unsuccessful.
+            """
         r_layer=self.getR_Layer(p)
         if  r_layer==0:
             return 0
@@ -75,6 +106,32 @@ class Raster():
 
 
     def getR_Layer(self,p:QgsPoint):
+        def getR_Layer(self, p: QgsPoint):
+            """
+            Retrieve or load a raster layer based on the geographic coordinates of a point.
+            
+            This method attempts to find a raster layer corresponding to the 1km x 1km grid cell
+            containing the given point. It first checks if the layer is already loaded in memory,
+            then searches the QGIS project, and finally attempts to load it from the file system
+            if not found.
+            
+            Args:
+                p (QgsPoint): A point object containing x and y coordinates (typically in meters)
+                             from which the layer name is derived by integer division by 1000.
+            
+            Returns:
+                QgsRasterLayer: The raster layer corresponding to the grid cell, or 0 if the
+                               layer cannot be found or loaded from the file system.
+            
+            Raises:
+                None: Returns 0 instead of raising exceptions if layer is not found.
+            
+            Notes:
+                - Layer names are generated from coordinates: "{int(x//1000)}-{int(y//1000)}"
+                - Searches for .tif files matching the pattern "*{lname}*.tif" in self.tiffPath
+                - Loaded layers are cached in self.r_layer and added to the layer group self.rg
+                - The method uses glob for recursive file searching
+            """
         lname=f"{int(p.x()//1000)}-{int(p.y()//1000)}"
         if lname==self.r_layer.name():
             return self.r_layer
@@ -95,6 +152,27 @@ class Raster():
             return self.r_layer 
         
     def mark_line(self,point:QgsPoint):
+        def mark_line(self, point: QgsPoint):
+            """
+            Highlights a specific value range in raster layers by applying a color ramp shader.
+            
+            Retrieves the pixel value at the given point and creates a color ramp that 
+            highlights values within ±1.5 of that value in cyan, with transparent areas 
+            outside this range. The color ramp is applied to all raster layers whose names 
+            start with "2" and contain the target value within their min-max range.
+            
+            Args:
+                point (QgsPoint): The point location to sample the raster value from.
+            
+            Returns:
+                None
+            
+            Side Effects:
+                - Modifies the renderer of matching raster layers
+                - Triggers repaints and style change signals on updated layers
+                - Reloads all layers in the current QGIS project
+                - Prints exception details to console if renderer application fails
+            """
         val=self.getValue(point)
         fcn = QgsColorRampShader()
         fcn.setColorRampType(QgsColorRampShader.Interpolated)
@@ -130,6 +208,41 @@ class Raster():
         QgsProject.instance().reloadAllLayers()
 
 class Mupe:
+    """
+    A utility class for performing geometric and raster-based operations on QGIS point objects.
+
+    This class provides methods for calculating distances, vector operations, and retrieving
+    point values from a raster dataset. It serves as a helper for 3D raster manipulations.
+
+    Attributes:
+        raster (Raster): The raster dataset to query for point values.
+
+    Methods:
+        qgsDisXy(p1, p2) -> float:
+            Calculate the Euclidean distance between two points in the XY plane.
+        
+        qgsVecDirNorm(p1, p2) -> QgsPoint:
+            Compute the normalized direction vector from p2 to p1 in 3D space.
+        
+        qgsVecAdd(p1, p2) -> QgsPoint:
+            Add two points' XY coordinates and set Z from raster value.
+        
+        qgsVecAddM(p1, p2) -> QgsPoint:
+            Subtract p2's XY coordinates from p1's and set Z from raster value.
+        
+        qgsVec90add(p1, p2) -> QgsPoint:
+            Add p1 to p2 rotated 90 degrees counterclockwise and set Z from raster.
+        
+        qgsVec90addM(p1, p2) -> QgsPoint:
+            Subtract p2 rotated 90 degrees counterclockwise from p1 and set Z from raster.
+        
+        getPoint(x, y) -> QgsPoint:
+            Create a QgsPoint from various input formats with Z value from raster.
+            Supports float coordinates, QgsPointXY, or QgsPoint as input.
+        
+        getPointXY(p) -> QgsPointXY:
+            Convert a QgsPoint to a QgsPointXY (2D projection).
+    """
     def __init__(self,raster:Raster):
         self.raster=raster
     def qgsDisXy(self,p1:QgsPoint,p2:QgsPoint)->float:

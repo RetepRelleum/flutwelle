@@ -44,12 +44,51 @@ from qgis.utils import iface
 from qgis.core import *
 
 from .Wwk3D_Raster import Raster,Mupe
-from .Wwk3D_Tasks import C_run
+from .Wwk3D_Tasks import CreateFluss
 
 import numpy as np
 from .Ww3d_damm_l import DammL, FlussL,IntL
 
 class Querschnitt(QgsTask): 
+    """
+    Querschnitt is a QGIS task class for calculating and analyzing cross-sections (Qerschnitt) in a hydrological context, specifically for flood wave computations.
+    Args:
+        dlg: The dialog object containing user interface elements and input values.
+    Attributes:
+        dlg: Reference to the dialog UI.
+        raster: Raster object initialized from the selected file path.
+        proName: Project name from the dialog input.
+        fluss: FlussL object for river geometry.
+        mupe: Mupe object for vector and elevation calculations.
+        damm: DammL object for storing cross-section data.
+        intL: IntL object for storing intensity data.
+        vo: Value from dialog spin box (velocity or similar).
+        qb_: Value from dialog spin box (discharge or similar).
+        k: Value from dialog spin box (coefficient or similar).
+    Methods:
+        finished(result):
+            Called when the task is finished. Prints a message if the result is False.
+        run():
+            Main computation loop. Iterates over river vertices, calculates cross-sections, determines geometry type (rectangle, triangle, trapezoid, parabola), computes hydraulic parameters, and stores results in the dam and intensity layers.
+        r_ymax(ls, i, k, qmm, l):
+            Calculates maximum height and area for a rectangular cross-section.
+        interpolation(i, dmax, dm, um):
+            Performs linear interpolation between tabulated values.
+        d_ymax(ls, i, k, qmm, m):
+            Calculates maximum height and area for a triangular cross-section.
+        t_ymax(ls, i, k, qmm, m, l):
+            Calculates maximum height and area for a trapezoidal cross-section.
+        p_ymax(ls, i, k, qmm, p):
+            Calculates maximum height and area for a parabolic cross-section.
+        setMarker(pk, col):
+            Sets a marker on the QGIS map canvas at the given point with a specified color.
+        qmax_div_qb(x, vo, j, k):
+            Computes the ratio of maximum discharge to base discharge using tabulated factors.
+    Notes:
+        - This class is designed for use within a QGIS plugin environment.
+        - It relies on several custom classes (Raster, FlussL, Mupe, DammL, IntL) and QGIS API objects.
+        - The main logic involves iteratively constructing cross-sections, classifying their geometry, and storing hydraulic properties for further analysis or visualization.
+    """
     def __init__(self,dlg):
         description='Flutwellenberechnung 2'
         super().__init__(description, QgsTask.CanCancel)

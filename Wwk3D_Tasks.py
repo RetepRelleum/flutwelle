@@ -45,7 +45,30 @@ from .Ww3d_damm_l import DammL, FlussL
 
 import numpy as np
 
-class C_run(QgsTask):
+class CreateFluss(QgsTask):
+    """
+    CreateFluss Task for QGIS Flood Wave Calculation
+    A QgsTask subclass that computes flood wave propagation from a dam breach,
+    including water spread simulation and profile data generation.
+    Attributes:
+        p1 (QgsPoint): Starting point of the dam line
+        p2 (QgsPoint): Ending point of the dam line
+        raster (Raster): Digital elevation model raster data
+        mupe (Mupe): Utility class for geometric calculations
+        dlg: QGIS dialog reference for UI updates
+        proName (str): Project name
+        isSee (bool): Flag to include lake/water body simulation
+        fllae (float): Flow area parameter in kilometers
+    Methods:
+        __init__(p1, p2, raster, dlg): Initialize task with dam parameters and UI dialog
+        run() -> bool: Execute the main flood wave calculation workflow
+        finished(result): Post-processing callback after task completion; updates UI with results
+        addDammLayer(p1, p2) -> tuple: Analyze dam geometry and create dam layer with profile data
+        addFluss(minPoint) -> QgsPoint: Generate flood flow path from lowest point using elevation following
+        m_see(dirPD, h, pl, pr, p10, minPoint): Simulate water spread in lake/depression area
+        add_see(dirPD, h, pl, pr, p10, seeFlaeche) -> tuple: Iteratively expand water polygon within depression
+        setMarker(pk, col): Place colored vertex marker on canvas for visualization (col: 1=green, 2=blue, 3=red, 4=cyan)
+    """
     def __init__(self, p1:QgsPoint,p2:QgsPoint,raster:Raster,dlg,):
         description='Flutwellenberechnung'
         super().__init__(description, QgsTask.CanCancel)

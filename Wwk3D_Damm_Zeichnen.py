@@ -44,7 +44,7 @@ from qgis.utils import iface
 from qgis.core import *
 
 from .Wwk3D_Raster import Raster,Mupe
-from .Wwk3D_Tasks import C_run
+from .Wwk3D_Tasks import CreateFluss
 
 import numpy as np
 
@@ -94,7 +94,7 @@ class PointTool(QgsMapTool):
                     self.p2=self.mupe.getPoint(self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                     self.polyline.reset(Qgis.GeometryType.Line)
                     QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
-                    self.c_run=C_run(self.p1,self.p2,self.raster,self.dlg)
+                    self.c_run=CreateFluss(self.p1,self.p2,self.raster,self.dlg)
                     self.dlg.tab.setEnabled(False)
                     self.dlg.tab_2.setEnabled(True)
                     self.__task=QgsApplication.taskManager().addTask(self.c_run)
