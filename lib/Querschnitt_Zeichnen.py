@@ -113,8 +113,8 @@ class Querschnitt(QgsTask):
     def run(self):
         ls=self.fluss.getFluss()
         t=0
-        self.dlg.progressBar.setRange(0,ls.vertexCount()-1)
-        for i in range(ls.vertexCount()-1):
+        self.dlg.progressBar.setRange(0,ls.vertexCount()-2)
+        for i in range(ls.vertexCount()-2):
             self.dlg.progressBar.setValue(i+1)
             lsl=QgsLineString()
             lsr=QgsLineString()
@@ -179,8 +179,8 @@ class Querschnitt(QgsTask):
                 ymaxD,fmaxD ,umD= self.d_ymax(ls, i, self.k, qmm, (l/2)/(niveauHoehe-hmin))
                 ymaxT,fmaxT ,umT= self.t_ymax(ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin),lt)
                 ymaxP,fmaxP ,umP= self.p_ymax(ls, i, self.k, qmm, l)
-                dq=8
-                dy=0.5
+                dq=qm2/100*15
+                dy=(niveauHoehe-hmin)/100*15
                 if fmaxR<=qm2<=(fmaxR+dq) and ymaxR<=(niveauHoehe-hmin)<=(ymaxR+dy):
                     typq='Rechteck'
                     break
@@ -196,7 +196,6 @@ class Querschnitt(QgsTask):
                 if qm2>1.5*fmaxR:
                     typq='????????'
                     break
-         
             for p in lsr.reversed():
                 lsp.addVertex(p)
             for p in lsl:
@@ -205,6 +204,8 @@ class Querschnitt(QgsTask):
             if lsp.startPoint().z()<(niveauHoehe-3*deltaHoehe) or lsp.endPoint().z()<(niveauHoehe-3*deltaHoehe):
                 ueberlauf=True
                 querStr='Ueberlauf'
+            if typq=='????????':
+                querStr='?'+querStr
             v=qmm/fmaxR
             t+=10/v
             polygonL = QgsPolygon(lsp)
@@ -217,10 +218,8 @@ class Querschnitt(QgsTask):
                     self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,0,0,ymaxT,f'{typq} {i*10} m',qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,t)
                 elif typq=='Parabel':
                     self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,0,0,ymaxP,f'{typq} {i*10} m',qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,t)
-                elif querStr=='Ueberlauf':
-                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,t)
                 else:
-                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,t)
                 for p in lsx:
                     intens=abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
@@ -230,7 +229,7 @@ class Querschnitt(QgsTask):
 
     def r_ymax(self, ls, i, k, qmm, l):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+1).z())/10
+        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
         if dh<=0.001:
             dh=0.001
         dmax=qmm/(k*dh**(1/2)*l**(8/3))
@@ -266,7 +265,7 @@ class Querschnitt(QgsTask):
 
     def d_ymax(self, ls, i, k, qmm, m):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+1).z())/10
+        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
         if dh<=0.001:
             dh=0.001
         dmax=qmm*(1+m**2)**(1/3)/(k*dh**(1/2)*m**(5/3))
@@ -294,7 +293,7 @@ class Querschnitt(QgsTask):
     
     def t_ymax(self, ls, i, k, qmm, m,l):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+1).z())/10
+        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
         if dh<=0.001:
             dh=0.001
         dmax=qmm*m**(5/3)/(k*dh**(1/2)*l**(8/3))
@@ -322,7 +321,7 @@ class Querschnitt(QgsTask):
     
     def p_ymax(self, ls, i, k, qmm, p):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+1).z())/10
+        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
         if dh<=0.001:
             dh=0.001
         dmax=qmm/(k*dh**(1/2)*p**(16/3))
