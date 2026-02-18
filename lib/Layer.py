@@ -99,42 +99,7 @@ class DammL(Layer):
             poly(): Creates a small square polygon from a point
     """
     def __init__(self,projektGroup:QVariant.String):
-        """
-        Initialize a dam layer for the QGIS project.
-
-        This method creates or retrieves a "Damm" (dam) vector layer with 3D MultiPolygon 
-        geometry in EPSG:2056 coordinate reference system. If the layer doesn't exist, it 
-        creates a new memory-based layer with comprehensive attributes for dam analysis 
-        including physical properties (length, width, height), hydraulic properties (flow rate, 
-        velocity, overflow), and surface/volume calculations.
-
-        Args:
-            projektGroup (QVariant.String): The project group name where the dam layer 
-                                            should be added or retrieved from.
-
-        Attributes Created (if layer doesn't exist):
-            - type (String): Type classification of the dam
-            - flaecheS (Double): Surface area S
-            - flaecheM (Double): Surface area M
-            - volumen (Double): Volume
-            - breite (Double): Width
-            - laenge (Double): Length
-            - breiteU (Double): Upper width
-            - hoehe (Double): Height
-            - type_b (String): Secondary type classification
-            - q (Double): Flow rate
-            - u (Double): Velocity/Flow velocity
-            - xvo (Double): X-axis value
-            - jkk (Double): Additional parameter
-            - um (Double): Circumference/Perimeter
-            - ueberlauf (Bool): Overflow flag
-            - v (Double): Additional velocity parameter
-            - quote (Double): Quote/Level
-            - t (String): Time/Temperature parameter
-
-        The layer is styled with a categorical renderer using 6 distinct colors for dam 
-        types: 'Damm', 'Profil Damm', 'See', 'Bresche', 'Querschnitt', 'Ueberlauf'.
-        """
+        
         self.damm = QgsProject.instance().mapLayersByName("Damm")
         if not self.damm :
             self.damm = QgsVectorLayer("MultiPolygonZ?crs=epsg:2056", "Damm", "memory")
@@ -155,7 +120,8 @@ class DammL(Layer):
             pr.addAttributes( [QgsField("um", QVariant.Double)])    
             pr.addAttributes( [QgsField("ueberlauf", QVariant.Bool)]) 
             pr.addAttributes( [QgsField("v", QVariant.Double)])    
-            pr.addAttributes( [QgsField("quote", QVariant.Double)])    
+            pr.addAttributes( [QgsField("quote", QVariant.Double)])  
+            pr.addAttributes( [QgsField("energielinienhoehe", QVariant.Double)])    
             pr.addAttributes( [QgsField("t", QVariant.String)])   
 
             self.damm.updateFields()
@@ -193,6 +159,7 @@ class DammL(Layer):
                    ueberlauf:QVariant.Bool=False,
                    v:QVariant.Double=0,
                    quote:QVariant.Double=0,
+                   energielinienhoehe:QVariant.Double=0,
                    t:QVariant.Double=0
                    ):
         
@@ -206,7 +173,7 @@ class DammL(Layer):
         hours = t // 3600
         minutes = (t % 3600) // 60
         seconds = round(t % 60,2)
-        feature.setAttributes([type,flaecheS,flaecheM,volumen,breite,laenge,breiteU,hoehe,type_b,q,u,xvo,ki,um,ueberlauf,v,quote,f"{hours} Std. {minutes} Min. {seconds} Sek."])
+        feature.setAttributes([type,flaecheS,flaecheM,volumen,breite,laenge,breiteU,hoehe,type_b,q,u,xvo,ki,um,ueberlauf,v,quote,energielinienhoehe,f"{hours} Std. {minutes} Min. {seconds} Sek."])
         self.damm.startEditing()
         assert(self.damm.addFeatures([feature]))
         self.damm.commitChanges()

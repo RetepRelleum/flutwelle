@@ -142,7 +142,7 @@ class Querschnitt(QgsTask):
                 ueberlauf=False
                 insl=False
                 insr=False     
-                if point0l.z()<=niveauHoehe:
+                if point0l.z()<=niveauHoehe and point0l.z()!=0.0 :
                     point0l=self.mupe.qgsVecAdd(point0l,dirV)
                     px=point0l.clone()
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
@@ -150,7 +150,7 @@ class Querschnitt(QgsTask):
                     lsl.addVertex(px)
                     lsx.addVertex(point0l)
                     insl=True
-                if point0r.z()<=niveauHoehe:    
+                if point0r.z()<=niveauHoehe and point0r.z()!=0.0:    
                     point0r=self.mupe.qgsVecAddM(point0r,dirV)
                     px=point0r.clone()
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
@@ -209,17 +209,18 @@ class Querschnitt(QgsTask):
             v=qmm/fmaxR
             t+=10/v
             polygonL = QgsPolygon(lsp)
+            el=niveauHoehe+(v**2)/(2*9.81)
             if i>0:
                 if  typq=='Rechteck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Dreieck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Trapez':
-                    self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,0,0,ymaxT,f'{typq} {i*10} m',qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,0,0,ymaxT,f'{typq} {i*10} m',qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Parabel':
-                    self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,0,0,ymaxP,f'{typq} {i*10} m',qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,0,0,ymaxP,f'{typq} {i*10} m',qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,el,t)
                 else:
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
                 for p in lsx:
                     intens=abs((niveauHoehe-p.z())*v)
                     if ueberlauf:

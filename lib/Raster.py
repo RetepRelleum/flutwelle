@@ -75,26 +75,6 @@ class Raster():
         self.rg.setItemVisibilityChecked(vis)
 
     def getValue(self,p:QgsPoint):
-        def getValue(self, p: QgsPoint) -> float:
-            """
-            Retrieve the raster value at a specified point location.
-            
-            Args:
-                p (QgsPoint): A QgsPoint object representing the coordinate location
-                             from which to sample the raster value.
-            
-            Returns:
-                float: The raster value at the specified point. Returns 0 if the raster
-                       layer cannot be retrieved or if the sampling operation fails.
-            
-            Raises:
-                None
-            
-            Notes:
-                - Uses the data provider's sample method with a 1-pixel sample size.
-                - Returns 0 as a default value when the raster layer is invalid (returns 0)
-                  or when the sample operation is unsuccessful.
-            """
         r_layer=self.getR_Layer(p)
         if  r_layer==0:
             return 0
