@@ -125,8 +125,8 @@ class DammL(Layer):
             pr.addAttributes( [QgsField("t", QVariant.String)])   
 
             self.damm.updateFields()
-            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#0580f3","#6c05f3","#56a6f1","#9c59f3"]
-            unique_values = ['Damm', 'Profil Damm','See','Bresche','Qerschnitt','Ueberlauf','?Qerschnitt','?Ueberlauf']
+            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#0580f3","#6c05f3"]
+            unique_values = ['Damm', 'Profil Damm','See','Bresche','Qerschnitt','Ueberlauf']
             n=len(unique_values)
             square = [QgsFillSymbol.createSimple({'color': colors[i],
                                                    "outline_width": "1",
@@ -165,7 +165,7 @@ class DammL(Layer):
         
 
         for __f in self.damm.getFeatures():
-            if __f['type']==type and type!='Qerschnitt' and type!='Ueberlauf'and type!='?Qerschnitt' and type!='?Ueberlauf':
+            if __f['type']==type and type!='Qerschnitt' and type!='Ueberlauf':
                 self.damm.dataProvider().deleteFeatures([__f.id()])
      
         feature = QgsFeature()
@@ -183,12 +183,10 @@ class DammL(Layer):
         for f in features:
             if f['type']=='Damm':
                 dlg.spBb.setValue(float(f['breite']))
-                dlg.spBfm.setValue(float(f['flaecheM']))   
                 dlg.spBh.setValue(float(f['hoehe']))   
                 dlg.spBbu.setValue(float(f['breiteU']))   
             if f['type']=='See':
                 dlg.spBl.setValue(float(f['laenge']))
-                dlg.spBfs.setValue(float(f['flaecheS'])) 
                 dlg.sBv.setValue(float(f['volumen'])) 
 
     def __u(self, l, v, qb, f):

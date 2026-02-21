@@ -181,20 +181,20 @@ class Querschnitt(QgsTask):
                 ymaxP,fmaxP ,umP= self.p_ymax(ls, i, self.k, qmm, l)
                 dq=qm2/100*15
                 dy=(niveauHoehe-hmin)/100*15
-                if fmaxR<=qm2<=(fmaxR+dq) and ymaxR<=(niveauHoehe-hmin)<=(ymaxR+dy):
+                if (fmaxR-dq*0.1)<=qm2<=(fmaxR+dq) and (ymaxR-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxR+dy):
                     typq='Rechteck'
                     break
-                if fmaxD<=qm2<=(fmaxD+dq) and ymaxD<=(niveauHoehe-hmin)<=(ymaxD+dy):
+                if (fmaxD-dq*0.1)<=qm2<=(fmaxD+dq) and (ymaxD-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxD+dy):
                     typq='Dreieck'
                     break
-                if fmaxT<=qm2<=(fmaxT+dq) and ymaxT<=(niveauHoehe-hmin)<=(ymaxT+dy):
+                if (fmaxT-dq*0.1)<=qm2<=(fmaxT+dq) and (ymaxT-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxT+dy):
                     typq='Trapez'
                     break
-                if fmaxP<=qm2<=(fmaxP+dq) and ymaxP<=(niveauHoehe-hmin)<=(ymaxP+dy):
+                if (fmaxP-dq*0.1)<=qm2<=(fmaxP+dq) and (ymaxP-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxP+dy):
                     typq='Parabel'
                     break
-                if qm2>1.5*fmaxR:
-                    typq='????????'
+                if qm2>1.5*fmaxR or qm2>3*fmaxP :
+                    typq='Unbekannt'
                     break
             for p in lsr.reversed():
                 lsp.addVertex(p)
@@ -204,23 +204,21 @@ class Querschnitt(QgsTask):
             if lsp.startPoint().z()<(niveauHoehe-3*deltaHoehe) or lsp.endPoint().z()<(niveauHoehe-3*deltaHoehe):
                 ueberlauf=True
                 querStr='Ueberlauf'
-            if typq=='????????':
-                querStr='?'+querStr
             v=qmm/fmaxR
             t+=10/v
             polygonL = QgsPolygon(lsp)
             el=niveauHoehe+(v**2)/(2*9.81)
-            if i>0:
+            if i>0 and v>0:
                 if  typq=='Rechteck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,i*10,0,ymaxR,typq,qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Dreieck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,0,0,ymaxD,f'{typq} {i*10} m',qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,i*10,0,ymaxD,typq,qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Trapez':
-                    self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,0,0,ymaxT,f'{typq} {i*10} m',qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,i*10,0,ymaxT,typq,qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,el,t)
                 elif typq=='Parabel':
-                    self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,0,0,ymaxP,f'{typq} {i*10} m',qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,i*10,0,ymaxP,typq,qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,el,t)
                 else:
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,0,0,ymaxR,f'{typq} {i*10} m',qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,i*10,0,ymaxR,typq,qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
                 for p in lsx:
                     intens=abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
@@ -231,8 +229,8 @@ class Querschnitt(QgsTask):
     def r_ymax(self, ls, i, k, qmm, l):
         umx=0
         dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
-        if dh<=0.001:
-            dh=0.001
+        if dh<=0.00001:
+            dh=0.00001
         dmax=qmm/(k*dh**(1/2)*l**(8/3))
         if dmax<=10**(-3):
             ymax=l*dmax**(3/5)

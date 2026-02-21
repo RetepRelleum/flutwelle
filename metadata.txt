@@ -6,7 +6,7 @@
 name=Flutwelle
 qgisMinimumVersion=3.0
 description=Schätzt eine Flutwelle gemäss CTGREF
-version=0.4
+version=0.5
 author=retep relleum
 email=retep.relleum@bluewin.ch
 
@@ -23,7 +23,7 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python,damm,talsperre,BFE,river,fluss,CTGREF,CTGREF,see,staumauer,energielinienhöhe,beffa
+tags=bresche,see,damm,talsperre,staumauer,bfe,river,fluss,CTGREF,beffa,energiewirtschaft,energielinienhöhe
 
 homepage=https://github.com/RetepRelleum/flutwelle
 category=Plugins

@@ -11,7 +11,6 @@
         copyright            : (C) 2026 by retep relleum
         email                : retep.relleum@bluewin.ch
  ***************************************************************************/
-
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,8 +19,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
 PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
@@ -31,7 +28,6 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import os
-
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 

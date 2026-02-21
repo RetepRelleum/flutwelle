@@ -212,14 +212,7 @@ class Flutwelle:
         print(self.dlg.mQgsFileWidget.filePath())
 
 
-    def check_button2(self):
-        v1=self.dlg.spBl.value()
-        v2=self.dlg.sBv.value()
-        v3=self.dlg.sBQb.value()
-        if v1>0 and v2>0 and v3>0:
-            self.dlg.pushButton_2.setEnabled(True)
-        else:
-            self.dlg.pushButton_2.setEnabled(False)
+
     
     def check_button(self):
         h=self.dlg.spBh.value()
@@ -243,7 +236,10 @@ class Flutwelle:
         if self.dlg.rBp.isChecked():
             qb,f=damml.p_b(p1,h,b,l,v)
         self.dlg.sBQb.setValue(qb)
-        self.dlg.spBfs.setValue(f)
+        if l>0 and v>0 and qb>0:
+            self.dlg.pushButton_2.setEnabled(True)
+        else:
+            self.dlg.pushButton_2.setEnabled(False)
 
     def safeTiffPath(self,path):
         s = QgsSettings()
@@ -269,8 +265,8 @@ class Flutwelle:
         self.dlg.spBh.valueChanged.connect(self.check_button) 
         self.dlg.spBb.valueChanged.connect(self.check_button) 
         self.dlg.spBbu.valueChanged.connect(self.check_button) 
-        self.dlg.spBl.valueChanged.connect(self.check_button2) 
-        self.dlg.sBv.valueChanged.connect(self.check_button2) 
+        self.dlg.spBl.valueChanged.connect(self.check_button) 
+        self.dlg.sBv.valueChanged.connect(self.check_button) 
         self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
         self.dlg.pushButton.setEnabled(False)
         self.dlg.pushButton_2.setEnabled(False)

@@ -95,7 +95,6 @@ class CreateFluss(QgsTask):
             v=self.dlg.sBv.value()
             qb,fx=damml.s_b(p1,h,l,v)
             self.dlg.sBQb.setValue(qb)
-            self.dlg.spBfs.setValue(fx)
             if l>0 and v>0 and qb>0:
                 self.dlg.pushButton_2.setEnabled(True)
           
