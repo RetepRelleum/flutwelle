@@ -47,6 +47,7 @@ from qgis.core import *
 from .Damm_Zeichnen import DammZeichnen
 from .Layer import DammL, FlussL
 from .Querschnitt_Zeichnen import Querschnitt
+from .Querschnitt3D import Querschnitt3D
 
 
 class Flutwelle:
@@ -211,8 +212,6 @@ class Flutwelle:
         self.dlg.pushButton.setEnabled(True)
         print(self.dlg.mQgsFileWidget.filePath())
 
-
-
     
     def check_button(self):
         h=self.dlg.spBh.value()
@@ -238,14 +237,17 @@ class Flutwelle:
         self.dlg.sBQb.setValue(qb)
         if l>0 and v>0 and qb>0:
             self.dlg.pushButton_2.setEnabled(True)
+            self.dlg.pushButton_3.setEnabled(True)
         else:
             self.dlg.pushButton_2.setEnabled(False)
+            self.dlg.pushButton_3.setEnabled(False)
 
     def safeTiffPath(self,path):
         s = QgsSettings()
         s.setValue("flutwelle/tiffPath", path)
 
-
+    def querschnitt3D(self):
+        q3d=Querschnitt3D(self.dlg.lineEditProjetName.text(),self.dlg.mQgsFileWidget.filePath())
 
     def run(self):
         """Run method that performs all the real work"""
@@ -262,6 +264,7 @@ class Flutwelle:
         self.dlg.rBs.clicked.connect(self.check_button) 
         self.dlg.rBt.clicked.connect(self.check_button) 
         self.dlg.rBp.clicked.connect(self.check_button) 
+        self.dlg.pushButton_3.clicked.connect(self.querschnitt3D) 
         self.dlg.spBh.valueChanged.connect(self.check_button) 
         self.dlg.spBb.valueChanged.connect(self.check_button) 
         self.dlg.spBbu.valueChanged.connect(self.check_button) 

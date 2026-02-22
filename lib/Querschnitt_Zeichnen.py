@@ -29,24 +29,19 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from qgis.PyQt.QtCore import Qt,QVariant
-from qgis.PyQt.QtGui import QColor,QGuiApplication
-from qgis.PyQt.QtWidgets import QDialogButtonBox
-import math
+from qgis.PyQt.QtGui import QColor
 
 
 # Initialize Qt resources from file resources.py
 from ..resources import *
 # Import the code for the dialog
 
-from qgis.gui import QgsMapTool,QgsVertexMarker,QgsRubberBand
+from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 from qgis.core import *
 
 from .Raster import Raster,Mupe
-from .Fluss_Zeichnen import CreateFluss
 
-import numpy as np
 from .Layer import DammL, FlussL,IntL
 
 class Querschnitt(QgsTask): 
@@ -121,12 +116,12 @@ class Querschnitt(QgsTask):
             lsp=QgsLineString()
             lsx=QgsLineString()
             point0l=ls.pointN(i+1)
-            point0l.setX(point0l.x()+0.001)
+            point0l.setX(point0l.x()-0.001)
             point0r=point0l.clone()
-            point0r.setX(point0l.x()-0.001)
+            point0r.setX(point0r.x()+0.001)
             hmin=point0l.z()
             lsl.addVertex(point0l)
-            lsx.addVertex(point0l)
+            lsx.addVertex(QgsPoint(point0l.x(),point0l.y(),point0l.z(),0))
             dirV=self.mupe.qgsVecDirNorm(point0l,ls.pointN(i))
             deltaHoehe=0.01
             niveauHoehe=hmin+deltaHoehe
@@ -137,6 +132,8 @@ class Querschnitt(QgsTask):
             qm_qb,xvo,ki= self.qmax_div_qb(10*i+10,self.vo,(h1-h2)/(10*i+10),self.k)
             qmm=self.qb_*qm_qb
             typq=''
+            pil=0
+            pir=0
             
             while weiter:
                 ueberlauf=False
@@ -148,7 +145,8 @@ class Querschnitt(QgsTask):
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
                     px.setY(px.y()-dirV.x()*(px.z()-hmin))
                     lsl.addVertex(px)
-                    lsx.addVertex(point0l)
+                    pil+=1
+                    lsx.addVertex(QgsPoint(point0l.x(),point0l.y(),point0l.z(),pil))
                     insl=True
                 if point0r.z()<=niveauHoehe and point0r.z()!=0.0:    
                     point0r=self.mupe.qgsVecAddM(point0r,dirV)
@@ -156,7 +154,8 @@ class Querschnitt(QgsTask):
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
                     px.setY(px.y()-dirV.x()*(px.z()-hmin))
                     lsr.addVertex(px)  
-                    lsx.addVertex(point0r)
+                    pir-=1
+                    lsx.addVertex(QgsPoint(point0r.x(),point0r.y(),point0r.z(),pir))
                     insr=True  
                 qm2=0
                 lt=0
@@ -196,12 +195,12 @@ class Querschnitt(QgsTask):
                 if qm2>1.5*fmaxR or qm2>3*fmaxP :
                     typq='Unbekannt'
                     break
-            for p in lsr.reversed():
+            for p in lsr:
                 lsp.addVertex(p)
-            for p in lsl:
+            for p in lsl.reversed():
                 lsp.addVertex(p)
             querStr='Qerschnitt'
-            if lsp.startPoint().z()<(niveauHoehe-3*deltaHoehe) or lsp.endPoint().z()<(niveauHoehe-3*deltaHoehe):
+            if lsr.endPoint().z()<(niveauHoehe-3*deltaHoehe) or lsl.endPoint().z()<(niveauHoehe-3*deltaHoehe):
                 ueberlauf=True
                 querStr='Ueberlauf'
             v=qmm/fmaxR
@@ -223,14 +222,20 @@ class Querschnitt(QgsTask):
                     intens=abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
                         intens=intens*-1
-                    self.intL.insertData(p,intens,v,niveauHoehe-p.z(),f'{i*10} m')
+                    h=niveauHoehe-p.z()
+                    if h<0:
+                        h=0
+                    self.intL.insertData(p,intens,v,h,i*10,p.m(),niveauHoehe,el)
         self.raster.setVisibility(False)
+
+    def getPlPr(self,p):
+        pass
 
     def r_ymax(self, ls, i, k, qmm, l):
         umx=0
         dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
-        if dh<=0.00001:
-            dh=0.00001
+        if dh<=0.001:
+            dh=0.001
         dmax=qmm/(k*dh**(1/2)*l**(8/3))
         if dmax<=10**(-3):
             ymax=l*dmax**(3/5)

@@ -44,7 +44,7 @@
     </sizepolicy>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideRight</enum>
@@ -109,6 +109,9 @@
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GeoTIF Direktory&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton">
@@ -232,10 +235,10 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>120</x>
        <y>180</y>
-       <width>130</width>
-       <height>31</height>
+       <width>171</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="text">
@@ -590,8 +593,8 @@
       <rect>
        <x>10</x>
        <y>180</y>
-       <width>130</width>
-       <height>31</height>
+       <width>101</width>
+       <height>30</height>
       </rect>
      </property>
      <property name="value">
@@ -612,7 +615,6 @@
      </property>
     </widget>
     <zorder>groupBox</zorder>
-    <zorder>pushButton_2</zorder>
     <zorder>label_4</zorder>
     <zorder>label_8</zorder>
     <zorder>label_7</zorder>
@@ -628,6 +630,25 @@
     <zorder>sBQb</zorder>
     <zorder>progressBar</zorder>
     <zorder>label_12</zorder>
+    <zorder>pushButton_2</zorder>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Exp</string>
+    </attribute>
+    <widget class="QPushButton" name="pushButton_3">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>30</y>
+       <width>81</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MatPlotLib</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

@@ -178,6 +178,9 @@ class DammL(Layer):
         assert(self.damm.addFeatures([feature]))
         self.damm.commitChanges()
     
+    def getSelected(self):
+        return self.damm.selectedFeatures()
+    
     def updateDlg(self,dlg):
         features = self.damm.getFeatures()
         for f in features:
@@ -375,12 +378,15 @@ class IntL(Layer):
     def __init__(self,projektGroup:QVariant.String):
         self.intensitaet = QgsProject.instance().mapLayersByName("Intensitaet")
         if not self.intensitaet :
-            self.intensitaet = QgsVectorLayer("PointZ?crs=epsg:2056", "Intensitaet", "memory")
+            self.intensitaet = QgsVectorLayer("PointZM?crs=epsg:2056", "Intensitaet", "memory")
             pr = self.intensitaet.dataProvider()
             pr.addAttributes( [QgsField("Intensitaet", QVariant.Double)])
             pr.addAttributes( [QgsField("v", QVariant.Double)])
             pr.addAttributes( [QgsField("h", QVariant.Double)])
-            pr.addAttributes( [QgsField("type", QVariant.String)])
+            pr.addAttributes( [QgsField("type", QVariant.Double)])
+            pr.addAttributes( [QgsField("pos", QVariant.Double)])
+            pr.addAttributes( [QgsField("quote", QVariant.Double)])  
+            pr.addAttributes( [QgsField("energielinienhoehe", QVariant.Double)])   
             self.intensitaet.updateFields()
       #      self.intensitaet.renderer().symbol().setColor(QColor("blue"))
             QgsProject.instance().addMapLayer(self.intensitaet,False)
@@ -415,16 +421,35 @@ class IntL(Layer):
 
             self.intensitaet.setRenderer(renderer)
            # layer.triggerRepaint()
-
-
         else:
             self.intensitaet=self.intensitaet[0] 
+    
+    def getPlPr(self,pos):
+        self.intensitaet.selectByExpression(f"type={pos}")
+        f=self.intensitaet.getSelectedFeatures()
+        p1=QgsPoint(0,0,0,0)
+        p2=p1.clone()
+        for fi in f:
+            geom=fi.geometry().constGet()
+            if p1.m()<geom.m():
+                p1=geom
+            if p2.m()>geom.m():
+                p2=geom
+        f=self.intensitaet.getSelectedFeatures()
+        for fi in f:
+            p1.setZ(fi['quote'])
+            p2.setZ(fi['quote'])
+            p1.setM(fi['energielinienhoehe'])
+            p2.setM(fi['energielinienhoehe'])
+            break
+        return p1,p2
 
-    def insertData(self,ls:QgsPoint,inten:QVariant.Double=0,v:QVariant.Double=0,h:QVariant.Double=0,type: QVariant.String=''):
+ 
+
+    def insertData(self,ls:QgsPoint,inten:QVariant.Double=0,v:QVariant.Double=0,h:QVariant.Double=0,type: QVariant.Double=0,pos: QVariant.Double=0,quote: QVariant.Double=0,energielinienhoehe:QVariant.Double=0):
         feature = QgsFeature()
         feature.setGeometry(ls)
-        feature.setAttributes([inten,v,h,type])
+        feature.setAttributes([inten,v,h,type,pos,quote,energielinienhoehe])
         self.intensitaet.startEditing()
         assert(self.intensitaet.addFeatures([feature]))
-        self.intensitaet.commitChanges()        
 
