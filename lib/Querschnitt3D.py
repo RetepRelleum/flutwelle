@@ -56,7 +56,7 @@ class Querschnitt3D:
 
                 # Plot the surface
                 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-                ax.plot_surface(X, Y, Z,alpha=0.5,color='green',label='Gelaende',edgecolors='gray')
+                ax.plot_surface(X, Y, Z,alpha=0.5,color='green',label='Gelaende',edgecolors='gray',linewidth=0.5)
                 p3dc = Poly3DCollection(quadrat, alpha=0.5, facecolors =['blue'], edgecolors=['blue'],label='Quote Abfluss')
                 ax.add_collection3d(p3dc)
                 p3dc2 = Poly3DCollection(quadrat2, alpha=0.5,facecolors =['red'], edgecolors=['red'],label='Energielinienhoehe')
