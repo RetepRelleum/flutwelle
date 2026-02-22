@@ -37,8 +37,8 @@ class Querschnitt3D:
                 f=damm.damm.getFeatures()    
                 la=[]
                 ra=[]
-                for x in range(10):    
-                    p1,p2=self.inten.getPlPr(laenge-50+x*10)
+                for x in range(8):    
+                    p1,p2=self.inten.getPlPr(laenge-40+x*10)
                     la.append(p1)
                     ra.append(p2)
                 v=[]
@@ -56,10 +56,10 @@ class Querschnitt3D:
 
                 # Plot the surface
                 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-                ax.plot_surface(X, Y, Z,alpha=0.5,color='green',label='Gelaende',edgecolors='gray',linewidth=0.5)
-                p3dc = Poly3DCollection(quadrat, alpha=0.5, facecolors =['blue'], edgecolors=['blue'],label='Quote Abfluss')
+                ax.plot_surface(X, Y, Z,alpha=0.3,color='green',label='Gelaende',edgecolors='gray',linewidth=0.5)
+                p3dc = Poly3DCollection(quadrat, alpha=0.6, facecolors =['blue'], edgecolors=['blue'],label='Quote Abfluss')
                 ax.add_collection3d(p3dc)
-                p3dc2 = Poly3DCollection(quadrat2, alpha=0.5,facecolors =['red'], edgecolors=['red'],label='Energielinienhoehe')
+                p3dc2 = Poly3DCollection(quadrat2, alpha=0.6,facecolors =['red'], edgecolors=['red'],label='Energielinienhoehe')
                 ax.add_collection3d(p3dc2)
                 plt.show()
                
