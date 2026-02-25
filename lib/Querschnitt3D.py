@@ -49,11 +49,11 @@ class Querschnitt3D:
         Zb=  self.CreateZ(qb, qb, qb, Xq)     
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        ax.plot_surface(X, Y, Z,alpha=0.3,color='green',label='Gelaende',edgecolors='gray',linewidth=0.5)
-        ax.plot_surface(Xq, Yq, Zq,alpha=0.3,color='blue',label='Quote Abfluss',edgecolors='gray',linewidth=0.5)
-        ax.plot_surface(Xq, Yq, Ze,alpha=0.3,color='red',label='Energielinienhoehe',edgecolors='gray',linewidth=0.5)
+        ax.plot_surface(X, Y, Z,alpha=0.3,color='green',label='Gelaende',linewidth=0.5)
+        ax.plot_surface(Xq, Yq, Zq,alpha=0.3,color='blue',label='Quote Abfluss',linewidth=0.5)
+        ax.plot_surface(Xq, Yq, Ze,alpha=0.3,color='red',label='Energielinienhoehe',linewidth=0.5)
         if qb>0:
-            ax.plot_surface(Xq, Yq, Zb,alpha=0.3,color='black',label='Bruecke',edgecolors='gray',linewidth=0.5)
+            ax.plot_surface(Xq, Yq, Zb,alpha=0.3,color='black',label='Bruecke',linewidth=0.5)
         plt.show()
 
     def CreateZ(self, p1, p3, p5, Xq):

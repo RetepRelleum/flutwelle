@@ -205,6 +205,8 @@ class Querschnitt(QgsTask):
                 querStr='Ueberlauf'
             v=qmm/fmaxR
             t+=10/v
+            lsp.startPoint().setZ(niveauHoehe)
+            lsp.endPoint().setZ(niveauHoehe)
             polygonL = QgsPolygon(lsp)
             el=niveauHoehe+(v**2)/(2*9.81)
             if i>0 and v>0:
@@ -223,8 +225,6 @@ class Querschnitt(QgsTask):
                     if ueberlauf:
                         intens=intens*-1
                     h=niveauHoehe-p.z()
-                    if h<0:
-                        h=0
                     self.intL.insertData(p,intens,v,h,i*10,p.m(),niveauHoehe,el)
         self.raster.setVisibility(False)
 
