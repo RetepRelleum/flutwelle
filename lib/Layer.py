@@ -237,8 +237,6 @@ class DammL(Layer):
         self.insertData(pol,'Bresche',0,f,0,4*h,0,2*h,h,'Standart',qb_,u)
         return qb_,f
 
-
-    
     def r_b(self,p:QgsPoint,h:float,b:float,l:float,v:float)->tuple[float,float]: 
         ls=QgsLineString()
         ls.addVertex(p)
@@ -260,7 +258,6 @@ class DammL(Layer):
         qb_,u = self.__u(l, v, qb, f)
         self.insertData(pol,'Bresche',0,f,0,b,0,b,h,'Rechteck',qb_,u)
         return qb_,f
-
 
     def d_b(self,p:QgsPoint,h:float,b:float,l:float,v:float)->tuple[float,float]: 
         ls=QgsLineString()
@@ -415,33 +412,33 @@ class IntL(Layer):
             range2 = QgsRendererRange(0.5, 1, symbol2 , 'mässig 0.5 - 1.0')
             range3 = QgsRendererRange(1, 2, symbol3 ,   'mittel 1.0 - 2.0')
             range4 = QgsRendererRange(2, 1000, symbol4 ,'hoch   2.0 - ...')
-
-
             renderer = QgsGraduatedSymbolRenderer(field, [range1, range2, range3,range4])
-
             self.intensitaet.setRenderer(renderer)
-           # layer.triggerRepaint()
         else:
             self.intensitaet=self.intensitaet[0] 
     
     def getPlPr(self,pos):
-        self.intensitaet.selectByExpression(f"type={pos}")
-        f=self.intensitaet.getSelectedFeatures()
+        expression=f'"type"={pos}'
+        request=QgsFeatureRequest().setFilterExpression(expression)
+        quote=0
+        energielinienhoehe=0
+
         p1=QgsPoint(0,0,0,0)
         p2=p1.clone()
-        for fi in f:
+        for fi in  self.intensitaet.getFeatures(request):
             geom=fi.geometry().constGet()
             if p1.m()<geom.m():
-                p1=geom
+                p1=geom.clone()
             if p2.m()>geom.m():
-                p2=geom
-        f=self.intensitaet.getSelectedFeatures()
-        for fi in f:
-            p1.setZ(fi['quote'])
-            p2.setZ(fi['quote'])
-            p1.setM(fi['energielinienhoehe'])
-            p2.setM(fi['energielinienhoehe'])
-            break
+                p2=geom.clone()
+                quote=fi['quote']
+                energielinienhoehe=fi['energielinienhoehe']
+
+        p1.setZ(quote)
+        p2.setZ(quote)
+        p1.setM(energielinienhoehe)
+        p2.setM(energielinienhoehe)
+        
         return p1,p2
 
  
@@ -452,4 +449,5 @@ class IntL(Layer):
         feature.setAttributes([inten,v,h,type,pos,quote,energielinienhoehe])
         self.intensitaet.startEditing()
         assert(self.intensitaet.addFeatures([feature]))
+        self.intensitaet.commitChanges()
 

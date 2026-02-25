@@ -228,9 +228,6 @@ class Querschnitt(QgsTask):
                     self.intL.insertData(p,intens,v,h,i*10,p.m(),niveauHoehe,el)
         self.raster.setVisibility(False)
 
-    def getPlPr(self,p):
-        pass
-
     def r_ymax(self, ls, i, k, qmm, l):
         umx=0
         dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
