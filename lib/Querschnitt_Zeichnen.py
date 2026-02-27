@@ -230,7 +230,7 @@ class Querschnitt(QgsTask):
 
     def r_ymax(self, ls, i, k, qmm, l):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
+        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh<=0.001:
             dh=0.001
         dmax=qmm/(k*dh**(1/2)*l**(8/3))
@@ -266,7 +266,7 @@ class Querschnitt(QgsTask):
 
     def d_ymax(self, ls, i, k, qmm, m):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
+        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh<=0.001:
             dh=0.001
         dmax=qmm*(1+m**2)**(1/3)/(k*dh**(1/2)*m**(5/3))
@@ -294,7 +294,7 @@ class Querschnitt(QgsTask):
     
     def t_ymax(self, ls, i, k, qmm, m,l):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
+        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh<=0.001:
             dh=0.001
         dmax=qmm*m**(5/3)/(k*dh**(1/2)*l**(8/3))
@@ -322,7 +322,7 @@ class Querschnitt(QgsTask):
     
     def p_ymax(self, ls, i, k, qmm, p):
         umx=0
-        dh=(ls.pointN(i).z()-ls.pointN(i+2).z())/20
+        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh<=0.001:
             dh=0.001
         dmax=qmm/(k*dh**(1/2)*p**(16/3))

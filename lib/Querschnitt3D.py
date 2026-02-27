@@ -28,19 +28,39 @@ class Querschnitt3D:
         llx=int((lx+2*la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
-        X, Y = np.meshgrid(X1, Y1)
+        X, Y = np.meshgrid(Y1, X1)
         Z=X.copy()
-        for x in X1:
-            for y in Y1:
+        Z1=X.copy()
+        Z2=X.copy()
+        for x in Y1:
+            for y in X1:
                 x_=px.x()-dx_*x+y*dy_
                 y_=px.y()-dy_*x-y*dx_
-                if y<20:
+                if y<20 :
                     pk=QgsPoint(x_,y_)
-                    z_=self.raster.getValue(QgsPoint(x_,y_))
+                    z_=self.raster.getValue(pk)
+                    if y<10:
+                        h1=p1.z()+abs(p3.z()-p1.z())/10*y
+                        h2=p1.m()+abs(p3.m()-p1.m())/10*y
+                    else:
+                        h1=p3.z()+abs(p5.z()-p3.z())/10*(y-10)
+                        h2=p3.m()+abs(p5.m()-p3.m())/10*(y-10)
+                    if z_<=h1 and  x>la and x<llx-la:
+                        z1=h1
+                    else:
+                        z1=np.nan
+                    if z_<=h2 and  x>la and x<llx-la:
+                        z2=h2
+                    else:
+                        z2=np.nan
                   #  self.setMarker( pk,2)
                 else:
                     z_=np.nan
+                    z1=np.nan
+                    z2=np.nan
                 Z[int(x*2)][int(y*2)]=z_
+                Z1[int(x*2)][int(y*2)]=z1
+                Z2[int(x*2)][int(y*2)]=z2
         Y1 = np.array([0, llx/2, llx])
         X1 = np.array([0, 10, 20])
         Xq, Yq= np.meshgrid(X1, Y1) 
@@ -49,11 +69,20 @@ class Querschnitt3D:
         Zb=  self.CreateZ(qb, qb, qb, Xq)     
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        ax.plot_surface(X, Y, Z,alpha=0.3,color='green',label='Gelaende',linewidth=0.5)
-        ax.plot_surface(Xq, Yq, Zq,alpha=0.3,color='blue',label='Quote Abfluss',linewidth=0.5)
-        ax.plot_surface(Xq, Yq, Ze,alpha=0.3,color='red',label='Energielinienhoehe',linewidth=0.5)
+        ax.plot_surface(Y, X, Z,alpha=0.5,color='green',label='Gelaende',linewidth=0.5)
+        ax.plot_surface(Y, X, Z1,alpha=0.5,color='blue',label='Quote Abfluss',linewidth=0.5)
+        ax.plot_surface(Y, X, Z2,alpha=0.5,color='red',label='Energielinienhoehe',linewidth=0.5)
+   
         if qb>0:
-            ax.plot_surface(Xq, Yq, Zb,alpha=0.3,color='black',label='Bruecke',linewidth=0.5)
+            ax.plot_surface(Yq,Xq, Zb,alpha=0.3,color='black',label='Bruecke',linewidth=0.5)
+            ax.text(llx/2,0,qb,  'Brücke', size=10, color='black',ha='right',va='bottom') 
+
+        ax.text(0,0,p1.z(),  'Quote Abfluss', size=10,  color='blue',va='bottom') 
+        ax.text(llx,0,p1.m(),  'Energielinienhöhe', size=10, color='red',ha='right',va='bottom') 
+
+        ax.set_xlabel('m')
+        ax.set_ylabel('m')
+        ax.set_zlabel('mü.M.')
         plt.show()
 
     def CreateZ(self, p1, p3, p5, Xq):
