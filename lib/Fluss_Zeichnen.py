@@ -40,10 +40,11 @@ from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 from qgis.core import *
 
-from .Raster import Raster,Mupe
+from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL
 
 import numpy as np
+
 
 class CreateFluss(QgsTask):
     """
@@ -69,110 +70,114 @@ class CreateFluss(QgsTask):
         add_see(dirPD, h, pl, pr, p10, seeFlaeche) -> tuple: Iteratively expand water polygon within depression
         setMarker(pk, col): Place colored vertex marker on canvas for visualization (col: 1=green, 2=blue, 3=red, 4=cyan)
     """
-    def __init__(self, p1:QgsPoint,p2:QgsPoint,raster:Raster,dlg,):
-        description='Flutwellenberechnung'
+
+    def __init__(self, p1: QgsPoint, p2: QgsPoint, raster: Raster, dlg,):
+        description = 'Flutwellenberechnung'
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
-        self.p1=p1
-        self.p2=p2
-        self.raster=raster
-        self.mupe=Mupe(self.raster)
-        self.dlg=dlg
-        self.proName=dlg.lineEditProjetName.text()
-        self.isSee=dlg.mitSee.isChecked()
-        self.fllae=dlg.spinBox.value()
+        self.p1 = p1
+        self.p2 = p2
+        self.raster = raster
+        self.mupe = Mupe(self.raster)
+        self.dlg = dlg
+        self.proName = dlg.lineEditProjetName.text()
+        self.isSee = dlg.mitSee.isChecked()
+        self.fllae = dlg.spinBox.value()
 
     def finished(self, result):
         if result:
-            damml=DammL('')
+            damml = DammL('')
             damml.updateDlg(self.dlg)
             self.dlg.pushButton_2.setEnabled(False)
-            self.dlg.tabWidget.setCurrentIndex(1)   
-            flussL=FlussL('')
-            p1=flussL.getPoint(0)
-            h=self.dlg.spBh.value()
-            l=self.dlg.spBl.value()
-            v=self.dlg.sBv.value()
-            qb,fx=damml.s_b(p1,h,l,v)
+            self.dlg.tabWidget.setCurrentIndex(1)
+            flussL = FlussL('')
+            p1 = flussL.getPoint(0)
+            h = self.dlg.spBh.value()
+            l = self.dlg.spBl.value()
+            v = self.dlg.sBv.value()
+            qb, fx = damml.s_b(p1, h, l, v)
             self.dlg.sBQb.setValue(qb)
-            if l>0 and v>0 and qb>0:
+            if l > 0 and v > 0 and qb > 0:
                 self.dlg.pushButton_2.setEnabled(True)
-          
+
         else:
             print("Finished Function False ")
 
     def run(self):
         self.raster.setVisibility(True)
-        minPoint,dirPD,h,pl,pr=self.addDammLayer(self.p1,self.p2)
+        minPoint, dirPD, h, pl, pr = self.addDammLayer(self.p1, self.p2)
         self.raster.setVisibility(False)
-        p10=self.addFluss(minPoint)
+        p10 = self.addFluss(minPoint)
         if self.isSee:
-            self.m_see(dirPD, h, pl, pr, p10,minPoint)
+            self.m_see(dirPD, h, pl, pr, p10, minPoint)
         return True
 
-    def m_see(self, dirPD:QgsPoint, h:float, pl:QgsPoint, pr:QgsPoint, p10:QgsPoint,minPoint:QgsPoint):
-        elen=5
-        seeV=0
-        damm=DammL(self.proName)
-        seeFlaeche=DammL.poly(minPoint)
-        while elen>4:
-            pl,pr,elen,seev,ishOK,seeFlaeche= self.add_see(dirPD, h, pl, pr, p10,seeFlaeche)
-            seeV+=seev
-            if  elen==0 or not(ishOK):
+    def m_see(self, dirPD: QgsPoint, h: float, pl: QgsPoint, pr: QgsPoint, p10: QgsPoint, minPoint: QgsPoint):
+        elen = 5
+        seeV = 0
+        damm = DammL(self.proName)
+        seeFlaeche = DammL.poly(minPoint)
+        while elen > 4:
+            pl, pr, elen, seev, ishOK, seeFlaeche = self.add_see(
+                dirPD, h, pl, pr, p10, seeFlaeche)
+            seeV += seev
+            if elen == 0 or not (ishOK):
                 break
             if self.isCanceled():
                 break
-        damm.insertData(seeFlaeche,"See",0,0,seeV,0,pl.distance(minPoint),0,0)
-        return 
+        damm.insertData(seeFlaeche, "See", 0, 0, seeV,
+                        0, pl.distance(minPoint), 0, 0)
+        return
 
-    def add_see(self, dirPD:QgsPoint, h, pl:QgsPoint, pr:QgsPoint, p10,seeFlaeche:QgsMultiPolygon):
-        qp=QgsGeometryParameters()
+    def add_see(self, dirPD: QgsPoint, h, pl: QgsPoint, pr: QgsPoint, p10, seeFlaeche: QgsMultiPolygon):
+        qp = QgsGeometryParameters()
         qp.setGridSize(1)
-        ishOk=True
-        p1=self.mupe.qgsVecAdd(pl,dirPD)
-        p2=self.mupe.qgsVecAddM(pl,dirPD)
-        if self.mupe.qgsDisXy(p10,p1) < self.mupe.qgsDisXy(p10,p2) :
-            p3=p2
-            dp=dirPD.clone()
+        ishOk = True
+        p1 = self.mupe.qgsVecAdd(pl, dirPD)
+        p2 = self.mupe.qgsVecAddM(pl, dirPD)
+        if self.mupe.qgsDisXy(p10, p1) < self.mupe.qgsDisXy(p10, p2):
+            p3 = p2
+            dp = dirPD.clone()
         else:
-            p3=p1
-            dp= dirPD.clone()
-        p4=self.mupe.qgsVec90add(p3,dp)
-        while p4.z()<h:
-            p4=self.mupe.qgsVec90add(p4,dp)
-        pa=[]
-        area=0
-        p5=self.mupe.qgsVec90addM(p4,dp)
-        if p5.z()>h:
+            p3 = p1
+            dp = dirPD.clone()
+        p4 = self.mupe.qgsVec90add(p3, dp)
+        while p4.z() < h:
+            p4 = self.mupe.qgsVec90add(p4, dp)
+        pa = []
+        area = 0
+        p5 = self.mupe.qgsVec90addM(p4, dp)
+        if p5.z() > h:
             p5.setZ(h)
-        if p5.z()<h:
+        if p5.z() < h:
             pa.append(p5)
-            area+=h-p5.z()
-            seeFlaeche=QgsGeometry(seeFlaeche).combine(QgsGeometry(DammL.poly(p5)),qp)
+            area += h-p5.z()
+            seeFlaeche = QgsGeometry(seeFlaeche).combine(
+                QgsGeometry(DammL.poly(p5)), qp)
         #    seeFlaeche.addGeometry(DammL.poly(p5))
-        weiter=True
-        while  weiter or p5.z()<h:
+        weiter = True
+        while weiter or p5.z() < h:
             if self.isCanceled():
-                return  pl,pr, 0,0,False, seeFlaeche   
-            if self.mupe.qgsDisXy(p5,pr)<2:
-                weiter=False
-            p5=self.mupe.qgsVec90addM(p5,dp)
-            if p5.z()==0:
-                ishOk=False
+                return pl, pr, 0, 0, False, seeFlaeche
+            if self.mupe.qgsDisXy(p5, pr) < 2:
+                weiter = False
+            p5 = self.mupe.qgsVec90addM(p5, dp)
+            if p5.z() == 0:
+                ishOk = False
                 break
-            if p5.z()>h:
+            if p5.z() > h:
                 p5.setZ(h)
-            if p5.z()<h:
+            if p5.z() < h:
                 pa.append(p5)
-                area+=h-p5.z()
-                seeFlaeche=QgsGeometry(seeFlaeche).combine(QgsGeometry(DammL.poly(p5)),qp)
-        if pa==[]:
-            return pl,pr, 0,area,False,seeFlaeche       
-        return pa[0],pa[-1],len(pa),area,ishOk,seeFlaeche
+                area += h-p5.z()
+                seeFlaeche = QgsGeometry(seeFlaeche).combine(
+                    QgsGeometry(DammL.poly(p5)), qp)
+        if pa == []:
+            return pl, pr, 0, area, False, seeFlaeche
+        return pa[0], pa[-1], len(pa), area, ishOk, seeFlaeche
 
-
-    def setMarker(self, pk,col):
-        pnt=QgsPointXY(pk.x(),pk.y())
+    def setMarker(self, pk, col):
+        pnt = QgsPointXY(pk.x(), pk.y())
         canvas = iface.mapCanvas()
         m = QgsVertexMarker(canvas)
         m.setCenter(pnt)
@@ -180,104 +185,103 @@ class CreateFluss(QgsTask):
         m.setIconType(QgsVertexMarker.ICON_CIRCLE)
         m.setIconSize(12)
         m.setPenWidth(1)
-        if col==1:
+        if col == 1:
             m.setFillColor(QColor(0, 200, 0))
-        if col==2:
-            m.setFillColor(QColor(0, 0, 200))        
-        if col==3:
+        if col == 2:
+            m.setFillColor(QColor(0, 0, 200))
+        if col == 3:
             m.setFillColor(QColor(200, 0, 0))
-        if col==4:
-            m.setFillColor(QColor(0, 200, 200))        
+        if col == 4:
+            m.setFillColor(QColor(0, 200, 200))
 
-
-    def addFluss(self, minPoint:QgsPoint)->QgsPoint:
-        stp=minPoint.clone()
-        ls=QgsLineString()
+    def addFluss(self, minPoint: QgsPoint) -> QgsPoint:
+        stp = minPoint.clone()
+        ls = QgsLineString()
         ls.addVertex(minPoint)
-        id=[-1.5,-1,-0.5,0.5,1,1.5]
-        notEnd=True
-        min=5000
-        i=1
+        id = [-1.5, -1, -0.5, 0.5, 1, 1.5]
+        notEnd = True
+        min = 5000
+        i = 1
         while notEnd:
             if self.isCanceled():
                 return False
             id.append(np.min(id)-0.5*i)
             id.append(np.max(id)+0.5*i)
-            i=i*1.25
+            i = i*1.25
             for xi in id:
                 for yi in id:
-                    p=self.mupe.qgsVecAdd(minPoint,QgsPoint(xi,yi,0))
-                    if p.z()==0  or len(id)>100:
-                        notEnd=False
-                        break 
-                    if min>p.z():
-                        min=p.z()-0.002
+                    p = self.mupe.qgsVecAdd(minPoint, QgsPoint(xi, yi, 0))
+                    if p.z() == 0 or len(id) > 100:
+                        notEnd = False
+                        break
+                    if min > p.z():
+                        min = p.z()-0.002
                         p.setZ(min)
-                        pmin=p.clone()
-            if minPoint.z()>min:
+                        pmin = p.clone()
+            if minPoint.z() > min:
                 ls.addVertex(pmin)
-                if ls.startPoint().distance(ls.endPoint())>self.fllae*1000:
+                if ls.startPoint().distance(ls.endPoint()) > self.fllae*1000:
                     break
-                minPoint=pmin
-                id=[-1.5,-1,-0.5,0.5,1,1.5]
-                i=1
-        lsx=QgsLineString()
+                minPoint = pmin
+                id = [-1.5, -1, -0.5, 0.5, 1, 1.5]
+                i = 1
+        lsx = QgsLineString()
         lsx.addVertex(ls.startPoint().clone())
         for p in ls:
             while True:
-                l=self.mupe.qgsDisXy(p,lsx.endPoint())
-                if l>10:
-                    x=lsx.endPoint().x()+(p.x()-lsx.endPoint().x())/l*10
-                    y=lsx.endPoint().y()+(p.y()-lsx.endPoint().y())/l*10
-                    z=self.raster.getValue(QgsPoint(x,y,0))
-                    dl=self.mupe.qgsDisXy(stp,QgsPoint(x,y,z))
-                    dh=stp.z()-z
-                    m=dh/dl
-                    px=QgsPoint(x,y,z,m)
+                l = self.mupe.qgsDisXy(p, lsx.endPoint())
+                if l > 10:
+                    x = lsx.endPoint().x()+(p.x()-lsx.endPoint().x())/l*10
+                    y = lsx.endPoint().y()+(p.y()-lsx.endPoint().y())/l*10
+                    z = self.raster.getValue(QgsPoint(x, y, 0))
+                    dl = self.mupe.qgsDisXy(stp, QgsPoint(x, y, z))
+                    dh = stp.z()-z
+                    m = dh/dl
+                    px = QgsPoint(x, y, z, m)
                     lsx.addVertex(px)
                 else:
                     break
-        fluss=FlussL(self.proName)
-        fluss.insertData(lsx)     
+        fluss = FlussL(self.proName)
+        fluss.insertData(lsx)
         return lsx.endPoint()
 
-    def addDammLayer(self,p1:QgsPoint,p2:QgsPoint)->tuple[QgsPoint,QgsPoint,float,QgsPoint,QgsPoint]:    
-        zmin=5000
-        minPoint=NULL
-        dirP=NULL
-        zStart=p1.z()
-        valh=0
-        l=int(p1.distance(p2))
-        lsa=QgsLineString()
-        lsb=QgsLineString()
-        lsc=QgsLineString()
+    def addDammLayer(self, p1: QgsPoint, p2: QgsPoint) -> tuple[QgsPoint, QgsPoint, float, QgsPoint, QgsPoint]:
+        zmin = 5000
+        minPoint = NULL
+        dirP = NULL
+        zStart = p1.z()
+        valh = 0
+        l = int(p1.distance(p2))
+        lsa = QgsLineString()
+        lsb = QgsLineString()
+        lsc = QgsLineString()
         for i in range(l):
-            x=p1.x()-(p1.x()-p2.x())/l*i
-            y=p1.y()-(p1.y()-p2.y())/l*i 
-            p=self.mupe.getPoint(x,y)
-            if p.z()==0:
+            x = p1.x()-(p1.x()-p2.x())/l*i
+            y = p1.y()-(p1.y()-p2.y())/l*i
+            p = self.mupe.getPoint(x, y)
+            if p.z() == 0:
                 break
-            if zmin>p.z():
-                zmin=p.z()
-                minPoint=p.clone()
-            if zStart>=p.z():
+            if zmin > p.z():
+                zmin = p.z()
+                minPoint = p.clone()
+            if zStart >= p.z():
                 lsa.addVertex(p)
-                lsb.addVertex(QgsPoint(p1.x()+i,p1.y()+p.z()-p1.z(),p.z()))
-                valh+=p.z()
+                lsb.addVertex(QgsPoint(p1.x()+i, p1.y()+p.z()-p1.z(), p.z()))
+                valh += p.z()
             else:
                 break
         for p in lsa:
-            if p.z()<(p1.z()-(zStart-minPoint.z())*0.9):
+            if p.z() < (p1.z()-(zStart-minPoint.z())*0.9):
                 lsc.addVertex(p)
-        if lsa.startPoint().distance(lsa.endPoint())==0:
+        if lsa.startPoint().distance(lsa.endPoint()) == 0:
             lsa.addVertex(p2)
-        dirP=self.mupe.qgsVecDirNorm(lsa.startPoint(),lsa.endPoint())
-        breite=lsa.startPoint().distance(lsa.endPoint())
-        damm=DammL(self.proName)
+        dirP = self.mupe.qgsVecDirNorm(lsa.startPoint(), lsa.endPoint())
+        breite = lsa.startPoint().distance(lsa.endPoint())
+        damm = DammL(self.proName)
         polygonA = QgsPolygon(lsa)
         polygonB = QgsPolygon(lsb)
-        damm.insertData(polygonA,"Damm",0,polygonB.area(),0,breite,0,lsc.startPoint().distance(lsc.endPoint()),zStart-minPoint.z())
-        damm.insertData(polygonB,'Profil Damm',0,polygonB.area(),0,breite,0,lsc.startPoint().distance(lsc.endPoint()),zStart-minPoint.z())
-        return minPoint,dirP,zStart,lsa.startPoint(),lsa.endPoint()
-
-
+        damm.insertData(polygonA, "Damm", 0, polygonB.area(
+        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart-minPoint.z())
+        damm.insertData(polygonB, 'Profil Damm', 0, polygonB.area(
+        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart-minPoint.z())
+        return minPoint, dirP, zStart, lsa.startPoint(), lsa.endPoint()

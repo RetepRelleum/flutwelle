@@ -40,11 +40,12 @@ from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 from qgis.core import *
 
-from .Raster import Raster,Mupe
+from .Raster import Raster, Mupe
 
-from .Layer import DammL, FlussL,IntL
+from .Layer import DammL, FlussL, IntL
 
-class Querschnitt(QgsTask): 
+
+class Querschnitt(QgsTask):
     """
     Querschnitt is a QGIS task class for calculating and analyzing cross-sections (Qerschnitt) in a hydrological context, specifically for flood wave computations.
     Args:
@@ -84,20 +85,21 @@ class Querschnitt(QgsTask):
         - It relies on several custom classes (Raster, FlussL, Mupe, DammL, IntL) and QGIS API objects.
         - The main logic involves iteratively constructing cross-sections, classifying their geometry, and storing hydraulic properties for further analysis or visualization.
     """
-    def __init__(self,dlg):
-        description='Flutwellenberechnung 2'
+
+    def __init__(self, dlg):
+        description = 'Flutwellenberechnung 2'
         super().__init__(description, QgsTask.CanCancel)
-        self.dlg=dlg
-        self.raster=Raster(self.dlg.mQgsFileWidget.filePath())
+        self.dlg = dlg
+        self.raster = Raster(self.dlg.mQgsFileWidget.filePath())
         self.raster.setVisibility(False)
-        self.proName=dlg.lineEditProjetName.text()
-        self.fluss=FlussL(self.proName)
-        self.mupe=Mupe(self.raster)
-        self.damm=DammL(self.proName)
-        self.intL=IntL(self.proName)
-        self.vo=self.dlg.sBv.value()
-        self.qb_=self.dlg.sBQb.value()
-        self.k=self.dlg.spBR.value()
+        self.proName = dlg.lineEditProjetName.text()
+        self.fluss = FlussL(self.proName)
+        self.mupe = Mupe(self.raster)
+        self.damm = DammL(self.proName)
+        self.intL = IntL(self.proName)
+        self.vo = self.dlg.sBv.value()
+        self.qb_ = self.dlg.sBQb.value()
+        self.k = self.dlg.spBR.value()
 
     def finished(self, result):
         if result:
@@ -106,250 +108,261 @@ class Querschnitt(QgsTask):
             print("Finished Function False ")
 
     def run(self):
-        ls=self.fluss.getFluss()
-        t=0
-        self.dlg.progressBar.setRange(0,ls.vertexCount()-2)
+        ls = self.fluss.getFluss()
+        t = 0
+        self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
         for i in range(ls.vertexCount()-2):
             self.dlg.progressBar.setValue(i+1)
-            lsl=QgsLineString()
-            lsr=QgsLineString()
-            lsp=QgsLineString()
-            lsx=QgsLineString()
-            point0l=ls.pointN(i+1)
+            lsl = QgsLineString()
+            lsr = QgsLineString()
+            lsp = QgsLineString()
+            lsx = QgsLineString()
+            point0l = ls.pointN(i+1)
             point0l.setX(point0l.x()-0.001)
-            point0r=point0l.clone()
+            point0r = point0l.clone()
             point0r.setX(point0r.x()+0.001)
-            hmin=point0l.z()
+            hmin = point0l.z()
             lsl.addVertex(point0l)
-            lsx.addVertex(QgsPoint(point0l.x(),point0l.y(),point0l.z(),0))
-            dirV=self.mupe.qgsVecDirNorm(point0l,ls.pointN(i))
-            deltaHoehe=0.01
-            niveauHoehe=hmin+deltaHoehe
-            qm2=0
-            weiter=True
-            h1=ls.startPoint().z()
-            h2=point0l.z()
-            qm_qb,xvo,ki= self.qmax_div_qb(10*i+10,self.vo,(h1-h2)/(10*i+10),self.k)
-            qmm=self.qb_*qm_qb
-            typq=''
-            pil=0
-            pir=0
-            
+            lsx.addVertex(QgsPoint(point0l.x(), point0l.y(), point0l.z(), 0))
+            dirV = self.mupe.qgsVecDirNorm(point0l, ls.pointN(i))
+            deltaHoehe = 0.01
+            niveauHoehe = hmin+deltaHoehe
+            qm2 = 0
+            weiter = True
+            h1 = ls.startPoint().z()
+            h2 = point0l.z()
+            qm_qb, xvo, ki = self.qmax_div_qb(
+                10*i+10, self.vo, (h1-h2)/(10*i+10), self.k)
+            qmm = self.qb_*qm_qb
+            typq = ''
+            pil = 0
+            pir = 0
+
             while weiter:
-                ueberlauf=False
-                insl=False
-                insr=False     
-                if point0l.z()<=niveauHoehe and point0l.z()!=0.0 :
-                    point0l=self.mupe.qgsVecAdd(point0l,dirV)
-                    px=point0l.clone()
+                ueberlauf = False
+                insl = False
+                insr = False
+                if point0l.z() <= niveauHoehe and point0l.z() != 0.0:
+                    point0l = self.mupe.qgsVecAdd(point0l, dirV)
+                    px = point0l.clone()
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
                     px.setY(px.y()-dirV.x()*(px.z()-hmin))
                     lsl.addVertex(px)
-                    pil+=1
-                    lsx.addVertex(QgsPoint(point0l.x(),point0l.y(),point0l.z(),pil))
-                    insl=True
-                if point0r.z()<=niveauHoehe and point0r.z()!=0.0:    
-                    point0r=self.mupe.qgsVecAddM(point0r,dirV)
-                    px=point0r.clone()
+                    pil += 1
+                    lsx.addVertex(
+                        QgsPoint(point0l.x(), point0l.y(), point0l.z(), pil))
+                    insl = True
+                if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
+                    point0r = self.mupe.qgsVecAddM(point0r, dirV)
+                    px = point0r.clone()
                     px.setX(px.x()+dirV.y()*(px.z()-hmin))
                     px.setY(px.y()-dirV.x()*(px.z()-hmin))
-                    lsr.addVertex(px)  
-                    pir-=1
-                    lsx.addVertex(QgsPoint(point0r.x(),point0r.y(),point0r.z(),pir))
-                    insr=True  
-                qm2=0
-                lt=0
+                    lsr.addVertex(px)
+                    pir -= 1
+                    lsx.addVertex(
+                        QgsPoint(point0r.x(), point0r.y(), point0r.z(), pir))
+                    insr = True
+                qm2 = 0
+                lt = 0
                 for h_ in lsr:
-                    qm2+=abs(niveauHoehe-h_.z())
-                    if h_.z()<(hmin+(niveauHoehe-hmin)*0.9):
-                        lt+=1
+                    qm2 += abs(niveauHoehe-h_.z())
+                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.9):
+                        lt += 1
                 for h_ in lsl:
-                    qm2+=abs(niveauHoehe-h_.z())
-                    if h_.z()<(hmin+(niveauHoehe-hmin)*0.9):
-                        lt+=1
+                    qm2 += abs(niveauHoehe-h_.z())
+                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.9):
+                        lt += 1
                 if not insl and not insr:
-                    niveauHoehe+=deltaHoehe
-                l=lsl.endPoint().distance(lsr.endPoint())
-                if lt>l:
-                    lt=1
-                if qmm<=0:
+                    niveauHoehe += deltaHoehe
+                l = lsl.endPoint().distance(lsr.endPoint())
+                if lt > l:
+                    lt = 1
+                if qmm <= 0:
                     break
-                ymaxR,fmaxR ,umR= self.r_ymax(ls, i, self.k, qmm, l)
-                ymaxD,fmaxD ,umD= self.d_ymax(ls, i, self.k, qmm, (l/2)/(niveauHoehe-hmin))
-                ymaxT,fmaxT ,umT= self.t_ymax(ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin),lt)
-                ymaxP,fmaxP ,umP= self.p_ymax(ls, i, self.k, qmm, l)
-                dq=qm2/100*15
-                dy=(niveauHoehe-hmin)/100*15
-                if (fmaxR-dq*0.1)<=qm2<=(fmaxR+dq) and (ymaxR-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxR+dy):
-                    typq='Rechteck'
+                ymaxR, fmaxR, umR = self.r_ymax(ls, i, self.k, qmm, l)
+                ymaxD, fmaxD, umD = self.d_ymax(
+                    ls, i, self.k, qmm, (l/2)/(niveauHoehe-hmin))
+                ymaxT, fmaxT, umT = self.t_ymax(
+                    ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin), lt)
+                ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, l)
+                dq = qm2/100*15
+                dy = (niveauHoehe-hmin)/100*15
+                if (fmaxR-dq*0.1) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxR+dy):
+                    typq = 'Rechteck'
                     break
-                if (fmaxD-dq*0.1)<=qm2<=(fmaxD+dq) and (ymaxD-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxD+dy):
-                    typq='Dreieck'
+                if (fmaxD-dq*0.1) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxD+dy):
+                    typq = 'Dreieck'
                     break
-                if (fmaxT-dq*0.1)<=qm2<=(fmaxT+dq) and (ymaxT-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxT+dy):
-                    typq='Trapez'
+                if (fmaxT-dq*0.1) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxT+dy):
+                    typq = 'Trapez'
                     break
-                if (fmaxP-dq*0.1)<=qm2<=(fmaxP+dq) and (ymaxP-dy*0.1)<=(niveauHoehe-hmin)<=(ymaxP+dy):
-                    typq='Parabel'
+                if (fmaxP-dq*0.1) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxP+dy):
+                    typq = 'Parabel'
                     break
-                if qm2>1.5*fmaxR or qm2>3*fmaxP :
-                    typq='Unbekannt'
+                if qm2 > 1.5*fmaxR or qm2 > 3*fmaxP:
+                    typq = 'Unbekannt'
                     break
             for p in lsr:
                 lsp.addVertex(p)
             for p in lsl.reversed():
                 lsp.addVertex(p)
-            querStr='Qerschnitt'
-            if lsr.endPoint().z()<(niveauHoehe-3*deltaHoehe) or lsl.endPoint().z()<(niveauHoehe-3*deltaHoehe):
-                ueberlauf=True
-                querStr='Ueberlauf'
-            v=qmm/fmaxR
-            t+=10/v
+            querStr = 'Qerschnitt'
+            if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
+                ueberlauf = True
+                querStr = 'Ueberlauf'
+            v = qmm/fmaxR
+            t += 10/v
             lsp.startPoint().setZ(niveauHoehe)
             lsp.endPoint().setZ(niveauHoehe)
             polygonL = QgsPolygon(lsp)
-            el=niveauHoehe+(v**2)/(2*9.81)
-            if i>0 and v>0:
-                if  typq=='Rechteck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,i*10,0,ymaxR,typq,qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
-                elif typq=='Dreieck':
-                    self.damm.insertData(polygonL,querStr,0,fmaxD,0,l,i*10,0,ymaxD,typq,qmm,0,xvo,ki,umD,ueberlauf,v,niveauHoehe,el,t)
-                elif typq=='Trapez':
-                    self.damm.insertData(polygonL,querStr,0,fmaxT,0,l,i*10,0,ymaxT,typq,qmm,0,xvo,ki,umT,ueberlauf,v,niveauHoehe,el,t)
-                elif typq=='Parabel':
-                    self.damm.insertData(polygonL,querStr,0,fmaxP,0,l,i*10,0,ymaxP,typq,qmm,0,xvo,ki,umP,ueberlauf,v,niveauHoehe,el,t)
+            el = niveauHoehe+(v**2)/(2*9.81)
+            if i > 0 and v > 0:
+                if typq == 'Rechteck':
+                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, l, i*10, 0, ymaxR,
+                                         typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
+                elif typq == 'Dreieck':
+                    self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, l, i*10, 0, ymaxD,
+                                         typq, qmm, 0, xvo, ki, umD, ueberlauf, v, niveauHoehe, el, t)
+                elif typq == 'Trapez':
+                    self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, l, i*10, 0, ymaxT,
+                                         typq, qmm, 0, xvo, ki, umT, ueberlauf, v, niveauHoehe, el, t)
+                elif typq == 'Parabel':
+                    self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, l, i*10, 0, ymaxP,
+                                         typq, qmm, 0, xvo, ki, umP, ueberlauf, v, niveauHoehe, el, t)
                 else:
-                    self.damm.insertData(polygonL,querStr,0,fmaxR,0,l,i*10,0,ymaxR,typq,qmm,0,xvo,ki,umR,ueberlauf,v,niveauHoehe,el,t)
+                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, l, i*10, 0, ymaxR,
+                                         typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                 for p in lsx:
-                    intens=abs((niveauHoehe-p.z())*v)
+                    intens = abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
-                        intens=intens*-1
-                    h=niveauHoehe-p.z()
-                    self.intL.insertData(p,intens,v,h,i*10,p.m(),niveauHoehe,el)
+                        intens = intens*-1
+                    h = niveauHoehe-p.z()
+                    self.intL.insertData(
+                        p, intens, v, h, i*10, p.m(), niveauHoehe, el)
         self.raster.setVisibility(False)
 
     def r_ymax(self, ls, i, k, qmm, l):
-        umx=0
-        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
-        if dh<=0.001:
-            dh=0.001
-        dmax=qmm/(k*dh**(1/2)*l**(8/3))
-        if dmax<=10**(-3):
-            ymax=l*dmax**(3/5)
-        elif dmax>100:
-            ymax=1.59*l*dmax
+        umx = 0
+        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        if dh <= 0.001:
+            dh = 0.001
+        dmax = qmm/(k*dh**(1/2)*l**(8/3))
+        if dmax <= 10**(-3):
+            ymax = l*dmax**(3/5)
+        elif dmax > 100:
+            ymax = 1.59*l*dmax
         else:
-            dm=[0,0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,
-                0.010,0.020,0.030,0.040,0.050,0.060,0.070,0.080,0.090,
-                0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,
-                1.000,2.000,3.000,4.000,5.000,6.000,7.000,8.000,9.000,
-                10.00,20.00,30.00,40.00,50.00,60.00,70.00,80.00,90.00,100]
-            um=[0,0.018,0.025,0.033,0.040,0.045,0.050,0.055,0.060,0.065,
-                0.070,0.110,0.150,0.175,0.200,0.220,0.250,0.275,0.299,
-                0.300,0.500,0.700,0.850,1.000,1.200,1.400,1.600,1.800,
-                2.000,3.500,5.000,7.000,9.000,10.00,14.00,15.00,17.00,
-                20.00,35.00,50.00,70.00,90.00,110.0,120.00,130.0,143.00,200]
+            dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                  0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
+                  0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900,
+                  1.000, 2.000, 3.000, 4.000, 5.000, 6.000, 7.000, 8.000, 9.000,
+                  10.00, 20.00, 30.00, 40.00, 50.00, 60.00, 70.00, 80.00, 90.00, 100]
+            um = [0, 0.018, 0.025, 0.033, 0.040, 0.045, 0.050, 0.055, 0.060, 0.065,
+                  0.070, 0.110, 0.150, 0.175, 0.200, 0.220, 0.250, 0.275, 0.299,
+                  0.300, 0.500, 0.700, 0.850, 1.000, 1.200, 1.400, 1.600, 1.800,
+                  2.000, 3.500, 5.000, 7.000, 9.000, 10.00, 14.00, 15.00, 17.00,
+                  20.00, 35.00, 50.00, 70.00, 90.00, 110.0, 120.00, 130.0, 143.00, 200]
             for i in range(len(dm)):
-                if dmax<dm[i]:
+                if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax=l*umx
-        return ymax,l*ymax,umx
+            ymax = l*umx
+        return ymax, l*ymax, umx
 
     def interpolation(self, i, dmax, dm, um):
-        umx1=um[i]
-        dm1=dm[i]
-        umx2=um[i-1]
-        dm2=dm[i-1]
-        umx=umx2+(umx1-umx2)/(dm1-dm2)*(dm1-dmax)
+        umx1 = um[i]
+        dm1 = dm[i]
+        umx2 = um[i-1]
+        dm2 = dm[i-1]
+        umx = umx2+(umx1-umx2)/(dm1-dm2)*(dm1-dmax)
         return umx
 
     def d_ymax(self, ls, i, k, qmm, m):
-        umx=0
-        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
-        if dh<=0.001:
-            dh=0.001
-        dmax=qmm*(1+m**2)**(1/3)/(k*dh**(1/2)*m**(5/3))
-        if dmax<=10**(-3):
-            ymax=1.2*dmax**(3/8)
-        elif dmax>100:
-            ymax=1.2*dmax**(3/8)
+        umx = 0
+        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        if dh <= 0.001:
+            dh = 0.001
+        dmax = qmm*(1+m**2)**(1/3)/(k*dh**(1/2)*m**(5/3))
+        if dmax <= 10**(-3):
+            ymax = 1.2*dmax**(3/8)
+        elif dmax > 100:
+            ymax = 1.2*dmax**(3/8)
         else:
-            dm=[0,0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,
-                0.010,0.020,0.030,0.040,0.050,0.060,0.070,0.080,0.090,
-                0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,
-                1.000,2.000,3.000,4.000,5.000,6.000,7.000,8.000,9.000,
-                10.00,20.00,30.00,40.00,50.00,60.00,70.00,80.00,90.00,100]
-            um=[0,0.008,0.011,0.013,0.015,0.016,0.017,0.018,0.019,0.020,
-                0.021,0.028,0.031,0.035,0.039,0.041,0.045,0.048,0.049,
-                0.050,0.060,0.075,0.080,0.090,0.100,0.110,0.120,0.130,
-                0.140,0.170,0.185,0.210,0.230,0.250,0.280,0.280,0.290,
-                0.300,0.380,0.420,0.500,0.550,0.580,0.600,0.650,0.680,0.700]
+            dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                  0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
+                  0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900,
+                  1.000, 2.000, 3.000, 4.000, 5.000, 6.000, 7.000, 8.000, 9.000,
+                  10.00, 20.00, 30.00, 40.00, 50.00, 60.00, 70.00, 80.00, 90.00, 100]
+            um = [0, 0.008, 0.011, 0.013, 0.015, 0.016, 0.017, 0.018, 0.019, 0.020,
+                  0.021, 0.028, 0.031, 0.035, 0.039, 0.041, 0.045, 0.048, 0.049,
+                  0.050, 0.060, 0.075, 0.080, 0.090, 0.100, 0.110, 0.120, 0.130,
+                  0.140, 0.170, 0.185, 0.210, 0.230, 0.250, 0.280, 0.280, 0.290,
+                  0.300, 0.380, 0.420, 0.500, 0.550, 0.580, 0.600, 0.650, 0.680, 0.700]
             for i in range(len(dm)):
-                if dmax<dm[i]:
+                if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax=10*umx
-        return ymax,m*ymax**2,umx
-    
-    def t_ymax(self, ls, i, k, qmm, m,l):
-        umx=0
-        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
-        if dh<=0.001:
-            dh=0.001
-        dmax=qmm*m**(5/3)/(k*dh**(1/2)*l**(8/3))
-        if dmax<=10**(-3):
-            ymax=l/m*dmax**(3/5)
-        elif dmax>100:
-            ymax=1.3*dmax**(3/8)
-        else:
-            dm=[0,0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,
-                0.010,0.020,0.030,0.040,0.050,0.060,0.070,0.080,0.090,
-                0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,
-                1.000,2.000,3.000,4.000,5.000,6.000,7.000,8.000,9.000,
-                10.00,20.00,30.00,40.00,50.00,60.00,70.00,80.00,90.00,100]
-            um=[0,0.018,0.025,0.030,0.038,0.042,0.048,0.052,0.057,0.060,
-                0.065,0.095,0.125,0.150,0.180,0.190,0.200,0.225,0.240,
-                0.250,0.375,0.460,0.550,0.620,0.690,0.750,0.800,0.850,
-                0.900,1.250,1.600,1.700,1.900,2.100,2.300,2.400,2.500,
-                2.700,3.500,4.100,4.750,5.100,5.500,5.800,6.200,6.500,6.900]
-            for i in range(len(dm)):
-                if dmax<dm[i]:
-                    umx = self.interpolation(i, dmax, dm, um)
-                    break
-            ymax=l/m*umx
-        return ymax,l*ymax+m*ymax**2,umx
-    
-    def p_ymax(self, ls, i, k, qmm, p):
-        umx=0
-        dh=(ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
-        if dh<=0.001:
-            dh=0.001
-        dmax=qmm/(k*dh**(1/2)*p**(16/3))
-        if dmax<=10**(-3):
-            ymax=1.37*p*p*dmax**(0.46)
-        elif dmax>100:
-            ymax=1.86*p*p*dmax**(0.55)
-        else:
-            dm=[0,0.001,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,
-                0.010,0.020,0.030,0.040,0.050,0.060,0.070,0.080,0.090,
-                0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,
-                1.000,2.000,3.000,4.000,5.000,6.000,7.000,8.000,9.000,
-                10.00,20.00,30.00,40.00,50.00,60.00,70.00,80.00,90.00,100]
-            um=[0,0.060,0.085,0.100,0.125,0.140,0.150,0.175,0.180,0.190,
-                0.195,0.250,0.300,0.350,0.400,0.420,0.475,0.500,0.520,
-                0.550,0.800,1.000,1.200,1.400,1.500,1.600,1.800,1.900,
-                1.990,2.800,3.500,4.000,4.500,5.000,5.500,5.900,6.200,
-                6.500,10.00,13.00,15.00,17.50,18.00,19.00,22.00,23.00,25.00]
-            for i in range(len(dm)):
-                if dmax<dm[i]:
-                    umx = self.interpolation(i, dmax, dm, um)
-                    break
-            ymax=p*p*umx
-        return ymax,2/3*p*ymax,umx
+            ymax = 10*umx
+        return ymax, m*ymax**2, umx
 
-    def setMarker(self, pk,col):
-        pnt=QgsPointXY(pk.x(),pk.y())
+    def t_ymax(self, ls, i, k, qmm, m, l):
+        umx = 0
+        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        if dh <= 0.001:
+            dh = 0.001
+        dmax = qmm*m**(5/3)/(k*dh**(1/2)*l**(8/3))
+        if dmax <= 10**(-3):
+            ymax = l/m*dmax**(3/5)
+        elif dmax > 100:
+            ymax = 1.3*dmax**(3/8)
+        else:
+            dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                  0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
+                  0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900,
+                  1.000, 2.000, 3.000, 4.000, 5.000, 6.000, 7.000, 8.000, 9.000,
+                  10.00, 20.00, 30.00, 40.00, 50.00, 60.00, 70.00, 80.00, 90.00, 100]
+            um = [0, 0.018, 0.025, 0.030, 0.038, 0.042, 0.048, 0.052, 0.057, 0.060,
+                  0.065, 0.095, 0.125, 0.150, 0.180, 0.190, 0.200, 0.225, 0.240,
+                  0.250, 0.375, 0.460, 0.550, 0.620, 0.690, 0.750, 0.800, 0.850,
+                  0.900, 1.250, 1.600, 1.700, 1.900, 2.100, 2.300, 2.400, 2.500,
+                  2.700, 3.500, 4.100, 4.750, 5.100, 5.500, 5.800, 6.200, 6.500, 6.900]
+            for i in range(len(dm)):
+                if dmax < dm[i]:
+                    umx = self.interpolation(i, dmax, dm, um)
+                    break
+            ymax = l/m*umx
+        return ymax, l*ymax+m*ymax**2, umx
+
+    def p_ymax(self, ls, i, k, qmm, p):
+        umx = 0
+        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        if dh <= 0.001:
+            dh = 0.001
+        dmax = qmm/(k*dh**(1/2)*p**(16/3))
+        if dmax <= 10**(-3):
+            ymax = 1.37*p*p*dmax**(0.46)
+        elif dmax > 100:
+            ymax = 1.86*p*p*dmax**(0.55)
+        else:
+            dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
+                  0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
+                  0.100, 0.200, 0.300, 0.400, 0.500, 0.600, 0.700, 0.800, 0.900,
+                  1.000, 2.000, 3.000, 4.000, 5.000, 6.000, 7.000, 8.000, 9.000,
+                  10.00, 20.00, 30.00, 40.00, 50.00, 60.00, 70.00, 80.00, 90.00, 100]
+            um = [0, 0.060, 0.085, 0.100, 0.125, 0.140, 0.150, 0.175, 0.180, 0.190,
+                  0.195, 0.250, 0.300, 0.350, 0.400, 0.420, 0.475, 0.500, 0.520,
+                  0.550, 0.800, 1.000, 1.200, 1.400, 1.500, 1.600, 1.800, 1.900,
+                  1.990, 2.800, 3.500, 4.000, 4.500, 5.000, 5.500, 5.900, 6.200,
+                  6.500, 10.00, 13.00, 15.00, 17.50, 18.00, 19.00, 22.00, 23.00, 25.00]
+            for i in range(len(dm)):
+                if dmax < dm[i]:
+                    umx = self.interpolation(i, dmax, dm, um)
+                    break
+            ymax = p*p*umx
+        return ymax, 2/3*p*ymax, umx
+
+    def setMarker(self, pk, col):
+        pnt = QgsPointXY(pk.x(), pk.y())
         canvas = iface.mapCanvas()
         m = QgsVertexMarker(canvas)
         m.setCenter(pnt)
@@ -357,59 +370,59 @@ class Querschnitt(QgsTask):
         m.setIconType(QgsVertexMarker.ICON_CIRCLE)
         m.setIconSize(12)
         m.setPenWidth(1)
-        if col==1:
+        if col == 1:
             m.setFillColor(QColor(0, 200, 0))
-        if col==2:
-            m.setFillColor(QColor(0, 0, 200))        
-        if col==3:
+        if col == 2:
+            m.setFillColor(QColor(0, 0, 200))
+        if col == 3:
             m.setFillColor(QColor(200, 0, 0))
-        if col==4:
-            m.setFillColor(QColor(0, 200, 200))     
+        if col == 4:
+            m.setFillColor(QColor(0, 200, 200))
 
-    def qmax_div_qb(self,x,vo,j,k):
-        jkk=abs(j)*k**2   
-        xvo=x/vo**(1/3)
-        fxx=[[0,0.1,0.5 ,   1,    2,    5,   10,     20,   50,      80],
-        [0,  1    ,  1  ,  1 ,   1 ,  1  ,   1 ,      1,   1 ,       1],
-        [2, 0.7    ,0.8  ,0.8 ,0.85 ,0.9  ,0.95 ,0.98844,0.99 ,0.992232],
-        [4, 0.4    ,0.57 ,0.7 ,0.78 ,0.85 ,0.9  ,0.97696,0.97 ,0.984528],
-        [6, 0.29   ,0.43 ,0.6 ,0.72 ,0.8  ,0.85 ,0.96556,0.96 ,0.976888],
-        [8, 0.23   ,0.37 ,0.55,0.68 ,0.75 ,0.8  ,0.95424,0.95 ,0.969312],
-        [10,0.2    ,0.34 ,0.5 ,0.62 ,0.71 ,0.78 ,0.943  ,0.95 ,0.9618  ],
-        [20,0.13   ,0.25 ,0.38,0.48 ,0.58 ,0.68 ,0.888  ,0.9  ,0.9252  ],
-        [30,0.098  ,0.19 ,0.3 ,0.4  ,0.47 ,0.58 ,0.835  ,0.85 ,0.8902  ],
-        [40,0.079  ,0.15 ,0.24,0.33 ,0.42 ,0.52 ,0.784  ,0.8  ,0.8568  ],
-        [50,0.064  ,0.13 ,0.21,0.29 ,0.38 ,0.48 ,0.735  ,0.76 ,0.825   ],
-        [70,0.04   ,0.1  ,0.16,0.225,0.31 ,0.4  ,0.643  ,0.67 ,0.7662  ],
-        [85,0.034  ,0.085,0.13,0.19 ,0.27 ,0.35 ,0.57925,0.62 ,0.7263  ],
-        [100,0.03  ,0.073,0.11,0.17 ,0.24 ,0.32 ,0.52   ,0.58 ,0.69    ],
-        [150,0.01  ,0.038,0.062,0.1 ,0.16 ,0.235,0.355  ,0.48 ,0.595   ],
-        [180,0.001 ,0.028,0.042,0.078,0.13,0.2  ,0.28   ,0.4  ,0.5572 ]]
-        xi=0
+    def qmax_div_qb(self, x, vo, j, k):
+        jkk = abs(j)*k**2
+        xvo = x/vo**(1/3)
+        fxx = [[0, 0.1, 0.5,   1,    2,    5,   10,     20,   50,      80],
+               [0,  1,  1,  1,   1,  1,   1,      1,   1,       1],
+               [2, 0.7, 0.8, 0.8, 0.85, 0.9, 0.95, 0.98844, 0.99, 0.992232],
+               [4, 0.4, 0.57, 0.7, 0.78, 0.85, 0.9, 0.97696, 0.97, 0.984528],
+               [6, 0.29, 0.43, 0.6, 0.72, 0.8, 0.85, 0.96556, 0.96, 0.976888],
+               [8, 0.23, 0.37, 0.55, 0.68, 0.75, 0.8, 0.95424, 0.95, 0.969312],
+               [10, 0.2, 0.34, 0.5, 0.62, 0.71, 0.78, 0.943, 0.95, 0.9618],
+               [20, 0.13, 0.25, 0.38, 0.48, 0.58, 0.68, 0.888, 0.9, 0.9252],
+               [30, 0.098, 0.19, 0.3, 0.4, 0.47, 0.58, 0.835, 0.85, 0.8902],
+               [40, 0.079, 0.15, 0.24, 0.33, 0.42, 0.52, 0.784, 0.8, 0.8568],
+               [50, 0.064, 0.13, 0.21, 0.29, 0.38, 0.48, 0.735, 0.76, 0.825],
+               [70, 0.04, 0.1, 0.16, 0.225, 0.31, 0.4, 0.643, 0.67, 0.7662],
+               [85, 0.034, 0.085, 0.13, 0.19, 0.27, 0.35, 0.57925, 0.62, 0.7263],
+               [100, 0.03, 0.073, 0.11, 0.17, 0.24, 0.32, 0.52, 0.58, 0.69],
+               [150, 0.01, 0.038, 0.062, 0.1, 0.16, 0.235, 0.355, 0.48, 0.595],
+               [180, 0.001, 0.028, 0.042, 0.078, 0.13, 0.2, 0.28, 0.4, 0.5572]]
+        xi = 0
         for fxA in fxx[0]:
-            if jkk<fxA:
+            if jkk < fxA:
                 break
-            xi+=1
-        if xi==0:
-            xi=1
-        if xi==10:
-            xi=9
-        yi=0
+            xi += 1
+        if xi == 0:
+            xi = 1
+        if xi == 10:
+            xi = 9
+        yi = 0
         for fxA in fxx:
-            if xvo<fxA[0]:
+            if xvo < fxA[0]:
                 break
-            yi+=1
-        if yi==0:
-            yi=1
-        if yi==16:
-            yi=15
-        f1=fxx[yi][xi]
-        f2=fxx[yi][xi-1]
-        f3=f1+(f2-f1)/(fxx[0][xi-1]-fxx[0][xi])*(jkk-fxx[0][xi])
-        f1=fxx[yi][xi]
-        f2=fxx[yi-1][xi]
-        f4=f1+(f2-f1)/(fxx[yi-1][0]-fxx[yi][0])*(xvo-fxx[yi][0])
-        fr=(f3+f4)/2
-        if fr>1:
-            fr=1
-        return fr,jkk,xvo
+            yi += 1
+        if yi == 0:
+            yi = 1
+        if yi == 16:
+            yi = 15
+        f1 = fxx[yi][xi]
+        f2 = fxx[yi][xi-1]
+        f3 = f1+(f2-f1)/(fxx[0][xi-1]-fxx[0][xi])*(jkk-fxx[0][xi])
+        f1 = fxx[yi][xi]
+        f2 = fxx[yi-1][xi]
+        f4 = f1+(f2-f1)/(fxx[yi-1][0]-fxx[yi][0])*(xvo-fxx[yi][0])
+        fr = (f3+f4)/2
+        if fr > 1:
+            fr = 1
+        return fr, jkk, xvo

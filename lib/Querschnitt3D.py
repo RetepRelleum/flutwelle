@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from matplotlib import cm
 import numpy as np
-from .Layer import DammL,IntL
+from .Layer import DammL, IntL
 from .Raster import Raster
 from qgis.core import *
 from matplotlib import colormaps
@@ -12,96 +12,115 @@ from qgis.PyQt.QtGui import QColor
 
 
 class Querschnitt3D:
-    def __init__(self,laenge,la,qb,path):
-        laenge=round(laenge/10)*10
-        self.raster=Raster(path)
-        self.inten=IntL(path)
-        p1,p2=self.inten.getPlPr(laenge)
-        p3,p4=self.inten.getPlPr(laenge-10)
-        p5,p6=self.inten.getPlPr(laenge-20)
-        lx=p1.distance(p2)
-        dx_=(p1.x()-p2.x())/lx
-        dy_=(p1.y()-p2.y())/lx
+    def __init__(self, laenge, la, qb, path):
+        laenge = round(laenge/10)*10
+        self.raster = Raster(path)
+        self.inten = IntL(path)
+        self.damm = DammL(path)
+        p1, p2 = self.inten.getPlPr(laenge)
+        p3, p4 = self.inten.getPlPr(laenge-10)
+        p5, p6 = self.inten.getPlPr(laenge-20)
+        lx = p1.distance(p2)
+        dx_ = (p1.x()-p2.x())/lx
+        dy_ = (p1.y()-p2.y())/lx
 
-        px=QgsPoint(p1.x()+dx_*la,p1.y()+dy_*la,0)
+        px = QgsPoint(p1.x()+dx_*la, p1.y()+dy_*la, 0)
 
-        llx=int((lx+2*la))
+        llx = int((lx+2*la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
         X, Y = np.meshgrid(Y1, X1)
-        Z=X.copy()
-        Z1=X.copy()
-        Z2=X.copy()
+        Z = X.copy()
+        Z1 = X.copy()
+        Z2 = X.copy()
         for x in Y1:
             for y in X1:
-                x_=px.x()-dx_*x+y*dy_
-                y_=px.y()-dy_*x-y*dx_
-                if y<20 :
-                    pk=QgsPoint(x_,y_)
-                    z_=self.raster.getValue(pk)
-                    if y<10:
-                        h1=p1.z()+abs(p3.z()-p1.z())/10*y
-                        h2=p1.m()+abs(p3.m()-p1.m())/10*y
+                x_ = px.x()-dx_*x+y*dy_
+                y_ = px.y()-dy_*x-y*dx_
+                if y < 20:
+                    pk = QgsPoint(x_, y_)
+                    z_ = self.raster.getValue(pk)
+                    if y <= 10:
+                        h1 = p1.z()+(p3.z()-p1.z())/10*y
+                        h2 = p1.m()+(p3.m()-p1.m())/10*y
                     else:
-                        h1=p3.z()+abs(p5.z()-p3.z())/10*(y-10)
-                        h2=p3.m()+abs(p5.m()-p3.m())/10*(y-10)
-                    if z_<=h1 and  x>la and x<llx-la:
-                        z1=h1
+                        h1 = p3.z()+(p5.z()-p3.z())/10*(y-10)
+                        h2 = p3.m()+(p5.m()-p3.m())/10*(y-10)
+
+                    if z_ <= h1 and x > la/2 and x < llx-la/2:
+                        z1 = h1
                     else:
-                        z1=np.nan
-                    if z_<=h2 and  x>la and x<llx-la:
-                        z2=h2
+                        z1 = np.nan
+
+                    if z_ <= h2 and x > la/2 and x < llx-la/2:
+                        z2 = h2
                     else:
-                        z2=np.nan
-                  #  self.setMarker( pk,2)
+                        z2 = np.nan
+                   # self.setMarker( pk,2)
                 else:
-                    z_=np.nan
-                    z1=np.nan
-                    z2=np.nan
-                Z[int(x*2)][int(y*2)]=z_
-                Z1[int(x*2)][int(y*2)]=z1
-                Z2[int(x*2)][int(y*2)]=z2
+                    z_ = np.nan
+                    z1 = np.nan
+                    z2 = np.nan
+                Z[int(x*2)][int(y*2)] = z_
+                Z1[int(x*2)][int(y*2)] = z1
+                Z2[int(x*2)][int(y*2)] = z2
         Y1 = np.array([0, llx/2, llx])
         X1 = np.array([0, 10, 20])
-        Xq, Yq= np.meshgrid(X1, Y1) 
-        Zq = self.CreateZ(p1.z(), p3.z(), p5.z(), Xq)   
-        Ze = self.CreateZ(p1.m(), p3.m(), p5.m(), Xq)    
-        Zb=  self.CreateZ(qb, qb, qb, Xq)     
+        Xq, Yq = np.meshgrid(X1, Y1)
+        Zq = self.CreateZ(p1.z(), p3.z(), p5.z(), Xq)
+        Ze = self.CreateZ(p1.m(), p3.m(), p5.m(), Xq)
+        Zb = self.CreateZ(qb, qb, qb, Xq)
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-        ax.plot_surface(Y, X, Z,alpha=0.5,color='green',label='Gelaende',linewidth=0.5)
-        ax.plot_surface(Y, X, Z1,alpha=0.5,color='blue',label='Quote Abfluss',linewidth=0.5)
-        ax.plot_surface(Y, X, Z2,alpha=0.5,color='red',label='Energielinienhoehe',linewidth=0.5)
-   
-        if qb>0:
-            ax.plot_surface(Yq,Xq, Zb,alpha=0.3,color='black',label='Bruecke',linewidth=0.5)
-            ax.text(llx/2,0,qb,  'Brücke', size=10, color='black',ha='right',va='bottom') 
+        ax.plot_surface(Y, X, Z, alpha=0.5, color='green',
+                        label='Gelaende', linewidth=0.5)
+        ax.plot_surface(Y, X, Z1, alpha=0.5, color='blue',
+                        label='Quote Abfluss', linewidth=0.5)
+        ax.plot_surface(Y, X, Z2, alpha=0.5, color='red',
+                        label='Energielinienhoehe', linewidth=0.5)
 
-        ax.text(0,0,p1.z(),  'Quote Abfluss', size=10,  color='blue',va='bottom') 
-        ax.text(llx,0,p1.m(),  'Energielinienhöhe', size=10, color='red',ha='right',va='bottom') 
+        if qb > 0:
+            ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='black',
+                            label='Bruecke', linewidth=0.5)
+            ax.text(llx/2, 0, qb,  'Brücke', size=12, color='black',
+                    ha='center', va='center_baseline')
 
+        ax.text(0, 0, p1.z(),  'Quote Abfluss', size=12,  color='blue')
+        ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
+                size=12, color='red', ha='right')
+        text = f'Koordinaten\n'
+        text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
+        text += self.damm.getData(laenge)
+        ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/2, text,
+                size=9, color='black', ha='left', va='center_baseline')
         ax.set_xlabel('m')
         ax.set_ylabel('m')
         ax.set_zlabel('mü.M.')
         plt.show()
+        self.raster.setVisibility(False)
+
+    def sep(self, s):
+        ret = ''
+        while s > 0:
+            ret = f"{s % 1000}'{ret}"
+            s = s//1000
+        return ret[:-1]
 
     def CreateZ(self, p1, p3, p5, Xq):
-        Zq=Xq.copy()
-        Zq[0][0]=p1
-        Zq[0][1]=p3   
-        Zq[0][2]=p5
-        Zq[1][0]=p1
-        Zq[1][1]=p3   
-        Zq[1][2]=p5    
-        Zq[2][0]=p1
-        Zq[2][1]=p3   
-        Zq[2][2]=p5
+        Zq = Xq.copy()
+        Zq[0][0] = p1
+        Zq[0][1] = p3
+        Zq[0][2] = p5
+        Zq[1][0] = p1
+        Zq[1][1] = p3
+        Zq[1][2] = p5
+        Zq[2][0] = p1
+        Zq[2][1] = p3
+        Zq[2][2] = p5
         return Zq
 
-
-
-    def setMarker(self, pk,col):
-        pnt=QgsPointXY(pk.x(),pk.y())
+    def setMarker(self, pk, col):
+        pnt = QgsPointXY(pk.x(), pk.y())
         canvas = iface.mapCanvas()
         m = QgsVertexMarker(canvas)
         m.setCenter(pnt)
@@ -109,25 +128,23 @@ class Querschnitt3D:
         m.setIconType(QgsVertexMarker.ICON_CIRCLE)
         m.setIconSize(4)
         m.setPenWidth(1)
-        if col==1:
+        if col == 1:
             m.setFillColor(QColor(0, 200, 0))
-        if col==2:
-            m.setFillColor(QColor(0, 0, 200))        
-        if col==3:
+        if col == 2:
+            m.setFillColor(QColor(0, 0, 200))
+        if col == 3:
             m.setFillColor(QColor(200, 0, 0))
-        if col==4:
-            m.setFillColor(QColor(0, 200, 200))   
+        if col == 4:
+            m.setFillColor(QColor(0, 200, 200))
+
+
 """
         X, Y = np.meshgrid(X1, Y1)
         for x in range(int(llx)):
             for y in range( int(llx)):
                 X[x][y]=px.x()-dx/2*x
                 Y[x][y]=px.y()-dy/2*y
-"""             
-
-
-
-
+"""
 
 
 """

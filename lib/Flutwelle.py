@@ -29,9 +29,9 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication,Qt
-from qgis.PyQt.QtGui import QIcon,QGuiApplication
-from qgis.PyQt.QtWidgets import QAction,QDialogButtonBox
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
+from qgis.PyQt.QtGui import QIcon, QGuiApplication
+from qgis.PyQt.QtWidgets import QAction, QDialogButtonBox
 
 
 # Initialize Qt resources from file resources.py
@@ -100,18 +100,17 @@ class Flutwelle:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('Flutwelle', message)
 
-
     def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+            self,
+            icon_path,
+            text,
+            callback,
+            enabled_flag=True,
+            add_to_menu=True,
+            add_to_toolbar=True,
+            status_tip=None,
+            whats_this=None,
+            parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -199,55 +198,55 @@ class Flutwelle:
     def buttonPressed(self):
         self.tool = DammZeichnen(iface.mapCanvas(), self.dlg)
         iface.mapCanvas().setMapTool(self.tool)
-    
+
     def buttonPressed2(self):
         self.tool2 = Querschnitt(self.dlg)
         self.tool2.run()
-        #self.__task2=QgsApplication.taskManager().addTask(self.tool2)
+        # self.__task2=QgsApplication.taskManager().addTask(self.tool2)
         root = QgsProject.instance().layerTreeRoot()
-        gr=root.findGroup(self.dlg.lineEditProjetName.text() ) 
+        gr = root.findGroup(self.dlg.lineEditProjetName.text())
         gr.setExpanded(True)
-        
+
     def fileChanged(self):
         self.dlg.pushButton.setEnabled(True)
         print(self.dlg.mQgsFileWidget.filePath())
 
-    
     def check_button(self):
-        h=self.dlg.spBh.value()
-        b=self.dlg.spBb.value()
-        bu=self.dlg.spBbu.value()
-        l=self.dlg.spBl.value()
-        v=self.dlg.sBv.value()
-        damml=DammL('')
-        flussL=FlussL('')
-        qb=0
-        f=0
-        p1=flussL.getPoint(0)
+        h = self.dlg.spBh.value()
+        b = self.dlg.spBb.value()
+        bu = self.dlg.spBbu.value()
+        l = self.dlg.spBl.value()
+        v = self.dlg.sBv.value()
+        damml = DammL('')
+        flussL = FlussL('')
+        qb = 0
+        f = 0
+        p1 = flussL.getPoint(0)
         if self.dlg.rBd.isChecked():
-            qb,f=damml.d_b(p1,h,b,l,v)
+            qb, f = damml.d_b(p1, h, b, l, v)
         if self.dlg.rBr.isChecked():
-            qb,f=damml.r_b(p1,h,b,l,v)
+            qb, f = damml.r_b(p1, h, b, l, v)
         if self.dlg.rBt.isChecked():
-            qb,f=damml.t_b(p1,h,b,bu,l,v)
+            qb, f = damml.t_b(p1, h, b, bu, l, v)
         if self.dlg.rBs.isChecked():
-            qb,f=damml.s_b(p1,h,l,v)
+            qb, f = damml.s_b(p1, h, l, v)
         if self.dlg.rBp.isChecked():
-            qb,f=damml.p_b(p1,h,b,l,v)
+            qb, f = damml.p_b(p1, h, b, l, v)
         self.dlg.sBQb.setValue(qb)
-        if l>0 and v>0 and qb>0:
+        if l > 0 and v > 0 and qb > 0:
             self.dlg.pushButton_2.setEnabled(True)
             self.dlg.pushButton_3.setEnabled(True)
         else:
             self.dlg.pushButton_2.setEnabled(False)
             self.dlg.pushButton_3.setEnabled(False)
 
-    def safeTiffPath(self,path):
+    def safeTiffPath(self, path):
         s = QgsSettings()
         s.setValue("flutwelle/tiffPath", path)
 
     def querschnitt3D(self):
-        q3d=Querschnitt3D(self.dlg.lx.value(),self.dlg.la.value(),self.dlg.q_bruecke.value(),self.dlg.mQgsFileWidget.filePath())
+        q3d = Querschnitt3D(self.dlg.lx.value(), self.dlg.la.value(
+        ), self.dlg.q_bruecke.value(), self.dlg.mQgsFileWidget.filePath())
 
     def run(self):
         """Run method that performs all the real work"""
@@ -255,42 +254,41 @@ class Flutwelle:
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         s = QgsSettings()
-        fp=s.value("flutwelle/tiffPath", "default text")
+        fp = s.value("flutwelle/tiffPath", "default text")
         self.dlg = FlutwelleDialog(iface.mainWindow())
         self.dlg.pushButton.clicked.connect(self.buttonPressed)
         self.dlg.pushButton_2.clicked.connect(self.buttonPressed2)
-        self.dlg.rBd.clicked.connect(self.check_button) 
-        self.dlg.rBr.clicked.connect(self.check_button) 
-        self.dlg.rBs.clicked.connect(self.check_button) 
-        self.dlg.rBt.clicked.connect(self.check_button) 
-        self.dlg.rBp.clicked.connect(self.check_button) 
-        self.dlg.pushButton_3.clicked.connect(self.querschnitt3D) 
-        self.dlg.spBh.valueChanged.connect(self.check_button) 
-        self.dlg.spBb.valueChanged.connect(self.check_button) 
-        self.dlg.spBbu.valueChanged.connect(self.check_button) 
-        self.dlg.spBl.valueChanged.connect(self.check_button) 
-        self.dlg.sBv.valueChanged.connect(self.check_button) 
+        self.dlg.rBd.clicked.connect(self.check_button)
+        self.dlg.rBr.clicked.connect(self.check_button)
+        self.dlg.rBs.clicked.connect(self.check_button)
+        self.dlg.rBt.clicked.connect(self.check_button)
+        self.dlg.rBp.clicked.connect(self.check_button)
+        self.dlg.pushButton_3.clicked.connect(self.querschnitt3D)
+        self.dlg.spBh.valueChanged.connect(self.check_button)
+        self.dlg.spBb.valueChanged.connect(self.check_button)
+        self.dlg.spBbu.valueChanged.connect(self.check_button)
+        self.dlg.spBl.valueChanged.connect(self.check_button)
+        self.dlg.sBv.valueChanged.connect(self.check_button)
         self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
         self.dlg.pushButton.setEnabled(False)
         self.dlg.pushButton_2.setEnabled(False)
         self.dlg.mQgsFileWidget.setFilePath(fp)
-        self.dlg.mQgsFileWidget.fileChanged.connect(self.safeTiffPath) 
+        self.dlg.mQgsFileWidget.fileChanged.connect(self.safeTiffPath)
         self.dlg.tabWidget.setCurrentIndex(0)
         relief = QgsProject.instance().mapLayersByName("Relief")
-        if not relief :
+        if not relief:
             urlWithParams = 'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7&featureCount=10&format=image/jpeg&layers=ch.swisstopo.swissalti3d-reliefschattierung&styles&tilePixelRatio=0&url=https://wms.geo.admin.ch/'
             rlayer = QgsRasterLayer(urlWithParams, 'Relief', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
         landeskarte = QgsProject.instance().mapLayersByName("Landeskarte")
-        if not landeskarte :
+        if not landeskarte:
             urlWithParams = 'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7&featureCount=10&format=image/jpeg&layers=ch.swisstopo.pixelkarte-grau&styles&tilePixelRatio=0&url=https://wms.geo.admin.ch/'
             rlayer = QgsRasterLayer(urlWithParams, 'Landeskarte', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
 
-
         # show the dialog
         self.dlg.show()
-        self.tool=False
+        self.tool = False
 
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -301,5 +299,3 @@ class Flutwelle:
             QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
             if self.tool:
                 self.tool.cancel()
-
-

@@ -29,95 +29,97 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from qgis.PyQt.QtCore import Qt,QVariant
-from qgis.PyQt.QtGui import QColor,QGuiApplication
-from qgis.PyQt.QtWidgets import QDialogButtonBox
-import math
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor, QGuiApplication
 
 
 # Initialize Qt resources from file resources.py
 from ..resources import *
 # Import the code for the dialog
 
-from qgis.gui import QgsMapTool,QgsVertexMarker,QgsRubberBand
+from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.utils import iface
 from qgis.core import *
 
-from .Raster import Raster,Mupe
+from .Raster import Raster, Mupe
 from .Fluss_Zeichnen import CreateFluss
 
-import numpy as np
 
-class DammZeichnen(QgsMapTool):   
-    def __init__(self, canvas,dlg):
+class DammZeichnen(QgsMapTool):
+    def __init__(self, canvas, dlg):
         QgsMapTool.__init__(self, canvas)
-        self.canvas = canvas 
-        self.p1=NULL
-        self.p2=NULL
+        self.canvas = canvas
+        self.p1 = NULL
+        self.p2 = NULL
         self.iface = iface
-        self.parray=[]
-        self.polyline = QgsRubberBand(self.canvas,geometryType = Qgis.GeometryType.Line) 
-        self.isRightButtonPressed=False
-        self.dlg=dlg
-        self.val=0
-        self.c_run=False
-        self.is_crun=True
+        self.parray = []
+        self.polyline = QgsRubberBand(
+            self.canvas, geometryType=Qgis.GeometryType.Line)
+        self.isRightButtonPressed = False
+        self.dlg = dlg
+        self.val = 0
+        self.c_run = False
+        self.is_crun = True
         root = QgsProject.instance().layerTreeRoot()
         for group in [child for child in root.children() if child.nodeType() == 0]:
             if group.name() == 'Raster':
                 root.removeChildNode(group)
-        self.raster=Raster(self.dlg.mQgsFileWidget.filePath())
-        self.mupe=Mupe(self.raster)
+        self.raster = Raster(self.dlg.mQgsFileWidget.filePath())
+        self.mupe = Mupe(self.raster)
         damm_layer = QgsProject.instance().mapLayersByName("Damm")
-        fluss_layer= QgsProject.instance().mapLayersByName("Fluss")
-        see_layer=QgsProject.instance().mapLayersByName("See")
-        int_layer=QgsProject.instance().mapLayersByName("Intensitaet")
+        fluss_layer = QgsProject.instance().mapLayersByName("Fluss")
+        see_layer = QgsProject.instance().mapLayersByName("See")
+        int_layer = QgsProject.instance().mapLayersByName("Intensitaet")
         p = QgsProject.instance()
         if damm_layer:
-            p.removeMapLayer( damm_layer[0].id())
+            p.removeMapLayer(damm_layer[0].id())
         if fluss_layer:
-            p.removeMapLayer( fluss_layer[0].id())
+            p.removeMapLayer(fluss_layer[0].id())
         if see_layer:
-            p.removeMapLayer( see_layer[0].id())
+            p.removeMapLayer(see_layer[0].id())
         if int_layer:
-            p.removeMapLayer( int_layer[0].id())
+            p.removeMapLayer(int_layer[0].id())
 
     def canvasPressEvent(self, event):
-        if event.button()==Qt.LeftButton:
+        if event.button() == Qt.LeftButton:
             if self.p1 is NULL:
-                self.p1=self.mupe.getPoint(self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
+                self.p1 = self.mupe.getPoint(
+                    self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                 self.raster.mark_line(self.p1)
-                if  self.p1.z()==0:
-                    return 
+                if self.p1.z() == 0:
+                    iface.messageBar().pushMessage("Error",
+                                                   "Bitte Kopieren sie die nötigen Dateien herunter https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d ", level=Qgis.Critical)
             elif self.p2 is NULL:
                 try:
-                    self.p2=self.mupe.getPoint(self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
+                    self.p2 = self.mupe.getPoint(
+                        self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                     self.polyline.reset(Qgis.GeometryType.Line)
                     QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
-                    self.c_run=CreateFluss(self.p1,self.p2,self.raster,self.dlg)
+                    self.c_run = CreateFluss(
+                        self.p1, self.p2, self.raster, self.dlg)
                     self.dlg.tab.setEnabled(False)
                     self.dlg.tab_2.setEnabled(True)
-                    self.__task=QgsApplication.taskManager().addTask(self.c_run)
+                    self.__task = QgsApplication.taskManager().addTask(self.c_run)
                 except Exception as inst:
                     print(type(inst))    # the exception type
                     print(inst.args)     # arguments stored in .args
                     print(inst)
             else:
-                return 
+                return
 
     def canvasMoveEvent(self, event):
         if self.p1 is not NULL and self.p2 is NULL:
-            p2=self.mupe.getPoint(self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
+            p2 = self.mupe.getPoint(
+                self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
             self.polyline.reset(Qgis.GeometryType.Line)
             self.polyline.addPoint(self.mupe.getPointXY(self.p1))
             self.polyline.addPoint(self.mupe.getPointXY(p2))
-            self.polyline.setColor(QColor(255,0,0,255))
+            self.polyline.setColor(QColor(255, 0, 0, 255))
             self.polyline.setWidth(3)
-
 
     def canvasReleaseEvent(self, event):
         pass
-       
+
     def activate(self):
         QGuiApplication.setOverrideCursor(Qt.CrossCursor)
 
@@ -133,6 +135,6 @@ class DammZeichnen(QgsMapTool):
 
     def isEditTool(self):
         return True
-    
+
     def cancel(self):
         pass

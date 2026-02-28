@@ -36,7 +36,7 @@ from ..resources import *
 # Import the code for the dialog
 
 from qgis.core import *
-from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtGui import QColor,QFont
 import math
 
 
@@ -53,13 +53,15 @@ class Layer:
     Returns:
         QgsLayerTreeGroup: The layer group object with the specified name.
     """
-    def getProjektGroup(self,projektGroup:QVariant.String):
+
+    def getProjektGroup(self, projektGroup: QVariant.String):
         root = QgsProject.instance().layerTreeRoot()
-        myOriginalGroup = root.findGroup(projektGroup ) 
-       
+        myOriginalGroup = root.findGroup(projektGroup)
+
         if not myOriginalGroup:
-            myOriginalGroup=root.insertGroup(0,projektGroup )        
+            myOriginalGroup = root.insertGroup(0, projektGroup)
         return myOriginalGroup
+
 
 class DammL(Layer):
     """
@@ -98,356 +100,386 @@ class DammL(Layer):
             circle_geometry(): Generates circular/parabolic vertex sequences
             poly(): Creates a small square polygon from a point
     """
-    def __init__(self,projektGroup:QVariant.String):
-        
+
+    def __init__(self, projektGroup: QVariant.String):
+
         self.damm = QgsProject.instance().mapLayersByName("Damm")
-        if not self.damm :
-            self.damm = QgsVectorLayer("MultiPolygonZ?crs=epsg:2056", "Damm", "memory")
+        if not self.damm:
+            self.damm = QgsVectorLayer(
+                "MultiPolygonZ?crs=epsg:2056", "Damm", "memory")
             pr = self.damm.dataProvider()
-            pr.addAttributes( [QgsField("type", QVariant.String)])
-            pr.addAttributes( [QgsField("flaecheS", QVariant.Double)])
-            pr.addAttributes( [QgsField("flaecheM", QVariant.Double)])
-            pr.addAttributes( [QgsField("volumen", QVariant.Double)])
-            pr.addAttributes( [QgsField("breite", QVariant.Double)])
-            pr.addAttributes( [QgsField("laenge", QVariant.Double)])
-            pr.addAttributes( [QgsField("breiteU", QVariant.Double)])
-            pr.addAttributes( [QgsField("hoehe", QVariant.Double)])
-            pr.addAttributes( [QgsField("type_b", QVariant.String)])
-            pr.addAttributes( [QgsField("q", QVariant.Double)])
-            pr.addAttributes( [QgsField("u", QVariant.Double)])
-            pr.addAttributes( [QgsField("xvo", QVariant.Double)])
-            pr.addAttributes( [QgsField("jkk", QVariant.Double)])     
-            pr.addAttributes( [QgsField("um", QVariant.Double)])    
-            pr.addAttributes( [QgsField("ueberlauf", QVariant.Bool)]) 
-            pr.addAttributes( [QgsField("v", QVariant.Double)])    
-            pr.addAttributes( [QgsField("quote", QVariant.Double)])  
-            pr.addAttributes( [QgsField("energielinienhoehe", QVariant.Double)])    
-            pr.addAttributes( [QgsField("t", QVariant.String)])   
+            pr.addAttributes([QgsField("type", QVariant.String)])
+            pr.addAttributes([QgsField("flaecheS", QVariant.Double)])
+            pr.addAttributes([QgsField("flaecheM", QVariant.Double)])
+            pr.addAttributes([QgsField("volumen", QVariant.Double)])
+            pr.addAttributes([QgsField("breite", QVariant.Double)])
+            pr.addAttributes([QgsField("laenge", QVariant.Double)])
+            pr.addAttributes([QgsField("breiteU", QVariant.Double)])
+            pr.addAttributes([QgsField("hoehe", QVariant.Double)])
+            pr.addAttributes([QgsField("type_b", QVariant.String)])
+            pr.addAttributes([QgsField("q", QVariant.Double)])
+            pr.addAttributes([QgsField("u", QVariant.Double)])
+            pr.addAttributes([QgsField("xvo", QVariant.Double)])
+            pr.addAttributes([QgsField("jkk", QVariant.Double)])
+            pr.addAttributes([QgsField("um", QVariant.Double)])
+            pr.addAttributes([QgsField("ueberlauf", QVariant.Bool)])
+            pr.addAttributes([QgsField("v", QVariant.Double)])
+            pr.addAttributes([QgsField("quote", QVariant.Double)])
+            pr.addAttributes([QgsField("energielinienhoehe", QVariant.Double)])
+            pr.addAttributes([QgsField("t", QVariant.String)])
 
             self.damm.updateFields()
-            colors = ["#4778E2", "#57565C", "#4bebe3","#f80707","#0580f3","#6c05f3"]
-            unique_values = ['Damm', 'Profil Damm','See','Bresche','Qerschnitt','Ueberlauf']
-            n=len(unique_values)
+            colors = ["#4778E2", "#57565C", "#4bebe3",
+                      "#f80707", "#0580f3", "#6c05f3"]
+            unique_values = ['Damm', 'Profil Damm', 'See',
+                             'Bresche', 'Qerschnitt', 'Ueberlauf']
+            n = len(unique_values)
             square = [QgsFillSymbol.createSimple({'color': colors[i],
-                                                   "outline_width": "1",
-                                                   "outline_color": colors[i],}) for i in range(n) ]
-            list = [QgsRendererCategory(unique_values[i],square[i].clone(), unique_values[i], True) for i in range(n)]
+                                                  "outline_width": "1",
+                                                  "outline_color": colors[i], }) for i in range(n)]
+            list = [QgsRendererCategory(
+                unique_values[i], square[i].clone(), unique_values[i], True) for i in range(n)]
             renderer = QgsCategorizedSymbolRenderer("type", list)
             self.damm.setRenderer(renderer)
-            QgsProject.instance().addMapLayer(self.damm,False)
+            QgsProject.instance().addMapLayer(self.damm, False)
             self.getProjektGroup(projektGroup).addLayer(self.damm)
+            self.damm.setLabelsEnabled(True)
+            settings = QgsPalLayerSettings()
+            settings.fieldName = 'laenge' # Feldname, das beschriftet wird
+   
+            
+            # 3. Schriftart/Farbe einstellen
+            format = QgsTextFormat()
+            format.setFont(QFont("Arial", 10))
+            format.setColor(QColor("black"))
+            settings.setFormat(format)
+            labeling = QgsVectorLayerSimpleLabeling(settings)
+            self.damm.setLabeling(labeling)
         else:
-            self.damm=self.damm[0]
+            self.damm = self.damm[0]
 
+    def getData(self, pos):
 
+        expression = f'"laenge"={pos}'
+        request = QgsFeatureRequest().setFilterExpression(expression)
+        ret = ''
+        for fi in self.damm.getFeatures(request):
+            ret += f'v {round(fi['v'], 2)} m/s\n'
+            ret += f'q {round(fi['q'], 2)} m3/s\n'
+            ret += f't {fi['t']}'
+            break
+        return ret
 
-    def insertData(self,ppa:QgsGeometry,
-                   type:QVariant.String,
-                   flaecheS:QVariant.Double=0,
-                   flaecheM:QVariant.Double=0,
-                   volumen:QVariant.Double=0,
-                   breite:QVariant.Double=0,
-                   laenge:QVariant.Double=0,
-                   breiteU:QVariant.Double=0,
-                   hoehe:QVariant.Double=0,
-                   type_b:QVariant.String='',
-                   q:QVariant.Double=0,
-                   u:QVariant.Double=0,
-                   xvo:QVariant.Double=0,
-                   ki:QVariant.Double=0,
-                   um:QVariant.Double=0,
-                   ueberlauf:QVariant.Bool=False,
-                   v:QVariant.Double=0,
-                   quote:QVariant.Double=0,
-                   energielinienhoehe:QVariant.Double=0,
-                   t:QVariant.Double=0
+    def insertData(self, ppa: QgsGeometry,
+                   type: QVariant.String,
+                   flaecheS: QVariant.Double = 0,
+                   flaecheM: QVariant.Double = 0,
+                   volumen: QVariant.Double = 0,
+                   breite: QVariant.Double = 0,
+                   laenge: QVariant.Double = 0,
+                   breiteU: QVariant.Double = 0,
+                   hoehe: QVariant.Double = 0,
+                   type_b: QVariant.String = '',
+                   q: QVariant.Double = 0,
+                   u: QVariant.Double = 0,
+                   xvo: QVariant.Double = 0,
+                   ki: QVariant.Double = 0,
+                   um: QVariant.Double = 0,
+                   ueberlauf: QVariant.Bool = False,
+                   v: QVariant.Double = 0,
+                   quote: QVariant.Double = 0,
+                   energielinienhoehe: QVariant.Double = 0,
+                   t: QVariant.Double = 0
                    ):
-        
 
         for __f in self.damm.getFeatures():
-            if __f['type']==type and type!='Qerschnitt' and type!='Ueberlauf':
+            if __f['type'] == type and type != 'Qerschnitt' and type != 'Ueberlauf':
                 self.damm.dataProvider().deleteFeatures([__f.id()])
-     
+
         feature = QgsFeature()
         feature.setGeometry(ppa)
         hours = t // 3600
         minutes = (t % 3600) // 60
-        seconds = round(t % 60,2)
-        feature.setAttributes([type,flaecheS,flaecheM,volumen,breite,laenge,breiteU,hoehe,type_b,q,u,xvo,ki,um,ueberlauf,v,quote,energielinienhoehe,f"{hours} Std. {minutes} Min. {seconds} Sek."])
+        seconds = round(t % 60, 2)
+        feature.setAttributes([type, flaecheS, flaecheM, volumen, breite, laenge, breiteU, hoehe, type_b, q,
+                              u, xvo, ki, um, ueberlauf, v, quote, energielinienhoehe, f"{int(hours):02d}{int(minutes):02d}:{seconds:2.2f}"])
         self.damm.startEditing()
-        assert(self.damm.addFeatures([feature]))
+        assert (self.damm.addFeatures([feature]))
         self.damm.commitChanges()
-    
+
     def getSelected(self):
         return self.damm.selectedFeatures()
-    
-    def updateDlg(self,dlg):
+
+    def updateDlg(self, dlg):
         features = self.damm.getFeatures()
         for f in features:
-            if f['type']=='Damm':
+            if f['type'] == 'Damm':
                 dlg.spBb.setValue(float(f['breite']))
-                dlg.spBh.setValue(float(f['hoehe']))   
-                dlg.spBbu.setValue(float(f['breiteU']))   
-            if f['type']=='See':
+                dlg.spBh.setValue(float(f['hoehe']))
+                dlg.spBbu.setValue(float(f['breiteU']))
+            if f['type'] == 'See':
                 dlg.spBl.setValue(float(f['laenge']))
-                dlg.sBv.setValue(float(f['volumen'])) 
+                dlg.sBv.setValue(float(f['volumen']))
 
     def __u(self, l, v, qb, f):
-        u=1
-        if v>0 and l>0 and f>0:
-            u=1+math.log(v/(f*l))
-            if u<0.6:
-                u=0.6
-            if u>1.4:
-                u=1.4
-            qb=u*qb
-        return qb,u
-    
-    def poly(p:QgsPoint)->QgsPolygon:
-        ls=QgsLineString()
-        ls.addVertex( QgsPoint(p.x()-0.75,p.y()-0.75,p.z()))
-        ls.addVertex( QgsPoint(p.x()+0.75,p.y()-0.75,p.z()))
-        ls.addVertex( QgsPoint(p.x()+0.75,p.y()+0.75,p.z()))
-        ls.addVertex( QgsPoint(p.x()-0.75,p.y()+0.75,p.z()))
-        pol=QgsPolygon(ls)
+        u = 1
+        if v > 0 and l > 0 and f > 0:
+            u = 1+math.log(v/(f*l))
+            if u < 0.6:
+                u = 0.6
+            if u > 1.4:
+                u = 1.4
+            qb = u*qb
+        return qb, u
+
+    def poly(p: QgsPoint) -> QgsPolygon:
+        ls = QgsLineString()
+        ls.addVertex(QgsPoint(p.x()-0.75, p.y()-0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x()+0.75, p.y()-0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x()+0.75, p.y()+0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x()-0.75, p.y()+0.75, p.z()))
+        pol = QgsPolygon(ls)
         return pol
 
-    def s_b(self,p:QgsPoint, h:float,l:float,v:float)->tuple[float,float]: 
-        
-        ls=QgsLineString()
+    def s_b(self, p: QgsPoint, h: float, l: float, v: float) -> tuple[float, float]:
+
+        ls = QgsLineString()
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+h)
         p.setY(p.y()+h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()-4*h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+h)
         p.setY(p.y()-h)
         ls.addVertex(p)
-        pol=QgsPolygon(ls)
-        qb=0.93*2*h*(h**(3/2))+0.72*(h**(5/2))
-        f=h*h*3
-        qb_,u= self.__u(l, v, qb, f)
-        self.insertData(pol,'Bresche',0,f,0,4*h,0,2*h,h,'Standart',qb_,u)
-        return qb_,f
+        pol = QgsPolygon(ls)
+        qb = 0.93*2*h*(h**(3/2))+0.72*(h**(5/2))
+        f = h*h*3
+        qb_, u = self.__u(l, v, qb, f)
+        self.insertData(pol, 'Bresche', 0, f, 0, 4*h,
+                        0, 2*h, h, 'Standart', qb_, u)
+        return qb_, f
 
-    def r_b(self,p:QgsPoint,h:float,b:float,l:float,v:float)->tuple[float,float]: 
-        ls=QgsLineString()
+    def r_b(self, p: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+        ls = QgsLineString()
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+b/2)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setY(p.y()+h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()-b)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setY(p.y()-h)
         ls.addVertex(p)
-        pol=QgsPolygon(ls)
-        qb=0.93*b*(h**(3/2))
-        f=h*b
-        qb_,u = self.__u(l, v, qb, f)
-        self.insertData(pol,'Bresche',0,f,0,b,0,b,h,'Rechteck',qb_,u)
-        return qb_,f
+        pol = QgsPolygon(ls)
+        qb = 0.93*b*(h**(3/2))
+        f = h*b
+        qb_, u = self.__u(l, v, qb, f)
+        self.insertData(pol, 'Bresche', 0, f, 0, b,
+                        0, b, h, 'Rechteck', qb_, u)
+        return qb_, f
 
-    def d_b(self,p:QgsPoint,h:float,b:float,l:float,v:float)->tuple[float,float]: 
-        ls=QgsLineString()
+    def d_b(self, p: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+        ls = QgsLineString()
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+b/2)
         p.setY(p.y()+h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()-b)
         ls.addVertex(p)
-        pol=QgsPolygon(ls)
-        qb=0.72*(b/2)/h*(h**(5/2))
-        f=h*b/2
-        qb_,u = self.__u(l, v, qb, f)
-        self.insertData(pol,'Bresche',0,f,0,b,0,0,h,'Dreieck',qb_,u)
-        return qb_,f
-   
-    def t_b(self,p:QgsPoint,h:float,b:float,bu:float,l:float,v:float)->tuple[float,float]: 
-        ls=QgsLineString()
+        pol = QgsPolygon(ls)
+        qb = 0.72*(b/2)/h*(h**(5/2))
+        f = h*b/2
+        qb_, u = self.__u(l, v, qb, f)
+        self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Dreieck', qb_, u)
+        return qb_, f
+
+    def t_b(self, p: QgsPoint, h: float, b: float, bu: float, l: float, v: float) -> tuple[float, float]:
+        ls = QgsLineString()
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+bu/2)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+(b-bu)/2)
         p.setY(p.y()+h)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()-b)
         ls.addVertex(p)
-        p=p.clone()
+        p = p.clone()
         p.setX(p.x()+(b-bu)/2)
         p.setY(p.y()-h)
         ls.addVertex(p)
-        pol=QgsPolygon(ls)
-        qb=0.93*bu*(h**(3/2))+0.72*((b-bu)/2)/h*(h**(5/2))
-        f=h*bu+h*(b-bu)/2
-        qb_,u = self.__u(l, v, qb, f)
-        self.insertData(pol,'Bresche',0,f,0,b,0,bu,h,'Trapez',qb_,u)
-        return qb_,f
-    
-    def p_b(self,px:QgsPoint,h:float,b:float,l:float,v:float)->tuple[float,float]: 
-        p=px.clone()
-        r=(4*h**2+b**2)/(8*h)
-        p.setY(p.y()+r)
-       
-        a=math.acos(1-h/r)
-        
-        ls=QgsLineString()
-        
-        ls= self.circle_geometry(p,ls,r,a)
-        
-      
-        pol=QgsPolygon(ls)
-        qb=0.58*b*h**(3/2)
-        f=2/3*b*h
-        qb_,u = self.__u(l, v, qb, f)
-        self.insertData(pol,'Bresche',0,f,0,b,0,0,h,'Parabel',qb_,u)
-        return qb_,f
+        pol = QgsPolygon(ls)
+        qb = 0.93*bu*(h**(3/2))+0.72*((b-bu)/2)/h*(h**(5/2))
+        f = h*bu+h*(b-bu)/2
+        qb_, u = self.__u(l, v, qb, f)
+        self.insertData(pol, 'Bresche', 0, f, 0, b, 0, bu, h, 'Trapez', qb_, u)
+        return qb_, f
 
-    def circle_geometry(self, pt, ls:QgsLineString,r,a):
+    def p_b(self, px: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+        p = px.clone()
+        r = (4*h**2+b**2)/(8*h)
+        p.setY(p.y()+r)
+
+        a = math.acos(1-h/r)
+
+        ls = QgsLineString()
+
+        ls = self.circle_geometry(p, ls, r, a)
+
+        pol = QgsPolygon(ls)
+        qb = 0.58*b*h**(3/2)
+        f = 2/3*b*h
+        qb_, u = self.__u(l, v, qb, f)
+        self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Parabel', qb_, u)
+        return qb_, f
+
+    def circle_geometry(self, pt, ls: QgsLineString, r, a):
         radius = r
-        segments =120
+        segments = 120
         for i in range(segments):
             theta = i * (2.0 * math.pi / segments)
-            if theta<a*2:
+            if theta < a*2:
                 p = QgsPoint(pt.x() + radius * math.cos(theta-math.pi/2-a),
-                            pt.y() + radius * math.sin(theta-math.pi/2-a))
+                             pt.y() + radius * math.sin(theta-math.pi/2-a))
             ls.addVertex(p)
         return ls
-        
+
+
 class FlussL(Layer):
-    def __init__(self,projektGroup:QVariant.String):
+    def __init__(self, projektGroup: QVariant.String):
         self.fluss = QgsProject.instance().mapLayersByName("Fluss")
-        if not self.fluss :
-            self.fluss = QgsVectorLayer("LineStringZM?crs=epsg:2056", "Fluss", "memory")
+        if not self.fluss:
+            self.fluss = QgsVectorLayer(
+                "LineStringZM?crs=epsg:2056", "Fluss", "memory")
             pr = self.fluss.dataProvider()
-            pr.addAttributes( [QgsField("type", QVariant.String)])
+            pr.addAttributes([QgsField("type", QVariant.String)])
             self.fluss.updateFields()
             self.fluss.startEditing()
             self.fluss.renderer().symbol().setColor(QColor("blue"))
             self.fluss.renderer().symbol().setWidth(1)
-            QgsProject.instance().addMapLayer(self.fluss,False)
+            QgsProject.instance().addMapLayer(self.fluss, False)
             self.getProjektGroup(projektGroup).addLayer(self.fluss)
         else:
-            self.fluss=self.fluss[0]
+            self.fluss = self.fluss[0]
 
-    def insertData(self,ls:QgsLineString):
+    def insertData(self, ls: QgsLineString):
         feature = QgsFeature()
         feature.setGeometry(ls)
         feature.setAttributes(["Fluss",])
-        assert(self.fluss.addFeatures([feature]))
+        assert (self.fluss.addFeatures([feature]))
         self.fluss.commitChanges()
 
-    def getFluss(self)->QgsLineString|None:
+    def getFluss(self) -> QgsLineString | None:
         features = self.fluss.getFeatures()
         for f in features:
-            if f['type']=='Fluss':
+            if f['type'] == 'Fluss':
                 return f.geometry().constGet()
         return None
 
-    def getPoint(self,index)->QgsPoint|None:
+    def getPoint(self, index) -> QgsPoint | None:
         features = self.fluss.getFeatures()
-        i=0
+        i = 0
         for f in features:
-            if f['type']=='Fluss':
+            if f['type'] == 'Fluss':
                 for p in f.geometry().constGet():
-                    if i==index:
-                        return p 
-                    i+=1
+                    if i == index:
+                        return p
+                    i += 1
         return None
-    
+
+
 class IntL(Layer):
-    def __init__(self,projektGroup:QVariant.String):
+    def __init__(self, projektGroup: QVariant.String):
         self.intensitaet = QgsProject.instance().mapLayersByName("Intensitaet")
-        if not self.intensitaet :
-            self.intensitaet = QgsVectorLayer("PointZM?crs=epsg:2056", "Intensitaet", "memory")
+        if not self.intensitaet:
+            self.intensitaet = QgsVectorLayer(
+                "PointZM?crs=epsg:2056", "Intensitaet", "memory")
             pr = self.intensitaet.dataProvider()
-            pr.addAttributes( [QgsField("Intensitaet", QVariant.Double)])
-            pr.addAttributes( [QgsField("v", QVariant.Double)])
-            pr.addAttributes( [QgsField("h", QVariant.Double)])
-            pr.addAttributes( [QgsField("type", QVariant.Double)])
-            pr.addAttributes( [QgsField("pos", QVariant.Double)])
-            pr.addAttributes( [QgsField("quote", QVariant.Double)])  
-            pr.addAttributes( [QgsField("energielinienhoehe", QVariant.Double)])   
+            pr.addAttributes([QgsField("Intensitaet", QVariant.Double)])
+            pr.addAttributes([QgsField("v", QVariant.Double)])
+            pr.addAttributes([QgsField("h", QVariant.Double)])
+            pr.addAttributes([QgsField("type", QVariant.Double)])
+            pr.addAttributes([QgsField("pos", QVariant.Double)])
+            pr.addAttributes([QgsField("quote", QVariant.Double)])
+            pr.addAttributes([QgsField("energielinienhoehe", QVariant.Double)])
             self.intensitaet.updateFields()
       #      self.intensitaet.renderer().symbol().setColor(QColor("blue"))
-            QgsProject.instance().addMapLayer(self.intensitaet,False)
+            QgsProject.instance().addMapLayer(self.intensitaet, False)
             self.getProjektGroup(projektGroup).addLayer(self.intensitaet)
-
 
             field = 'Intensitaet'
 
             # 1. Symbole für die Klassen erstellen
             symbol1 = QgsSymbol.defaultSymbol(self.intensitaet.geometryType())
-            symbol1.setColor(QColor("#2bff00")) # Startfarbe
+            symbol1.setColor(QColor("#2bff00"))  # Startfarbe
             symbol1.symbolLayer(0).setStrokeColor(QColor("#2bff00"))
             symbol2 = QgsSymbol.defaultSymbol(self.intensitaet.geometryType())
-            symbol2.setColor(QColor("#a6ff00")) # Startfarbe
-            symbol2.symbolLayer(0).setStrokeColor(QColor("#a6ff00"))      
+            symbol2.setColor(QColor("#a6ff00"))  # Startfarbe
+            symbol2.symbolLayer(0).setStrokeColor(QColor("#a6ff00"))
             symbol3 = QgsSymbol.defaultSymbol(self.intensitaet.geometryType())
-            symbol3.setColor(QColor("#fbff00")) # Startfarbe
-            symbol3.symbolLayer(0).setStrokeColor(QColor("#fbff00"))       
+            symbol3.setColor(QColor("#fbff00"))  # Startfarbe
+            symbol3.symbolLayer(0).setStrokeColor(QColor("#fbff00"))
             symbol4 = QgsSymbol.defaultSymbol(self.intensitaet.geometryType())
-            symbol4.setColor(QColor("#ff6600")) # Startfarbe
-            symbol4.symbolLayer(0).setStrokeColor(QColor("#ff6600"))     
+            symbol4.setColor(QColor("#ff6600"))  # Startfarbe
+            symbol4.symbolLayer(0).setStrokeColor(QColor("#ff6600"))
 
             # 2. Klassenbereiche (Ranges) definieren
             # QgsRendererRange(untere_grenze, obere_grenze, symbol, label)
-            range1 = QgsRendererRange(0, 0.5, symbol1 , 'gering 0.0 - 0.5')
-            range2 = QgsRendererRange(0.5, 1, symbol2 , 'mässig 0.5 - 1.0')
-            range3 = QgsRendererRange(1, 2, symbol3 ,   'mittel 1.0 - 2.0')
-            range4 = QgsRendererRange(2, 1000, symbol4 ,'hoch   2.0 - ...')
-            renderer = QgsGraduatedSymbolRenderer(field, [range1, range2, range3,range4])
+            range1 = QgsRendererRange(0, 0.5, symbol1, 'gering 0.0 - 0.5')
+            range2 = QgsRendererRange(0.5, 1, symbol2, 'mässig 0.5 - 1.0')
+            range3 = QgsRendererRange(1, 2, symbol3,   'mittel 1.0 - 2.0')
+            range4 = QgsRendererRange(2, 1000, symbol4, 'hoch   2.0 - ...')
+            renderer = QgsGraduatedSymbolRenderer(
+                field, [range1, range2, range3, range4])
             self.intensitaet.setRenderer(renderer)
         else:
-            self.intensitaet=self.intensitaet[0] 
-    
-    def getPlPr(self,pos):
-        expression=f'"type"={pos}'
-        request=QgsFeatureRequest().setFilterExpression(expression)
-        quote=0
-        energielinienhoehe=0
+            self.intensitaet = self.intensitaet[0]
 
-        p1=QgsPoint(0,0,0,0)
-        p2=p1.clone()
-        for fi in  self.intensitaet.getFeatures(request):
-            geom=fi.geometry().constGet()
-            if p1.m()<geom.m():
-                p1=geom.clone()
-            if p2.m()>geom.m():
-                p2=geom.clone()
-                quote=fi['quote']
-                energielinienhoehe=fi['energielinienhoehe']
+    def getPlPr(self, pos):
+        expression = f'"type"={pos}'
+        request = QgsFeatureRequest().setFilterExpression(expression)
+        quote = 0
+        energielinienhoehe = 0
+
+        p1 = QgsPoint(0, 0, 0, 0)
+        p2 = p1.clone()
+        for fi in self.intensitaet.getFeatures(request):
+            geom = fi.geometry().constGet()
+            if p1.m() < geom.m():
+                p1 = geom.clone()
+            if p2.m() > geom.m():
+                p2 = geom.clone()
+                quote = fi['quote']
+                energielinienhoehe = fi['energielinienhoehe']
 
         p1.setZ(quote)
         p2.setZ(quote)
         p1.setM(energielinienhoehe)
         p2.setM(energielinienhoehe)
-        
-        return p1,p2
 
- 
+        return p1, p2
 
-    def insertData(self,ls:QgsPoint,inten:QVariant.Double=0,v:QVariant.Double=0,h:QVariant.Double=0,type: QVariant.Double=0,pos: QVariant.Double=0,quote: QVariant.Double=0,energielinienhoehe:QVariant.Double=0):
+    def insertData(self, ls: QgsPoint, inten: QVariant.Double = 0, v: QVariant.Double = 0, h: QVariant.Double = 0, type: QVariant.Double = 0, pos: QVariant.Double = 0, quote: QVariant.Double = 0, energielinienhoehe: QVariant.Double = 0):
         feature = QgsFeature()
         feature.setGeometry(ls)
-        feature.setAttributes([inten,v,h,type,pos,quote,energielinienhoehe])
+        feature.setAttributes(
+            [inten, v, h, type, pos, quote, energielinienhoehe])
         self.intensitaet.startEditing()
-        assert(self.intensitaet.addFeatures([feature]))
+        assert (self.intensitaet.addFeatures([feature]))
         self.intensitaet.commitChanges()
-
