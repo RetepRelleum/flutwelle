@@ -32,7 +32,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 from qgis.PyQt.QtGui import QColor
 from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
-from qgis.core import QgsTask,QgsPoint,QgsGeometryParameters,QgsMultiPolygon,QgsGeometry,QgsPointXY,QgsLineString,QgsPolygon,NULL
+from qgis.core import QgsTask, QgsPoint, QgsGeometryParameters, QgsMultiPolygon, QgsGeometry, QgsPointXY, QgsLineString, QgsPolygon, NULL
 from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL
 
@@ -213,7 +213,7 @@ class CreateFluss(QgsTask):
                         pmin = p.clone()
             if minPoint.z() > min:
                 ls.addVertex(pmin)
-                if ls.startPoint().distance(ls.endPoint()) > self.fllae*1000:
+                if ls.startPoint().distance(ls.endPoint())>self.fllae*1000:
                     break
                 minPoint = pmin
                 id = [-1.5, -1, -0.5, 0.5, 1, 1.5]

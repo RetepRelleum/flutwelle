@@ -31,12 +31,6 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QGuiApplication
-
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
-
 from qgis.gui import QgsMapTool, QgsRubberBand
 import qgis.utils
 from qgis.core import Qgis, QgsProject, QgsApplication, NULL
@@ -95,8 +89,7 @@ class DammZeichnen(QgsMapTool):
                         self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                     self.polyline.reset(Qgis.GeometryType.Line)
                     QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
-                    self.c_run = CreateFluss(
-                        self.p1, self.p2, self.raster, self.dlg)
+                    self.c_run = CreateFluss(self.p1, self.p2, self.raster, self.dlg)
                     self.dlg.tab.setEnabled(False)
                     self.dlg.tab_2.setEnabled(True)
                     self.__task = QgsApplication.taskManager().addTask(self.c_run)
