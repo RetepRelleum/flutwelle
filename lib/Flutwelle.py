@@ -22,28 +22,20 @@
  ***************************************************************************/
 
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon, QGuiApplication
-from qgis.PyQt.QtWidgets import QAction, QDialogButtonBox
-
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
+from qgis.PyQt.QtWidgets import QAction
 from ..Flutwelle_dialog import FlutwelleDialog
 import os.path
-
-from qgis.utils import iface
-
-from qgis.core import *
-
+from qgis.core import QgsProject,QgsSettings,QgsRasterLayer
+import qgis.utils
 from .Damm_Zeichnen import DammZeichnen
 from .Layer import DammL, FlussL
 from .Querschnitt_Zeichnen import Querschnitt
@@ -196,8 +188,8 @@ class Flutwelle:
             self.iface.removeToolBarIcon(action)
 
     def buttonPressed(self):
-        self.tool = DammZeichnen(iface.mapCanvas(), self.dlg)
-        iface.mapCanvas().setMapTool(self.tool)
+        self.tool = DammZeichnen(qgis.utils.iface.mapCanvas(), self.dlg)
+        qgis.utils.iface.mapCanvas().setMapTool(self.tool)
 
     def buttonPressed2(self):
         self.tool2 = Querschnitt(self.dlg)
@@ -255,7 +247,7 @@ class Flutwelle:
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         s = QgsSettings()
         fp = s.value("flutwelle/tiffPath", "default text")
-        self.dlg = FlutwelleDialog(iface.mainWindow())
+        self.dlg = FlutwelleDialog(qgis.utils.iface.mainWindow())
         self.dlg.pushButton.clicked.connect(self.buttonPressed)
         self.dlg.pushButton_2.clicked.connect(self.buttonPressed2)
         self.dlg.rBd.clicked.connect(self.check_button)

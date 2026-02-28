@@ -38,8 +38,8 @@ from ..resources import *
 # Import the code for the dialog
 
 from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.utils import iface
-from qgis.core import Qgis,QgsProject,QgsApplication,NULL
+import qgis.utils
+from qgis.core import Qgis, QgsProject, QgsApplication, NULL
 
 from .Raster import Raster, Mupe
 from .Fluss_Zeichnen import CreateFluss
@@ -51,7 +51,7 @@ class DammZeichnen(QgsMapTool):
         self.canvas = canvas
         self.p1 = NULL
         self.p2 = NULL
-        self.iface = iface
+        self.iface = qgis.utils.iface
         self.parray = []
         self.polyline = QgsRubberBand(
             self.canvas, geometryType=Qgis.GeometryType.Line)
@@ -87,7 +87,7 @@ class DammZeichnen(QgsMapTool):
                     self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                 self.raster.mark_line(self.p1)
                 if self.p1.z() == 0:
-                    iface.messageBar().pushMessage("Error",
+                    qgis.utils.iface.messageBar().pushMessage("Error",
                                                    "Bitte Kopieren sie die nötigen Dateien herunter https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d ", level=Qgis.Critical)
             elif self.p2 is NULL:
                 try:

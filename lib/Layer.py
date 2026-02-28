@@ -22,21 +22,18 @@
  ***************************************************************************/
 
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtCore import QVariant
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
-
-from qgis.core import *
-from qgis.PyQt.QtGui import QColor,QFont
+from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsRendererCategory, QgsFillSymbol, QgsCategorizedSymbolRenderer
+from qgis.core import QgsTextFormat, QgsVectorLayerSimpleLabeling, QgsFeatureRequest, QgsGeometry, QgsFeature, QgsPoint, QgsLineString
+from qgis.core import QgsPalLayerSettings, QgsPolygon, QgsSymbol, QgsRendererRange, QgsGraduatedSymbolRenderer
+from qgis.PyQt.QtGui import QColor, QFont
 import math
 
 
@@ -145,10 +142,7 @@ class DammL(Layer):
             self.getProjektGroup(projektGroup).addLayer(self.damm)
             self.damm.setLabelsEnabled(True)
             settings = QgsPalLayerSettings()
-            settings.fieldName = 'laenge' # Feldname, das beschriftet wird
-   
-            
-            # 3. Schriftart/Farbe einstellen
+            settings.fieldName = 'laenge'  # Feldname, das beschriftet wird
             format = QgsTextFormat()
             format.setFont(QFont("Arial", 10))
             format.setColor(QColor("black"))
@@ -159,7 +153,6 @@ class DammL(Layer):
             self.damm = self.damm[0]
 
     def getData(self, pos):
-
         expression = f'"laenge"={pos}'
         request = QgsFeatureRequest().setFilterExpression(expression)
         ret = ''

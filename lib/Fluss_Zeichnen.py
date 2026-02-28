@@ -22,24 +22,17 @@
  ***************************************************************************/
 
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtGui import QColor
-
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
-
 from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
-from qgis.core import *
-
+from qgis.core import QgsTask,QgsPoint,QgsGeometryParameters,QgsMultiPolygon,QgsGeometry,QgsPointXY,QgsLineString,QgsPolygon,NULL
 from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL
 
@@ -92,12 +85,12 @@ class CreateFluss(QgsTask):
             self.dlg.tabWidget.setCurrentIndex(1)
             flussL = FlussL('')
             p1 = flussL.getPoint(0)
-            h = self.dlg.spBh.value()
-            l = self.dlg.spBl.value()
-            v = self.dlg.sBv.value()
-            qb, fx = damml.s_b(p1, h, l, v)
+            h_ = self.dlg.spBh.value()
+            l_ = self.dlg.spBl.value()
+            v_ = self.dlg.sBv.value()
+            qb, fx = damml.s_b(p1, h_, l_, v_)
             self.dlg.sBQb.setValue(qb)
-            if l > 0 and v > 0 and qb > 0:
+            if l_ > 0 and v_ > 0 and qb > 0:
                 self.dlg.pushButton_2.setEnabled(True)
 
         else:

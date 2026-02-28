@@ -30,18 +30,10 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtGui import QColor
-
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
-
 from qgis.gui import QgsVertexMarker
-from qgis.utils import iface
+import qgis.utils
 from qgis.core import QgsTask,QgsLineString,QgsPoint,QgsPolygon,QgsPointXY
-
 from .Raster import Raster, Mupe
-
 from .Layer import DammL, FlussL, IntL
 
 
@@ -363,7 +355,7 @@ class Querschnitt(QgsTask):
 
     def setMarker(self, pk, col):
         pnt = QgsPointXY(pk.x(), pk.y())
-        canvas = iface.mapCanvas()
+        canvas = qgis.utils.iface.mapCanvas()
         m = QgsVertexMarker(canvas)
         m.setCenter(pnt)
         m.setColor(QColor('Black'))

@@ -22,32 +22,19 @@
  ***************************************************************************/
 
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from qgis.PyQt.QtCore import Qt, QVariant
-from qgis.PyQt.QtGui import QColor, QGuiApplication
-from qgis.PyQt.QtWidgets import QDialogButtonBox
-
+from qgis.PyQt.QtGui import QColor
 import math
-
-# Initialize Qt resources from file resources.py
-from ..resources import *
-# Import the code for the dialog
-
-from qgis.gui import QgsMapTool
-from qgis.utils import iface
-from qgis.gui import QgsRubberBand
-from qgis.core import *
-
-
+from qgis.core import QgsProject, QgsRasterLayer, QgsPoint, QgsPointXY, QgsColorRampShader, QgsMapLayer, QgsRasterShader
+from qgis.core import QgsRasterBandStats, QgsSingleBandPseudoColorRenderer
 import glob
-import numpy as np
 
 
 class Raster():
