@@ -144,7 +144,7 @@ class CreateFluss(QgsTask):
             p5.setZ(h)
         if p5.z() < h:
             pa.append(p5)
-            area += h-p5.z()
+            area += h - p5.z()
             seeFlaeche = QgsGeometry(seeFlaeche).combine(
                 QgsGeometry(DammL.poly(p5)), qp)
         #    seeFlaeche.addGeometry(DammL.poly(p5))
@@ -162,7 +162,7 @@ class CreateFluss(QgsTask):
                 p5.setZ(h)
             if p5.z() < h:
                 pa.append(p5)
-                area += h-p5.z()
+                area += h - p5.z()
                 seeFlaeche = QgsGeometry(seeFlaeche).combine(
                     QgsGeometry(DammL.poly(p5)), qp)
         if pa == []:
@@ -198,9 +198,9 @@ class CreateFluss(QgsTask):
         while notEnd:
             if self.isCanceled():
                 return False
-            id.append(np.min(id)-0.5*i)
-            id.append(np.max(id)+0.5*i)
-            i = i*1.25
+            id.append(np.min(id) - 0.5 * i)
+            id.append(np.max(id) + 0.5 * i)
+            i = i * 1.25
             for xi in id:
                 for yi in id:
                     p = self.mupe.qgsVecAdd(minPoint, QgsPoint(xi, yi, 0))
@@ -208,12 +208,12 @@ class CreateFluss(QgsTask):
                         notEnd = False
                         break
                     if min > p.z():
-                        min = p.z()-0.002
+                        min = p.z() - 0.002
                         p.setZ(min)
                         pmin = p.clone()
             if minPoint.z() > min:
                 ls.addVertex(pmin)
-                if ls.startPoint().distance(ls.endPoint())>self.fllae*1000:
+                if ls.startPoint().distance(ls.endPoint()) > self.fllae * 1000:
                     break
                 minPoint = pmin
                 id = [-1.5, -1, -0.5, 0.5, 1, 1.5]
@@ -224,12 +224,12 @@ class CreateFluss(QgsTask):
             while True:
                 l = self.mupe.qgsDisXy(p, lsx.endPoint())
                 if l > 10:
-                    x = lsx.endPoint().x()+(p.x()-lsx.endPoint().x())/l*10
-                    y = lsx.endPoint().y()+(p.y()-lsx.endPoint().y())/l*10
+                    x = lsx.endPoint().x() + (p.x() - lsx.endPoint().x()) / l * 10
+                    y = lsx.endPoint().y() + (p.y() - lsx.endPoint().y()) / l * 10
                     z = self.raster.getValue(QgsPoint(x, y, 0))
                     dl = self.mupe.qgsDisXy(stp, QgsPoint(x, y, z))
-                    dh = stp.z()-z
-                    m = dh/dl
+                    dh = stp.z() - z
+                    m = dh / dl
                     px = QgsPoint(x, y, z, m)
                     lsx.addVertex(px)
                 else:
@@ -249,8 +249,8 @@ class CreateFluss(QgsTask):
         lsb = QgsLineString()
         lsc = QgsLineString()
         for i in range(l):
-            x = p1.x()-(p1.x()-p2.x())/l*i
-            y = p1.y()-(p1.y()-p2.y())/l*i
+            x = p1.x() - (p1.x() - p2.x()) / l * i
+            y = p1.y() - (p1.y() - p2.y()) / l * i
             p = self.mupe.getPoint(x, y)
             if p.z() == 0:
                 break
@@ -259,12 +259,12 @@ class CreateFluss(QgsTask):
                 minPoint = p.clone()
             if zStart >= p.z():
                 lsa.addVertex(p)
-                lsb.addVertex(QgsPoint(p1.x()+i, p1.y()+p.z()-p1.z(), p.z()))
+                lsb.addVertex(QgsPoint(p1.x() + i, p1.y() + p.z() - p1.z(), p.z()))
                 valh += p.z()
             else:
                 break
         for p in lsa:
-            if p.z() < (p1.z()-(zStart-minPoint.z())*0.9):
+            if p.z() < (p1.z() - (zStart - minPoint.z()) * 0.9):
                 lsc.addVertex(p)
         if lsa.startPoint().distance(lsa.endPoint()) == 0:
             lsa.addVertex(p2)
