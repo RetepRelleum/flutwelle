@@ -30,8 +30,12 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsRendererCategory, QgsFillSymbol, QgsCategorizedSymbolRenderer
-from qgis.core import QgsTextFormat, QgsVectorLayerSimpleLabeling, QgsFeatureRequest, QgsGeometry, QgsFeature, QgsPoint, QgsLineString
+from qgis.core import (QgsProject, QgsVectorLayer, QgsField,
+                       QgsRendererCategory, QgsFillSymbol,
+                       QgsCategorizedSymbolRenderer)
+from qgis.core import (QgsTextFormat, QgsVectorLayerSimpleLabeling,
+                       QgsFeatureRequest, QgsGeometry, QgsFeature,
+                       QgsPoint, QgsLineString)
 from qgis.core import QgsPalLayerSettings, QgsPolygon, QgsSymbol, QgsRendererRange, QgsGraduatedSymbolRenderer
 from qgis.PyQt.QtGui import QColor, QFont
 import math
@@ -194,8 +198,11 @@ class DammL(Layer):
         hours = t // 3600
         minutes = (t % 3600) // 60
         seconds = round(t % 60, 2)
-        feature.setAttributes([type, flaecheS, flaecheM, volumen, breite, laenge, breiteU, hoehe, type_b, q,
-                              u, xvo, ki, um, ueberlauf, v, quote, energielinienhoehe, f" {int(hours):02d}:{int(minutes):02d}:{seconds:2.2f}"])
+        time_str = f" {int(hours):02d}:{int(minutes):02d}:{seconds:2.2f}"
+        feature.setAttributes([type, flaecheS, flaecheM, volumen, breite,
+                              laenge, breiteU, hoehe, type_b, q, u, xvo, ki,
+                              um, ueberlauf, v, quote, energielinienhoehe,
+                              time_str])
         self.damm.startEditing()
         assert (self.damm.addFeatures([feature]))
         self.damm.commitChanges()
@@ -217,7 +224,7 @@ class DammL(Layer):
     def __u(self, laen, v, qb, f):
         u = 1
         if v > 0 and laen > 0 and f > 0:
-            u = 1 + math.log(v/( f * laen))
+            u = 1 + math.log(v / (f * laen))
             if u < 0.6:
                 u = 0.6
             if u > 1.4:
@@ -412,7 +419,6 @@ class IntL(Layer):
             pr.addAttributes([QgsField("quote", QVariant.Double)])
             pr.addAttributes([QgsField("energielinienhoehe", QVariant.Double)])
             self.intensitaet.updateFields()
-      #      self.intensitaet.renderer().symbol().setColor(QColor("blue"))
             QgsProject.instance().addMapLayer(self.intensitaet, False)
             self.getProjektGroup(projektGroup).addLayer(self.intensitaet)
 
@@ -468,7 +474,11 @@ class IntL(Layer):
 
         return p1, p2
 
-    def insertData(self, ls: QgsPoint, inten: QVariant.Double = 0, v: QVariant.Double = 0, h: QVariant.Double = 0, type: QVariant.Double = 0, pos: QVariant.Double = 0, quote: QVariant.Double = 0, energielinienhoehe: QVariant.Double = 0):
+    def insertData(self, ls: QgsPoint, inten: QVariant.Double = 0,
+                   v: QVariant.Double = 0, h: QVariant.Double = 0,
+                   type: QVariant.Double = 0, pos: QVariant.Double = 0,
+                   quote: QVariant.Double = 0,
+                   energielinienhoehe: QVariant.Double = 0):
         feature = QgsFeature()
         feature.setGeometry(ls)
         feature.setAttributes(

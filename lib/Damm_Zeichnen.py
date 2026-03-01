@@ -81,13 +81,15 @@ class DammZeichnen(QgsMapTool):
                     self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                 self.raster.mark_line(self.p1)
                 if self.p1.z() == 0:
-                    teer = "Bitte Kopieren sie die nötigen Dateien herunter "
-                    teer+= "https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d"
-                    qgis.utils.iface.messageBar().pushMessage("Error", teer, level=Qgis.Critical)
+                    teer = "Bitte Kopieren sie die nötigen Dateien herunter"
+                    teer += "https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d"
+                    qgis.utils.iface.messageBar().pushMessage(
+                        "Error", teer, level=Qgis.Critical)
             elif self.p2 is NULL:
                 try:
-                    self.p2 = self.mupe.getPoint(
-                        self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
+                    coord_transform = self.canvas.getCoordinateTransform()
+                    map_coords = coord_transform.toMapCoordinates(event.pos())
+                    self.p2 = self.mupe.getPoint(map_coords)
                     self.polyline.reset(Qgis.GeometryType.Line)
                     QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
                     self.c_run = CreateFluss(

@@ -42,6 +42,7 @@ from .Querschnitt_Zeichnen import Querschnitt
 from .Querschnitt3D import Querschnitt3D
 from ..resources import *
 
+
 class Flutwelle:
     """QGIS Plugin Implementation."""
 
@@ -269,12 +270,26 @@ class Flutwelle:
         self.dlg.tabWidget.setCurrentIndex(0)
         relief = QgsProject.instance().mapLayersByName("Relief")
         if not relief:
-            urlWithParams = 'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7&featureCount=10&format=image/jpeg&layers=ch.swisstopo.swissalti3d-reliefschattierung&styles&tilePixelRatio=0&url=https://wms.geo.admin.ch/'
+            urlWithParams = (
+                'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1'
+                '&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7'
+                '&featureCount=10&format=image/jpeg'
+                '&layers=ch.swisstopo.swissalti3d-reliefschattierung'
+                '&styles&tilePixelRatio=0'
+                '&url=https://wms.geo.admin.ch/'
+            )
             rlayer = QgsRasterLayer(urlWithParams, 'Relief', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
         landeskarte = QgsProject.instance().mapLayersByName("Landeskarte")
         if not landeskarte:
-            urlWithParams = 'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7&featureCount=10&format=image/jpeg&layers=ch.swisstopo.pixelkarte-grau&styles&tilePixelRatio=0&url=https://wms.geo.admin.ch/'
+            urlWithParams = (
+                'url=https://wms.geo.admin.ch/&SmoothPixmapTransform=1'
+                '&contextualWMSLegend=0&crs=EPSG:2056&dpiMode=7'
+                '&featureCount=10&format=image/jpeg'
+                '&layers=ch.swisstopo.pixelkarte-grau'
+                '&styles&tilePixelRatio=0'
+                '&url=https://wms.geo.admin.ch/'
+            )
             rlayer = QgsRasterLayer(urlWithParams, 'Landeskarte', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
 

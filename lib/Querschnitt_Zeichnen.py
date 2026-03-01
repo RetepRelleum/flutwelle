@@ -32,14 +32,16 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 from qgis.PyQt.QtGui import QColor
 from qgis.gui import QgsVertexMarker
 import qgis.utils
-from qgis.core import QgsTask,QgsLineString,QgsPoint,QgsPolygon,QgsPointXY
+from qgis.core import QgsTask, QgsLineString, QgsPoint, QgsPolygon, QgsPointXY
 from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL, IntL
 
 
 class Querschnitt(QgsTask):
     """
-    Querschnitt is a QGIS task class for calculating and analyzing cross-sections (Qerschnitt) in a hydrological context, specifically for flood wave computations.
+    Querschnitt is a QGIS task class for calculating and analyzing
+    cross-sections (Qerschnitt) in a hydrological context, specifically
+    for flood wave computations.
     Args:
         dlg: The dialog object containing user interface elements and input values.
     Attributes:
@@ -57,7 +59,10 @@ class Querschnitt(QgsTask):
         finished(result):
             Called when the task is finished. Prints a message if the result is False.
         run():
-            Main computation loop. Iterates over river vertices, calculates cross-sections, determines geometry type (rectangle, triangle, trapezoid, parabola), computes hydraulic parameters, and stores results in the dam and intensity layers.
+            Main computation loop. Iterates over river vertices, calculates
+            cross-sections, determines geometry type (rectangle, triangle,
+            trapezoid, parabola), computes hydraulic parameters, and stores
+            results in the dam and intensity layers.
         r_ymax(ls, i, k, qmm, l):
             Calculates maximum height and area for a rectangular cross-section.
         interpolation(i, dmax, dm, um):
@@ -74,8 +79,11 @@ class Querschnitt(QgsTask):
             Computes the ratio of maximum discharge to base discharge using tabulated factors.
     Notes:
         - This class is designed for use within a QGIS plugin environment.
-        - It relies on several custom classes (Raster, FlussL, Mupe, DammL, IntL) and QGIS API objects.
-        - The main logic involves iteratively constructing cross-sections, classifying their geometry, and storing hydraulic properties for further analysis or visualization.
+        - It relies on several custom classes (Raster, FlussL, Mupe, DammL, IntL)
+          and QGIS API objects.
+        - The main logic involves iteratively constructing cross-sections,
+          classifying their geometry, and storing hydraulic properties for further
+          analysis or visualization.
     """
 
     def __init__(self, dlg):
@@ -166,17 +174,17 @@ class Querschnitt(QgsTask):
                         lt += 1
                 if not insl and not insr:
                     niveauHoehe += deltaHoehe
-                l = lsl.endPoint().distance(lsr.endPoint())
-                if lt > l:
+                laenge_ = lsl.endPoint().distance(lsr.endPoint())
+                if lt > laenge_:
                     lt = 1
                 if qmm <= 0:
                     break
-                ymaxR, fmaxR, umR = self.r_ymax(ls, i, self.k, qmm, l)
+                ymaxR, fmaxR, umR = self.r_ymax(ls, i, self.k, qmm, laenge_)
                 ymaxD, fmaxD, umD = self.d_ymax(
-                    ls, i, self.k, qmm, (l/2)/(niveauHoehe-hmin))
+                    ls, i, self.k, qmm, (laenge_/2)/(niveauHoehe-hmin))
                 ymaxT, fmaxT, umT = self.t_ymax(
-                    ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin), lt)
-                ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, l)
+                    ls, i, self.k, qmm, ((laenge_-lt)/2)/(niveauHoehe-hmin), lt)
+                ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, laenge_)
                 dq = qm2/100*20
                 dy = (niveauHoehe-hmin)/100*20
                 dP = 0.15
@@ -211,19 +219,19 @@ class Querschnitt(QgsTask):
             el = niveauHoehe+(v**2)/(2*9.81)
             if i > 0 and v > 0:
                 if typq == 'Rechteck':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, l, i*10, 0, ymaxR,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*1, 0, ymaxR,
                                          typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                 elif typq == 'Dreieck':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, l, i*10, 0, ymaxD,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i*10, 0, ymaxD,
                                          typq, qmm, 0, xvo, ki, umD, ueberlauf, v, niveauHoehe, el, t)
                 elif typq == 'Trapez':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, l, i*10, 0, ymaxT,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, laenge_, i*10, 0, ymaxT,
                                          typq, qmm, 0, xvo, ki, umT, ueberlauf, v, niveauHoehe, el, t)
                 elif typq == 'Parabel':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, l, i*10, 0, ymaxP,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, laenge_, i*10, 0, ymaxP,
                                          typq, qmm, 0, xvo, ki, umP, ueberlauf, v, niveauHoehe, el, t)
                 else:
-                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, l, i*10, 0, ymaxR,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
                                          typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                 for p in lsx:
                     intens = abs((niveauHoehe-p.z())*v)
@@ -234,16 +242,16 @@ class Querschnitt(QgsTask):
                         p, intens, v, h, i*10, p.m(), niveauHoehe, el)
         self.raster.setVisibility(False)
 
-    def r_ymax(self, ls, i, k, qmm, l):
+    def r_ymax(self, ls, i, k, qmm, lae):
         umx = 0
         dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm/(k*dh**(1/2)*l**(8/3))
+        dmax = qmm/(k*dh**(1/2)*lae**(8/3))
         if dmax <= 10**(-3):
-            ymax = l*dmax**(3/5)
+            ymax = lae*dmax**(3/5)
         elif dmax > 100:
-            ymax = 1.59*l*dmax
+            ymax = 1.59*lae*dmax
         else:
             dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                   0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
@@ -259,8 +267,8 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = l*umx
-        return ymax, l*ymax, umx
+            ymax = lae*umx
+        return ymax, lae*ymax, umx
 
     def interpolation(self, i, dmax, dm, um):
         umx1 = um[i]
@@ -298,14 +306,14 @@ class Querschnitt(QgsTask):
             ymax = 10*umx
         return ymax, m*ymax**2, umx
 
-    def t_ymax(self, ls, i, k, qmm, m, l):
+    def t_ymax(self, ls, i, k, qmm, m, lae):
         umx = 0
         dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm*m**(5/3)/(k*dh**(1/2)*l**(8/3))
+        dmax = qmm*m**(5/3)/(k*dh**(1/2)*lae**(8/3))
         if dmax <= 10**(-3):
-            ymax = l/m*dmax**(3/5)
+            ymax = lae/m*dmax**(3/5)
         elif dmax > 100:
             ymax = 1.3*dmax**(3/8)
         else:
@@ -323,8 +331,8 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = l/m*umx
-        return ymax, l*ymax+m*ymax**2, umx
+            ymax = lae/m*umx
+        return ymax, lae*ymax+m*ymax**2, umx
 
     def p_ymax(self, ls, i, k, qmm, p):
         umx = 0

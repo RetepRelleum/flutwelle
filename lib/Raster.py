@@ -87,7 +87,6 @@ class Raster():
                 self.rg.addLayer(self.r_layer)
                 return self.r_layer
             else:
-              #  iface.messageBar().pushMessage("Error", "Bitte Kopieren sie die nötigen Dateien herunter https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d ", level=Qgis.Critical)
                 return 0
         else:
             self.r_layer = r_layer[0]

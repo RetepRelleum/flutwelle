@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from .Layer import DammL, IntL
 from .Raster import Raster
-from qgis.core import QgsPoint,QgsPointXY
+from qgis.core import QgsPoint, QgsPointXY
 import qgis.utils
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtGui import QColor
@@ -84,7 +84,7 @@ class Querschnitt3D:
                         z2 = h2
                     else:
                         z2 = np.nan
-                   # self.setMarker( pk,2)
+# self.setMarker( pk,2)
                 else:
                     z_ = np.nan
                     z1 = np.nan
@@ -95,13 +95,11 @@ class Querschnitt3D:
         Y1 = np.array([0, llx/2, llx])
         X1 = np.array([0, 10, 20])
         Xq, Yq = np.meshgrid(X1, Y1)
-        Zq = self.CreateZ(p1.z(), p3.z(), p5.z(), Xq)
-        Ze = self.CreateZ(p1.m(), p3.m(), p5.m(), Xq)
         Zb = self.CreateZ(qb, qb, qb, Xq)
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         ax.plot_surface(Y, X, Z, alpha=0.5, color='green',
-                        label='Gelaende', linewidth=0.5,edgecolor='gray')
+                        label='Gelaende', linewidth=0.5, edgecolor='gray')
         ax.plot_surface(Y, X, Z1, alpha=0.5, color='blue',
                         label='Quote Abfluss', linewidth=0.5)
         ax.plot_surface(Y, X, Z2, alpha=0.5, color='red',
@@ -116,7 +114,7 @@ class Querschnitt3D:
         ax.text(0, 0, p1.z(),  'Quote Abfluss', size=12,  color='blue')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right')
-        text = f'Koordinaten\n'
+        text = 'Koordinaten\n'
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
         text += self.damm.getData(laenge)
         ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/2, text,
