@@ -33,7 +33,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 from qgis.PyQt.QtGui import QColor
 import math
 from qgis.core import QgsProject, QgsRasterLayer, QgsPoint, QgsPointXY, QgsColorRampShader, QgsMapLayer, QgsRasterShader
-from qgis.core import QgsRasterBandStats, QgsSingleBandPseudoColorRenderer
+from qgis.core import QgsSingleBandPseudoColorRenderer
 import glob
 
 
@@ -73,14 +73,13 @@ class Raster():
             return 0
 
     def getR_Layer(self, p: QgsPoint):
-
         lname = f"{int(p.x()//1000)}-{int(p.y()//1000)}"
         if lname == self.r_layer.name():
             return self.r_layer
         r_layer = QgsProject.instance().mapLayersByName(lname)
         if not r_layer:
-            p = f'{self.tiffPath}/*{lname}*.tif'
-            pfad = glob.glob(p, recursive=True)
+            tiff = f'{self.tiffPath}/*{lname}*.tif'
+            pfad = glob.glob(tiff, recursive=True)
             if len(pfad) > 0:
                 self.r_layer = QgsRasterLayer(pfad[0], lname)
                 QgsProject.instance().addMapLayer(self.r_layer, False)
@@ -92,8 +91,7 @@ class Raster():
             self.r_layer = r_layer[0]
             return self.r_layer
 
-    def mark_line(self, point: QgsPoint):
-        val = self.getValue(point)
+    def mark_line(self, point: QgsPoint, val: float = 0):
         fcn = QgsColorRampShader()
         fcn.setColorRampType(QgsColorRampShader.Interpolated)
         fcn.setClassificationMode(QgsColorRampShader.Continuous)
@@ -107,25 +105,20 @@ class Raster():
         for layerx in layers:
             layerType = layerx.type()
             if layerType == QgsMapLayer.RasterLayer:
-                if layerx.name().startswith("2"):
-                    provider = layerx.dataProvider()
-                    stats = provider.bandStatistics(1, QgsRasterBandStats.All)
-                    min = stats.minimumValue
-                    max = stats.maximumValue
-                    if min <= val <= max:
-                        shader = QgsRasterShader()
-                        shader.setRasterShaderFunction(fcn)
-                        renderer = QgsSingleBandPseudoColorRenderer(
-                            layerx.dataProvider(), 1, shader)
-                        try:
-                            layerx.setRenderer(renderer)
-                            layerx.triggerRepaint()
-                            layerx.emitStyleChanged()
-                        except Exception as inst:
-                            print(type(inst))    # the exception type
-                            print(inst.args)     # arguments stored in .args
-                            print(inst)
-        QgsProject.instance().reloadAllLayers()
+                if layerx.name() in f'{int(point.x()//1000)}-{int(point.y())//1000}':
+                    shader = QgsRasterShader()
+                    shader.setRasterShaderFunction(fcn)
+                    renderer = QgsSingleBandPseudoColorRenderer(
+                        layerx.dataProvider(), 1, shader)
+                    try:
+                        layerx.setRenderer(renderer)
+                        layerx.triggerRepaint()
+                        layerx.emitStyleChanged()
+                    except Exception as inst:
+                        print(type(inst))    # the exception type
+                        print(inst.args)     # arguments stored in .args
+                        print(inst)
+#   QgsProject.instance().reloadAllLayers()
 
 
 class Mupe:

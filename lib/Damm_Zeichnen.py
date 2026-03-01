@@ -79,7 +79,7 @@ class DammZeichnen(QgsMapTool):
             if self.p1 is NULL:
                 self.p1 = self.mupe.getPoint(
                     self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
-                self.raster.mark_line(self.p1)
+                self.raster.mark_line(self.p1, self.p1.z())
                 if self.p1.z() == 0:
                     teer = "Bitte Kopieren sie die nötigen Dateien herunter"
                     teer += "https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d"
@@ -108,6 +108,7 @@ class DammZeichnen(QgsMapTool):
         if self.p1 is not NULL and self.p2 is NULL:
             p2 = self.mupe.getPoint(
                 self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
+            self.raster.mark_line(p2, self.p1.z())
             self.polyline.reset(Qgis.GeometryType.Line)
             self.polyline.addPoint(self.mupe.getPointXY(self.p1))
             self.polyline.addPoint(self.mupe.getPointXY(p2))
