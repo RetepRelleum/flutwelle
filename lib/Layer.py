@@ -195,7 +195,7 @@ class DammL(Layer):
         minutes = (t % 3600) // 60
         seconds = round(t % 60, 2)
         feature.setAttributes([type, flaecheS, flaecheM, volumen, breite, laenge, breiteU, hoehe, type_b, q,
-                              u, xvo, ki, um, ueberlauf, v, quote, energielinienhoehe, f"{int(hours):02d}{int(minutes):02d}:{seconds:2.2f}"])
+                              u, xvo, ki, um, ueberlauf, v, quote, energielinienhoehe, f" {int(hours):02d}:{int(minutes):02d}:{seconds:2.2f}"])
         self.damm.startEditing()
         assert (self.damm.addFeatures([feature]))
         self.damm.commitChanges()

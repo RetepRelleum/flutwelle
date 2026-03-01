@@ -177,18 +177,19 @@ class Querschnitt(QgsTask):
                 ymaxT, fmaxT, umT = self.t_ymax(
                     ls, i, self.k, qmm, ((l-lt)/2)/(niveauHoehe-hmin), lt)
                 ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, l)
-                dq = qm2/100*15
-                dy = (niveauHoehe-hmin)/100*15
-                if (fmaxR-dq*0.1) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxR+dy):
+                dq = qm2/100*20
+                dy = (niveauHoehe-hmin)/100*20
+                dP = 0.15
+                if (fmaxR-dq*dP) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*dP) <= (niveauHoehe-hmin) <= (ymaxR+dy):
                     typq = 'Rechteck'
                     break
-                if (fmaxD-dq*0.1) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxD+dy):
+                if (fmaxD-dq*dP) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD+dy):
                     typq = 'Dreieck'
                     break
-                if (fmaxT-dq*0.1) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxT+dy):
+                if (fmaxT-dq*dP) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*dP) <= (niveauHoehe-hmin) <= (ymaxT+dy):
                     typq = 'Trapez'
                     break
-                if (fmaxP-dq*0.1) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*0.1) <= (niveauHoehe-hmin) <= (ymaxP+dy):
+                if (fmaxP-dq*dP) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*dP) <= (niveauHoehe-hmin) <= (ymaxP+dy):
                     typq = 'Parabel'
                     break
                 if qm2 > 1.5*fmaxR or qm2 > 3*fmaxP:

@@ -40,7 +40,7 @@ from .Damm_Zeichnen import DammZeichnen
 from .Layer import DammL, FlussL
 from .Querschnitt_Zeichnen import Querschnitt
 from .Querschnitt3D import Querschnitt3D
-
+from ..resources import *
 
 class Flutwelle:
     """QGIS Plugin Implementation."""
