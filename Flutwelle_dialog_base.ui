@@ -44,7 +44,7 @@
     </sizepolicy>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideRight</enum>
@@ -606,7 +606,7 @@
       <rect>
        <x>0</x>
        <y>100</y>
-       <width>90</width>
+       <width>91</width>
        <height>21</height>
       </rect>
      </property>
@@ -659,7 +659,7 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>20</number>
+      <number>40</number>
      </property>
      <property name="maximum">
       <number>9000</number>
@@ -705,6 +705,9 @@
      </property>
      <property name="minimum">
       <number>10</number>
+     </property>
+     <property name="maximum">
+      <number>999</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">

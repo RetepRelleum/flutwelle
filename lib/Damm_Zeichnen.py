@@ -81,7 +81,7 @@ class DammZeichnen(QgsMapTool):
                     self.canvas.getCoordinateTransform().toMapCoordinates(event.pos()))
                 self.raster.mark_line(self.p1)
                 if self.p1.z() == 0:
-                    teer = "Bitte Kopieren sie die nötigen Dateien herunter " 
+                    teer = "Bitte Kopieren sie die nötigen Dateien herunter "
                     teer+= "https://www.swisstopo.admin.ch/de/hoehenmodell-swissalti3d"
                     qgis.utils.iface.messageBar().pushMessage("Error", teer, level=Qgis.Critical)
             elif self.p2 is NULL:

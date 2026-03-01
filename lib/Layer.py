@@ -64,8 +64,8 @@ class DammL(Layer):
     """
     DammL(Layer):
         A QGIS layer class for managing dam-related geometric features and their attributes.
-        This class handles the creation and manipulation of a vector layer named "Damm" 
-        that stores MultiPolygonZ geometries representing various dam components and breach 
+        This class handles the creation and manipulation of a vector layer named "Damm"
+        that stores MultiPolygonZ geometries representing various dam components and breach
         formations with associated hydraulic properties.
         Attributes:
             damm (QgsVectorLayer): Vector layer storing dam features with fields including:
@@ -91,8 +91,8 @@ class DammL(Layer):
             __init__(projektGroup): Initializes the DammL layer with categorized symbology
             insertData(): Adds feature geometries with hydraulic attributes to the layer
             updateDlg(): Updates dialog controls with current layer feature values
-            s_b(), r_b(), d_b(), t_b(), p_b(): Calculate and insert breach geometries 
-                                                (square, rectangular, triangular, 
+            s_b(), r_b(), d_b(), t_b(), p_b(): Calculate and insert breach geometries
+                                                (square, rectangular, triangular,
                                                 trapezoidal, parabolic shapes)
             circle_geometry(): Generates circular/parabolic vertex sequences
             poly(): Creates a small square polygon from a point
@@ -214,10 +214,10 @@ class DammL(Layer):
                 dlg.spBl.setValue(float(f['laenge']))
                 dlg.sBv.setValue(float(f['volumen']))
 
-    def __u(self, l, v, qb, f):
+    def __u(self, laen, v, qb, f):
         u = 1
-        if v > 0 and l > 0 and f > 0:
-            u = 1+math.log(v/(f*l))
+        if v > 0 and laen > 0 and f > 0:
+            u = 1 + math.log(v/( f * laen))
             if u < 0.6:
                 u = 0.6
             if u > 1.4:
@@ -234,7 +234,7 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         return pol
 
-    def s_b(self, p: QgsPoint, h: float, l: float, v: float) -> tuple[float, float]:
+    def s_b(self, p: QgsPoint, h: float, lx: float, v: float) -> tuple[float, float]:
 
         ls = QgsLineString()
         ls.addVertex(p)
@@ -255,12 +255,12 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         qb = 0.93*2*h*(h**(3/2))+0.72*(h**(5/2))
         f = h*h*3
-        qb_, u = self.__u(l, v, qb, f)
+        qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, 4*h,
                         0, 2*h, h, 'Standart', qb_, u)
         return qb_, f
 
-    def r_b(self, p: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+    def r_b(self, p: QgsPoint, h: float, b: float, lx: float, v: float) -> tuple[float, float]:
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
@@ -278,12 +278,12 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         qb = 0.93*b*(h**(3/2))
         f = h*b
-        qb_, u = self.__u(l, v, qb, f)
+        qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b,
                         0, b, h, 'Rechteck', qb_, u)
         return qb_, f
 
-    def d_b(self, p: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+    def d_b(self, p: QgsPoint, h: float, b: float, lx: float, v: float) -> tuple[float, float]:
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
@@ -296,11 +296,11 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         qb = 0.72*(b/2)/h*(h**(5/2))
         f = h*b/2
-        qb_, u = self.__u(l, v, qb, f)
+        qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Dreieck', qb_, u)
         return qb_, f
 
-    def t_b(self, p: QgsPoint, h: float, b: float, bu: float, l: float, v: float) -> tuple[float, float]:
+    def t_b(self, p: QgsPoint, h: float, b: float, bu: float, lx: float, v: float) -> tuple[float, float]:
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
@@ -320,11 +320,11 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         qb = 0.93*bu*(h**(3/2))+0.72*((b-bu)/2)/h*(h**(5/2))
         f = h*bu+h*(b-bu)/2
-        qb_, u = self.__u(l, v, qb, f)
+        qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, bu, h, 'Trapez', qb_, u)
         return qb_, f
 
-    def p_b(self, px: QgsPoint, h: float, b: float, l: float, v: float) -> tuple[float, float]:
+    def p_b(self, px: QgsPoint, h: float, b: float, lx: float, v: float) -> tuple[float, float]:
         p = px.clone()
         r = (4*h**2+b**2)/(8*h)
         p.setY(p.y()+r)
@@ -338,7 +338,7 @@ class DammL(Layer):
         pol = QgsPolygon(ls)
         qb = 0.58*b*h**(3/2)
         f = 2/3*b*h
-        qb_, u = self.__u(l, v, qb, f)
+        qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Parabel', qb_, u)
         return qb_, f
 

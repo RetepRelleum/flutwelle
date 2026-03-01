@@ -222,10 +222,10 @@ class CreateFluss(QgsTask):
         lsx.addVertex(ls.startPoint().clone())
         for p in ls:
             while True:
-                l = self.mupe.qgsDisXy(p, lsx.endPoint())
-                if l > 10:
-                    x = lsx.endPoint().x() + (p.x() - lsx.endPoint().x()) / l * 10
-                    y = lsx.endPoint().y() + (p.y() - lsx.endPoint().y()) / l * 10
+                l__ = self.mupe.qgsDisXy(p, lsx.endPoint())
+                if l__ > 10:
+                    x = lsx.endPoint().x() + (p.x() - lsx.endPoint().x()) / l__ * 10
+                    y = lsx.endPoint().y() + (p.y() - lsx.endPoint().y()) / l__ * 10
                     z = self.raster.getValue(QgsPoint(x, y, 0))
                     dl = self.mupe.qgsDisXy(stp, QgsPoint(x, y, z))
                     dh = stp.z() - z
@@ -244,13 +244,13 @@ class CreateFluss(QgsTask):
         dirP = NULL
         zStart = p1.z()
         valh = 0
-        l = int(p1.distance(p2))
+        ldi = int(p1.distance(p2))
         lsa = QgsLineString()
         lsb = QgsLineString()
         lsc = QgsLineString()
-        for i in range(l):
-            x = p1.x() - (p1.x() - p2.x()) / l * i
-            y = p1.y() - (p1.y() - p2.y()) / l * i
+        for i in range(ldi):
+            x = p1.x() - (p1.x() - p2.x()) / ldi * i
+            y = p1.y() - (p1.y() - p2.y()) / ldi * i
             p = self.mupe.getPoint(x, y)
             if p.z() == 0:
                 break
@@ -274,7 +274,7 @@ class CreateFluss(QgsTask):
         polygonA = QgsPolygon(lsa)
         polygonB = QgsPolygon(lsb)
         damm.insertData(polygonA, "Damm", 0, polygonB.area(
-        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart-minPoint.z())
+        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart - minPoint.z())
         damm.insertData(polygonB, 'Profil Damm', 0, polygonB.area(
-        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart-minPoint.z())
+        ), 0, breite, 0, lsc.startPoint().distance(lsc.endPoint()), zStart - minPoint.z())
         return minPoint, dirP, zStart, lsa.startPoint(), lsa.endPoint()
