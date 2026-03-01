@@ -234,15 +234,14 @@ class DammL(Layer):
 
     def poly(p: QgsPoint) -> QgsPolygon:
         ls = QgsLineString()
-        ls.addVertex(QgsPoint(p.x()-0.75, p.y()-0.75, p.z()))
-        ls.addVertex(QgsPoint(p.x()+0.75, p.y()-0.75, p.z()))
-        ls.addVertex(QgsPoint(p.x()+0.75, p.y()+0.75, p.z()))
-        ls.addVertex(QgsPoint(p.x()-0.75, p.y()+0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x() - 0.75, p.y() - 0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x() + 0.75, p.y() - 0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x() + 0.75, p.y() + 0.75, p.z()))
+        ls.addVertex(QgsPoint(p.x() - 0.75, p.y() + 0.75, p.z()))
         pol = QgsPolygon(ls)
         return pol
 
     def s_b(self, p: QgsPoint, h: float, lx: float, v: float) -> tuple[float, float]:
-
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()

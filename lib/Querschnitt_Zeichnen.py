@@ -233,7 +233,16 @@ class Querschnitt(QgsTask):
                 else:
                     self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
                                          typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
+                min_p = 0
+                max_p = 0
                 for p in lsx:
+                    if min_p > p.m():
+                        min_p = p.m()
+                    if max_p < p.m():
+                        max_p = p.m()
+                for p in lsx:
+                    if p.m() == min_p or p.m() == max_p and not ueberlauf:
+                        p.setZ(niveauHoehe)
                     intens = abs((niveauHoehe-p.z())*v)
                     if ueberlauf:
                         intens = intens*-1

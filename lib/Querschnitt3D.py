@@ -101,13 +101,13 @@ class Querschnitt3D:
         ax.plot_surface(Y, X, Z, alpha=0.5, color='green',
                         label='Gelaende', linewidth=0.5, edgecolor='gray')
         ax.plot_surface(Y, X, Z1, alpha=0.5, color='blue',
-                        label='Quote Abfluss', linewidth=0.5)
+                        label='Quote Abfluss', linewidth=0.25, edgecolor='black')
         ax.plot_surface(Y, X, Z2, alpha=0.5, color='red',
-                        label='Energielinienhoehe', linewidth=0.5)
+                        label='Energielinienhoehe', linewidth=0.25, edgecolor='black')
 
         if qb > 0:
             ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='black',
-                            label='Bruecke', linewidth=0.5)
+                            label='Bruecke', linewidth=0.25, edgecolor='black')
             ax.text(llx/2, 0, qb,  'Brücke', size=12, color='black',
                     ha='center', va='center_baseline')
 
