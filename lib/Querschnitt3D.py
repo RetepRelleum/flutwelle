@@ -77,12 +77,9 @@ class Querschnitt3D:
 
                     if z_ <= h1 and x > la/2 and x < llx-la/2:
                         z1 = h1
-                    else:
-                        z1 = np.nan
-
-                    if z_ <= h2 and x > la/2 and x < llx-la/2:
                         z2 = h2
                     else:
+                        z1 = np.nan
                         z2 = np.nan
 # self.setMarker( pk,2)
                 else:
@@ -102,9 +99,8 @@ class Querschnitt3D:
                         label='Gelaende', linewidth=0.5, edgecolor='gray')
         ax.plot_surface(Y, X, Z1, alpha=0.5, color='blue',
                         label='Quote Abfluss', linewidth=0.25, edgecolor='black')
-        ax.plot_surface(Y, X, Z2, alpha=0.5, color='red',
+        ax.plot_surface(Y, X, Z2, alpha=0.2, color='red',
                         label='Energielinienhoehe', linewidth=0.25, edgecolor='black')
-
         if qb > 0:
             ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='black',
                             label='Bruecke', linewidth=0.25, edgecolor='black')
@@ -114,6 +110,7 @@ class Querschnitt3D:
         ax.text(0, 0, p1.z(),  'Quote Abfluss', size=12,  color='blue')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right')
+
         text = 'Koordinaten\n'
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
         text += self.damm.getData(laenge)

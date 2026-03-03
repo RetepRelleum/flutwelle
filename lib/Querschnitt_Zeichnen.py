@@ -22,7 +22,7 @@
  ***************************************************************************/
 
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+THE SOFTWARE IS PROVIDED \u201cAS IS\u201d, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
@@ -219,7 +219,7 @@ class Querschnitt(QgsTask):
             el = niveauHoehe+(v**2)/(2*9.81)
             if i > 0 and v > 0:
                 if typq == 'Rechteck':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*1, 0, ymaxR,
+                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
                                          typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                 elif typq == 'Dreieck':
                     self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i*10, 0, ymaxD,
