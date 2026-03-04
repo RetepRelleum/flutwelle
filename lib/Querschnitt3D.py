@@ -57,6 +57,8 @@ class Querschnitt3D:
         llx = int((lx+2*la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
+        x3 = np.arange(0, 20, 0.5)
+        y3 = np.arange(0, 20, 0.5)
         X, Y = np.meshgrid(Y1, X1)
         Z = X.copy()
         Z1 = X.copy()
@@ -74,7 +76,6 @@ class Querschnitt3D:
                     else:
                         h1 = p3.z()+(p5.z()-p3.z())/10*(y-10)
                         h2 = p3.m()+(p5.m()-p3.m())/10*(y-10)
-
                     if z_ <= h1 and x > la/2 and x < llx-la/2:
                         z1 = h1
                         z2 = h2
@@ -89,6 +90,14 @@ class Querschnitt3D:
                 Z[int(x*2)][int(y*2)] = z_
                 Z1[int(x*2)][int(y*2)] = z1
                 Z2[int(x*2)][int(y*2)] = z2
+        for x in X1:
+            h3 = 100000
+            for y in Y1:
+                if h3 > Z[int(y*2)][int(x*2)]:
+                    h3 = Z[int(y*2)][int(x*2)]
+            if x < 20:
+                y3[int(x*2)] = h3
+
         Y1 = np.array([0, llx/2, llx])
         X1 = np.array([0, 10, 20])
         Xq, Yq = np.meshgrid(X1, Y1)
@@ -101,11 +110,31 @@ class Querschnitt3D:
                         label='Quote Abfluss', linewidth=0.25, edgecolor='black')
         ax.plot_surface(Y, X, Z2, alpha=0.2, color='red',
                         label='Energielinienhoehe', linewidth=0.25, edgecolor='black')
+        x = [0, 10, 20]
+        y = [p1.z(), p3.z(), p5.z()]
+        y1 = [p1.m(), p3.m(), p5.m()]
+        y2 = [qb, qb, qb]
+        ax.plot(x, y, zs=-llx/100*5, zdir='x',
+                label='curve in (x, y)', color='blue')
+        ax.plot(x, y, zs=llx+llx/100*5, zdir='x',
+                label='curve in (x, y)', color='blue')
+        ax.plot(x, y1, zs=-llx/100*5, zdir='x',
+                label='curve in (x, y)', color='red')
+        ax.plot(x, y1, zs=llx+llx/100*5, zdir='x',
+                label='curve in (x, y)', color='red')
+        ax.plot(x3, y3, zs=-llx/100*5, zdir='x',
+                label='curve in (x, y)', color='green')
+        ax.plot(x3, y3, zs=llx+llx/100*5, zdir='x',
+                label='curve in (x, y)', color='green')
         if qb > 0:
             ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='black',
                             label='Bruecke', linewidth=0.25, edgecolor='black')
             ax.text(llx/2, 0, qb,  'Brücke', size=12, color='black',
                     ha='center', va='center_baseline')
+            ax.plot(x, y2, zs=-llx/100*5, zdir='x',
+                    label='curve in (x, y)', color='black')
+            ax.plot(x, y2, zs=llx+llx/100*5, zdir='x',
+                    label='curve in (x, y)', color='black')
 
         ax.text(0, 0, p1.z(),  'Quote Abfluss', size=12,  color='blue')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
@@ -119,6 +148,8 @@ class Querschnitt3D:
         ax.set_xlabel('m')
         ax.set_ylabel('m')
         ax.set_zlabel('mü.M.')
+        ax.set_xlim(-llx/100*5, llx+llx/100*5)
+        ax.set_ylim(-llx/100*5, llx+llx/100*5)
         plt.show()
         self.raster.setVisibility(False)
 
