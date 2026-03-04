@@ -6,7 +6,7 @@
 name=Flutwelle
 qgisMinimumVersion=3.0
 description=Schätzt eine Flutwelle gemäss CTGREF
-version=0.8.2
+version=0.9
 author=retep relleum
 email=retep.relleum@bluewin.ch
 
