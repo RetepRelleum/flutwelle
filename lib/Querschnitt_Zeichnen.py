@@ -115,8 +115,8 @@ class Querschnitt(QgsTask):
             self.dlg.progressBar.setValue(i+1)
             lsl = QgsLineString()
             lsr = QgsLineString()
-            lsp = QgsLineString()
             lsx = QgsLineString()
+            lsp = QgsLineString()
             point0l = ls.pointN(i+1)
             point0l.setX(point0l.x()-0.001)
             point0r = point0l.clone()
@@ -135,45 +135,28 @@ class Querschnitt(QgsTask):
                 10*i+10, self.vo, (h1-h2)/(10*i+10), self.k)
             qmm = self.qb_*qm_qb
             typq = ''
-            pil = 0
-            pir = 0
+            pil = 1
+            pir = -1
 
             while weiter:
                 ueberlauf = False
-                insl = False
-                insr = False
                 if point0l.z() <= niveauHoehe and point0l.z() != 0.0:
-                    point0l = self.mupe.qgsVecAdd(point0l, dirV)
-                    px = point0l.clone()
-                    px.setX(px.x()+dirV.y()*(px.z()-hmin))
-                    px.setY(px.y()-dirV.x()*(px.z()-hmin))
-                    lsl.addVertex(px)
+                    point0l = self.insertPoint(lsl, lsx, point0l, hmin, dirV, pil)
                     pil += 1
-                    lsx.addVertex(
-                        QgsPoint(point0l.x(), point0l.y(), point0l.z(), pil))
-                    insl = True
                 if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
-                    point0r = self.mupe.qgsVecAddM(point0r, dirV)
-                    px = point0r.clone()
-                    px.setX(px.x()+dirV.y()*(px.z()-hmin))
-                    px.setY(px.y()-dirV.x()*(px.z()-hmin))
-                    lsr.addVertex(px)
+                    point0r = self.insertPoint(lsr, lsx, point0r, hmin, dirV, pir)
                     pir -= 1
-                    lsx.addVertex(
-                        QgsPoint(point0r.x(), point0r.y(), point0r.z(), pir))
-                    insr = True
+                niveauHoehe += deltaHoehe
                 qm2 = 0
                 lt = 0
                 for h_ in lsr:
                     qm2 += abs(niveauHoehe-h_.z())
-                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.9):
+                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
                         lt += 1
                 for h_ in lsl:
                     qm2 += abs(niveauHoehe-h_.z())
-                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.9):
+                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
                         lt += 1
-                if not insl and not insr:
-                    niveauHoehe += deltaHoehe
                 laenge_ = lsl.endPoint().distance(lsr.endPoint())
                 if lt > laenge_:
                     lt = 1
@@ -211,11 +194,9 @@ class Querschnitt(QgsTask):
             if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
                 ueberlauf = True
                 querStr = 'Ueberlauf'
+            polygonL = QgsPolygon(lsp)
             v = qmm/fmaxR
             t += 10/v
-            lsp.startPoint().setZ(niveauHoehe)
-            lsp.endPoint().setZ(niveauHoehe)
-            polygonL = QgsPolygon(lsp)
             el = niveauHoehe+(v**2)/(2*9.81)
             if i > 0 and v > 0:
                 if typq == 'Rechteck':
@@ -250,6 +231,18 @@ class Querschnitt(QgsTask):
                     self.intL.insertData(
                         p, intens, v, h, i*10, p.m(), niveauHoehe, el)
         self.raster.setVisibility(False)
+
+    def insertPoint(self, lsl_, lsx_, point0l_, hmin, dirV, pi):
+        if pi < 0:
+            point0l_ = self.mupe.qgsVecAddM(point0l_, dirV)
+        else:
+            point0l_ = self.mupe.qgsVecAdd(point0l_, dirV)
+        px = point0l_.clone()
+        px.setX(px.x()+dirV.y()*(px.z()-hmin))
+        px.setY(px.y()-dirV.x()*(px.z()-hmin))
+        lsl_.addVertex(px)
+        lsx_.addVertex(QgsPoint(point0l_.x(), point0l_.y(), point0l_.z(), pi))
+        return point0l_
 
     def r_ymax(self, ls, i, k, qmm, lae):
         umx = 0
