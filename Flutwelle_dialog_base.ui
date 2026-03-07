@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Bresche Konfigurator </string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon.png</normaloff>icon.png</iconset>
+  </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
     <bool>true</bool>

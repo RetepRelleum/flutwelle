@@ -396,9 +396,9 @@ class FlussL(Layer):
         i = 0
         for f in features:
             if f['type'] == 'Fluss':
-                for p in f.geometry().constGet():
+                for qlin in f.geometry().constGet():
                     if i == index:
-                        return p
+                        return QgsPoint(qlin.x(), qlin.y(), qlin.z(), 0)
                     i += 1
         return None
 
