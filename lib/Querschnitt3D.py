@@ -136,20 +136,26 @@ class Querschnitt3D:
             ax.plot(x, y2, zs=llx+llx/100.0*5.0, zdir='x',
                     label='curve in (x, y)', color='black')
 
-        ax.text(0, 0, p1.z(),  'Quote\nAbfluss', size=12,  color='blue')
-        ax.text(llx, 0, p1.m(),  'Energie-\nlinienhöhe',
-                size=12, color='red', ha='right')
+        ax.text(llx, 0, p1.z(),  'Quote Abfluss',
+                size=12,  color='blue', ha='right', va='top')
+        ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
+                size=12, color='red', ha='right', va='bottom')
 
         text = 'Koordinaten\n'
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
         text += self.damm.getData(laenge)
-        ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/2, text,
-                size=9, color='black', ha='left', va='center_baseline')
+        ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/4, text,
+                size=10, color='black', ha='left', va='center_baseline')
+
+        ax.text(llx/2, llx, np.nanmax(Z), 'erstell mit Qgis Plugin Flutwelle gemäss CTGREF',
+                size=7, color='grey', ha='center', va='center_baseline')
         ax.set_xlabel('m')
         ax.set_ylabel('m')
         ax.set_zlabel('mü.M.')
-        ax.set_xlim(-llx/100.0*5.0, llx+llx/100.0*5.0)
-        ax.set_ylim(-llx/100*5.0, llx+llx/100.0*5.0)
+
+        ax.set_xlim(int(-llx/100.0*5.0), int(llx+llx/100.0*5.0))
+        ax.set_ylim(int(-llx/100*5.0), int(llx+llx/100.0*5.0))
+
         plt.show()
         self.raster.setVisibility(False)
 

@@ -44,7 +44,7 @@
     </sizepolicy>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideRight</enum>
@@ -337,7 +337,7 @@
       <number>1</number>
      </property>
      <property name="maximum">
-      <double>10000000.000000000000000</double>
+      <double>1000.000000000000000</double>
      </property>
      <property name="stepType">
       <enum>QAbstractSpinBox::DefaultStepType</enum>
@@ -372,7 +372,7 @@
       <number>1</number>
      </property>
      <property name="maximum">
-      <double>99999999999999996863366107917975552.000000000000000</double>
+      <double>1000.000000000000000</double>
      </property>
     </widget>
     <widget class="QSpinBox" name="spBR">
@@ -429,7 +429,7 @@
       <number>1</number>
      </property>
      <property name="maximum">
-      <double>100000.000000000000000</double>
+      <double>1000.000000000000000</double>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -642,11 +642,11 @@
        <x>150</x>
        <y>130</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>MatPlotLib</string>
+      <string>3D Modell</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="lx">
@@ -662,7 +662,7 @@
       <number>40</number>
      </property>
      <property name="maximum">
-      <number>9000</number>
+      <number>100000</number>
      </property>
      <property name="singleStep">
       <number>10</number>
@@ -691,7 +691,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Rand l und r</string>
+      <string>Rand links und rechts</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="la">
@@ -707,7 +707,7 @@
       <number>10</number>
      </property>
      <property name="maximum">
-      <number>999</number>
+      <number>10000</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">
@@ -775,7 +775,7 @@
       <number>1</number>
      </property>
      <property name="maximum">
-      <double>99999.000000000000000</double>
+      <double>10000.000000000000000</double>
      </property>
     </widget>
    </widget>

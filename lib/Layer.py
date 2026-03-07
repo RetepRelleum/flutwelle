@@ -37,7 +37,7 @@ from qgis.core import (QgsTextFormat, QgsVectorLayerSimpleLabeling,
                        QgsFeatureRequest, QgsGeometry, QgsFeature,
                        QgsPoint, QgsLineString)
 from qgis.core import QgsPalLayerSettings, QgsPolygon, QgsSymbol, QgsRendererRange, QgsGraduatedSymbolRenderer
-from qgis.PyQt.QtGui import QColor, QFont
+from qgis.PyQt.QtGui import QColor
 import math
 
 
@@ -133,7 +133,7 @@ class DammL(Layer):
             colors = ["#4778E2", "#57565C", "#4bebe3",
                       "#f80707", "#0580f3", "#6c05f3"]
             unique_values = ['Damm', 'Profil Damm', 'See',
-                             'Bresche', 'Qerschnitt', 'Ueberlauf']
+                             'Bresche', 'Querschnitt', 'Ueberlauf']
             n = len(unique_values)
             square = [QgsFillSymbol.createSimple({'color': colors[i],
                                                   "outline_width": "1",
@@ -148,7 +148,7 @@ class DammL(Layer):
             settings = QgsPalLayerSettings()
             settings.fieldName = 'laenge'  # Feldname, das beschriftet wird
             format = QgsTextFormat()
-            format.setFont(QFont("Arial", 10))
+#      format.setFont(QFont("Arial", 10))
             format.setColor(QColor("black"))
             settings.setFormat(format)
             labeling = QgsVectorLayerSimpleLabeling(settings)
@@ -190,7 +190,7 @@ class DammL(Layer):
                    ):
 
         for __f in self.damm.getFeatures():
-            if __f['type'] == type and type != 'Qerschnitt' and type != 'Ueberlauf':
+            if __f['type'] == type and type != 'Querschnitt' and type != 'Ueberlauf':
                 self.damm.dataProvider().deleteFeatures([__f.id()])
 
         feature = QgsFeature()

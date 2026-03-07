@@ -199,6 +199,7 @@ class Flutwelle:
         root = QgsProject.instance().layerTreeRoot()
         gr = root.findGroup(self.dlg.lineEditProjetName.text())
         gr.setExpanded(True)
+        self.dlg.tabWidget.setCurrentIndex(2)
 
     def fileChanged(self):
         self.dlg.pushButton.setEnabled(True)

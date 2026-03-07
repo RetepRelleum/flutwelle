@@ -32,7 +32,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 from qgis.PyQt.QtGui import QColor
 from qgis.gui import QgsVertexMarker
 import qgis.utils
-from qgis.core import QgsTask, QgsLineString, QgsPoint, QgsPolygon, QgsPointXY
+from qgis.core import QgsTask, QgsLineString, QgsPoint, QgsPolygon, QgsPointXY, QgsFeatureRequest, QgsProject
 from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL, IntL
 
@@ -40,7 +40,7 @@ from .Layer import DammL, FlussL, IntL
 class Querschnitt(QgsTask):
     """
     Querschnitt is a QGIS task class for calculating and analyzing
-    cross-sections (Qerschnitt) in a hydrological context, specifically
+    cross-sections (Querschnitt) in a hydrological context, specifically
     for flood wave computations.
     Args:
         dlg: The dialog object containing user interface elements and input values.
@@ -108,6 +108,15 @@ class Querschnitt(QgsTask):
             print("Finished Function False ")
 
     def run(self):
+        self.damm.damm.startEditing()
+        request = QgsFeatureRequest().setFilterExpression("type = 'Querschnitt' or type = 'Ueberlauf'")
+        for f in self.damm.damm.getFeatures(request):
+            self.damm.damm.deleteFeature(f.id())
+        self.damm.damm.commitChanges()
+        p = QgsProject.instance()
+        if self.intL.intensitaet:
+            p.removeMapLayer(self.intL.intensitaet)
+        self.intL = IntL(self.proName)
         ls = self.fluss.getFluss()
         t = 0
         self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
@@ -141,10 +150,12 @@ class Querschnitt(QgsTask):
             while weiter:
                 ueberlauf = False
                 if point0l.z() <= niveauHoehe and point0l.z() != 0.0:
-                    point0l = self.insertPoint(lsl, lsx, point0l, hmin, dirV, pil)
+                    point0l = self.insertPoint(
+                        lsl, lsx, point0l, hmin, dirV, pil)
                     pil += 1
                 if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
-                    point0r = self.insertPoint(lsr, lsx, point0r, hmin, dirV, pir)
+                    point0r = self.insertPoint(
+                        lsr, lsx, point0r, hmin, dirV, pir)
                     pir -= 1
                 niveauHoehe += deltaHoehe
                 qm2 = 0
@@ -190,7 +201,7 @@ class Querschnitt(QgsTask):
                 lsp.addVertex(p)
             for p in lsl.reversed():
                 lsp.addVertex(p)
-            querStr = 'Qerschnitt'
+            querStr = 'Querschnitt'
             if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
                 ueberlauf = True
                 querStr = 'Ueberlauf'
