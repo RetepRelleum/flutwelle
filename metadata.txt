@@ -20,7 +20,7 @@ repository=https://github.com/RetepRelleum/flutwelle
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog= reduce Security items
+changelog= neu mit 3d Ansicht des Querschnitts 
 
 # Tags are comma separated with spaces allowed
 tags=bresche,see,damm,talsperre,staumauer,bfe,river,fluss,CTGREF,beffa,energiewirtschaft,energielinienhöhe
