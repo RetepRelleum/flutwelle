@@ -163,7 +163,11 @@ class DammL(Layer):
         for fi in self.damm.getFeatures(request):
             ret += f'v {round(fi['v'], 2)} m/s\n'
             ret += f'q {round(fi['q'], 2)} m3/s\n'
-            ret += f't {fi['t']}'
+            ret += f't {fi['t']}\n'
+            ret += f'Form {fi['type_b']}'
+            if fi['type'] == 'Ueberlauf':
+                ret += '\nÜberlauf'
+
             break
         return ret
 
@@ -388,7 +392,8 @@ class FlussL(Layer):
         features = self.fluss.getFeatures()
         for f in features:
             if f['type'] == 'Fluss':
-                return f.geometry().constGet()
+                qlins = f.geometry().constGet()
+                return qlins.clone()
         return None
 
     def getPoint(self, index) -> QgsPoint | None:

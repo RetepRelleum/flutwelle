@@ -108,140 +108,143 @@ class Querschnitt(QgsTask):
             print("Finished Function False ")
 
     def run(self):
-        self.damm.damm.startEditing()
-        request = QgsFeatureRequest().setFilterExpression("type = 'Querschnitt' or type = 'Ueberlauf'")
-        for f in self.damm.damm.getFeatures(request):
-            self.damm.damm.deleteFeature(f.id())
-        self.damm.damm.commitChanges()
-        p = QgsProject.instance()
-        if self.intL.intensitaet:
-            p.removeMapLayer(self.intL.intensitaet)
-        self.intL = IntL(self.proName)
-        ls = self.fluss.getFluss()
-        t = 0
-        self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
-        for i in range(ls.vertexCount()-2):
-            self.dlg.progressBar.setValue(i+1)
-            lsl = QgsLineString()
-            lsr = QgsLineString()
-            lsx = QgsLineString()
-            lsp = QgsLineString()
-            point0l = ls.pointN(i+1)
-            point0l.setX(point0l.x()-0.001)
-            point0r = point0l.clone()
-            point0r.setX(point0r.x()+0.001)
-            hmin = point0l.z()
-            lsl.addVertex(point0l)
-            lsx.addVertex(QgsPoint(point0l.x(), point0l.y(), point0l.z(), 0))
-            dirV = self.mupe.qgsVecDirNorm(point0l, ls.pointN(i))
-            deltaHoehe = 0.01
-            niveauHoehe = hmin+deltaHoehe
-            qm2 = 0
-            weiter = True
-            h1 = ls.startPoint().z()
-            h2 = point0l.z()
-            qm_qb, xvo, ki = self.qmax_div_qb(
-                10*i+10, self.vo, (h1-h2)/(10*i+10), self.k)
-            qmm = self.qb_*qm_qb
-            typq = ''
-            pil = 1
-            pir = -1
-
-            while weiter:
-                ueberlauf = False
-                if point0l.z() <= niveauHoehe and point0l.z() != 0.0:
-                    point0l = self.insertPoint(
-                        lsl, lsx, point0l, hmin, dirV, pil)
-                    pil += 1
-                if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
-                    point0r = self.insertPoint(
-                        lsr, lsx, point0r, hmin, dirV, pir)
-                    pir -= 1
-                niveauHoehe += deltaHoehe
+        try:
+            self.damm.damm.startEditing()
+            request = QgsFeatureRequest().setFilterExpression("type = 'Querschnitt' or type = 'Ueberlauf'")
+            for f in self.damm.damm.getFeatures(request):
+                self.damm.damm.deleteFeature(f.id())
+            self.damm.damm.commitChanges()
+            p = QgsProject.instance()
+            if self.intL.intensitaet:
+                p.removeMapLayer(self.intL.intensitaet)
+            self.intL = IntL(self.proName)
+            ls = self.fluss.getFluss()
+            t = 0
+            self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
+            for i in range(ls.vertexCount()-2):
+                self.dlg.progressBar.setValue(i+1)
+                lsl = QgsLineString()
+                lsr = QgsLineString()
+                lsx = QgsLineString()
+                lsp = QgsLineString()
+                point0l = ls.pointN(i+1)
+                point0l.setX(point0l.x()-0.001)
+                point0r = point0l.clone()
+                point0r.setX(point0r.x()+0.001)
+                hmin = point0l.z()
+                lsl.addVertex(point0l)
+                lsx.addVertex(QgsPoint(point0l.x(), point0l.y(), point0l.z(), 0))
+                dirV = self.mupe.qgsVecDirNorm(point0l, ls.pointN(i))
+                deltaHoehe = 0.01
+                niveauHoehe = hmin+deltaHoehe
                 qm2 = 0
-                lt = 0
-                for h_ in lsr:
-                    qm2 += abs(niveauHoehe-h_.z())
-                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
-                        lt += 1
-                for h_ in lsl:
-                    qm2 += abs(niveauHoehe-h_.z())
-                    if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
-                        lt += 1
-                laenge_ = lsl.endPoint().distance(lsr.endPoint())
-                if lt > laenge_:
-                    lt = 1
-                if qmm <= 0:
-                    break
-                ymaxR, fmaxR, umR = self.r_ymax(ls, i, self.k, qmm, laenge_)
-                ymaxD, fmaxD, umD = self.d_ymax(
-                    ls, i, self.k, qmm, (laenge_/2)/(niveauHoehe-hmin))
-                ymaxT, fmaxT, umT = self.t_ymax(
-                    ls, i, self.k, qmm, ((laenge_-lt)/2)/(niveauHoehe-hmin), lt)
-                ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, laenge_)
-                dq = qm2/100*20
-                dy = (niveauHoehe-hmin)/100*20
-                dP = 0.15
-                if (fmaxR-dq*dP) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*dP) <= (niveauHoehe-hmin) <= (ymaxR+dy):
-                    typq = 'Rechteck'
-                    break
-                if (fmaxD-dq*dP) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD+dy):
-                    typq = 'Dreieck'
-                    break
-                if (fmaxT-dq*dP) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*dP) <= (niveauHoehe-hmin) <= (ymaxT+dy):
-                    typq = 'Trapez'
-                    break
-                if (fmaxP-dq*dP) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*dP) <= (niveauHoehe-hmin) <= (ymaxP+dy):
-                    typq = 'Parabel'
-                    break
-                if qm2 > 1.5*fmaxR or qm2 > 3*fmaxP:
-                    typq = 'Unbekannt'
-                    break
-            for p in lsr:
-                lsp.addVertex(p)
-            for p in lsl.reversed():
-                lsp.addVertex(p)
-            querStr = 'Querschnitt'
-            if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
-                ueberlauf = True
-                querStr = 'Ueberlauf'
-            polygonL = QgsPolygon(lsp)
-            v = qmm/fmaxR
-            t += 10/v
-            el = niveauHoehe+(v**2)/(2*9.81)
-            if i > 0 and v > 0:
-                if typq == 'Rechteck':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
-                                         typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
-                elif typq == 'Dreieck':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i*10, 0, ymaxD,
-                                         typq, qmm, 0, xvo, ki, umD, ueberlauf, v, niveauHoehe, el, t)
-                elif typq == 'Trapez':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, laenge_, i*10, 0, ymaxT,
-                                         typq, qmm, 0, xvo, ki, umT, ueberlauf, v, niveauHoehe, el, t)
-                elif typq == 'Parabel':
-                    self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, laenge_, i*10, 0, ymaxP,
-                                         typq, qmm, 0, xvo, ki, umP, ueberlauf, v, niveauHoehe, el, t)
-                else:
-                    self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
-                                         typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
-                min_p = 0
-                max_p = 0
-                for p in lsx:
-                    if min_p > p.m():
-                        min_p = p.m()
-                    if max_p < p.m():
-                        max_p = p.m()
-                for p in lsx:
-                    if p.m() == min_p or p.m() == max_p and not ueberlauf:
-                        p.setZ(niveauHoehe)
-                    intens = abs((niveauHoehe-p.z())*v)
-                    if ueberlauf:
-                        intens = intens*-1
-                    h = niveauHoehe-p.z()
-                    self.intL.insertData(
-                        p, intens, v, h, i*10, p.m(), niveauHoehe, el)
-        self.raster.setVisibility(False)
+                weiter = True
+                h1 = ls.startPoint().z()
+                h2 = point0l.z()
+                qm_qb, xvo, ki = self.qmax_div_qb(
+                    10*i+10, self.vo, (h1-h2)/(10*i+10), self.k)
+                qmm = self.qb_*qm_qb
+                typq = ''
+                pil = 1
+                pir = -1
+
+                while weiter:
+                    ueberlauf = False
+                    if point0l.z() <= niveauHoehe and point0l.z() != 0.0:
+                        point0l = self.insertPoint(
+                            lsl, lsx, point0l, hmin, dirV, pil)
+                        pil += 1
+                    if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
+                        point0r = self.insertPoint(
+                            lsr, lsx, point0r, hmin, dirV, pir)
+                        pir -= 1
+                    niveauHoehe += deltaHoehe
+                    qm2 = 0
+                    lt = 0
+                    for h_ in lsr:
+                        qm2 += abs(niveauHoehe-h_.z())
+                        if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
+                            lt += 1
+                    for h_ in lsl:
+                        qm2 += abs(niveauHoehe-h_.z())
+                        if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
+                            lt += 1
+                    laenge_ = lsl.endPoint().distance(lsr.endPoint())
+                    if lt > laenge_:
+                        lt = 1
+                    if qmm <= 0:
+                        break
+                    ymaxR, fmaxR, umR = self.r_ymax(ls, i, self.k, qmm, laenge_)
+                    ymaxD, fmaxD, umD = self.d_ymax(
+                        ls, i, self.k, qmm, (laenge_/2)/(niveauHoehe-hmin))
+                    ymaxT, fmaxT, umT = self.t_ymax(
+                        ls, i, self.k, qmm, ((laenge_-lt)/2)/(niveauHoehe-hmin), lt)
+                    ymaxP, fmaxP, umP = self.p_ymax(ls, i, self.k, qmm, laenge_)
+                    dq = qm2/100*20
+                    dy = (niveauHoehe-hmin)/100*20
+                    dP = 0.15
+                    if (fmaxR-dq*dP) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*dP) <= (niveauHoehe-hmin) <= (ymaxR+dy):
+                        typq = 'Rechteck'
+                        break
+                    if (fmaxD-dq*dP) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD+dy):
+                        typq = 'Dreieck'
+                        break
+                    if (fmaxT-dq*dP) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*dP) <= (niveauHoehe-hmin) <= (ymaxT+dy):
+                        typq = 'Trapez'
+                        break
+                    if (fmaxP-dq*dP) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*dP) <= (niveauHoehe-hmin) <= (ymaxP+dy):
+                        typq = 'Parabel'
+                        break
+                    if qm2 > 1.5*fmaxR or qm2 > 3*fmaxP:
+                        typq = 'Unbekannt'
+                        break
+                for p in lsr:
+                    lsp.addVertex(p)
+                for p in lsl.reversed():
+                    lsp.addVertex(p)
+                querStr = 'Querschnitt'
+                if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
+                    ueberlauf = True
+                    querStr = 'Ueberlauf'
+                polygonL = QgsPolygon(lsp)
+                v = qmm/fmaxR
+                t += 10/v
+                el = niveauHoehe+(v**2)/(2*9.81)
+                if i > 0 and v > 0:
+                    if typq == 'Rechteck':
+                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
+                            typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
+                    elif typq == 'Dreieck':
+                        self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i*10, 0, ymaxD,
+                            typq, qmm, 0, xvo, ki, umD, ueberlauf, v, niveauHoehe, el, t)
+                    elif typq == 'Trapez':
+                        self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, laenge_, i*10, 0, ymaxT,
+                            typq, qmm, 0, xvo, ki, umT, ueberlauf, v, niveauHoehe, el, t)
+                    elif typq == 'Parabel':
+                        self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, laenge_, i*10, 0, ymaxP,
+                            typq, qmm, 0, xvo, ki, umP, ueberlauf, v, niveauHoehe, el, t)
+                    else:
+                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
+                            typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
+                    min_p = 0
+                    max_p = 0
+                    for p in lsx:
+                        if min_p > p.m():
+                            min_p = p.m()
+                        if max_p < p.m():
+                            max_p = p.m()
+                    for p in lsx:
+                        if p.m() == min_p or p.m() == max_p and not ueberlauf:
+                            p.setZ(niveauHoehe)
+                        intens = abs((niveauHoehe-p.z())*v)
+                        if ueberlauf:
+                            intens = intens*-1
+                        h = niveauHoehe-p.z()
+                        self.intL.insertData(
+                            p, intens, v, h, i*10, p.m(), niveauHoehe, el)
+            self.raster.setVisibility(False)
+        except Exception as X:
+            print(X)
 
     def insertPoint(self, lsl_, lsx_, point0l_, hmin, dirV, pi):
         if pi < 0:

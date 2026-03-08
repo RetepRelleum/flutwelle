@@ -140,6 +140,8 @@ class Querschnitt3D:
                 size=12,  color='blue', ha='right', va='top')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right', va='bottom')
+        ax.text(llx, 0, np.nanmin(Z),  'Flussbett',
+                size=12, color='green', ha='right', va='bottom')
 
         text = 'Koordinaten\n'
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
