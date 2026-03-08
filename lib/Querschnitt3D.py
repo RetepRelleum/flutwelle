@@ -40,7 +40,7 @@ from qgis.PyQt.QtGui import QColor
 
 
 class Querschnitt3D:
-    def __init__(self, laenge, la, qb, path):
+    def __init__(self, laenge, la, qb, path, projekt=''):
         laenge = round(laenge/10)*10
         self.raster = Raster(path)
         self.inten = IntL(path)
@@ -127,17 +127,19 @@ class Querschnitt3D:
         ax.plot(x3, y3, zs=llx+llx/100*5, zdir='x',
                 label='Gelaende', color='limegreen')
         if qb > 0:
-            ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='black',
-                            label='Bruecke', linewidth=0.25, edgecolor='black')
-            ax.text(llx/2, 0, qb,  'Brücke', size=12, color='black',
-                    ha='center', va='center_baseline')
+            ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='gray',
+                            label='Bruecke', linewidth=0.25, edgecolor='gray')
+            ax.text(llx, 0, qb,  'Brücke', size=12, color='gray',
+                    ha='right', va='center_baseline')
             ax.plot(x, y2, zs=-llx/100.0*5.0, zdir='x',
-                    label='curve in (x, y)', color='black')
+                    label='Bruecke', color='gray')
             ax.plot(x, y2, zs=llx+llx/100.0*5.0, zdir='x',
-                    label='curve in (x, y)', color='black')
+                    label='Bruecke', color='gray')
 
-        ax.text(llx, 0, p1.z(),  'Quote Abfluss',
+        ax.text(llx, 0, p1.z(), 'Quote Abfluss',
                 size=12,  color='blue', ha='right', va='top')
+        ax.text(llx/2, 0, np.nanmax(Z),  projekt,
+                size=16,  color='blue', ha='center', va='bottom')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right', va='bottom')
         ax.text(llx, 0, np.nanmin(Z),  'Flussbett',
@@ -147,7 +149,7 @@ class Querschnitt3D:
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
         text += self.damm.getData(laenge)
         ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/4, text,
-                size=10, color='black', ha='left', va='center_baseline')
+                size=10, color='black', ha='left', va='center_baseline', wrap=True)
 
         ax.text(llx/2, llx, np.nanmax(Z), 'erstell mit Qgis Plugin Flutwelle gemäss CTGREF',
                 size=7, color='grey', ha='center', va='center_baseline')

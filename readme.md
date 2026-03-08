@@ -21,7 +21,9 @@ Wird "mit See" angewählt, werden die Länge und das Volumen hinter dem Damm ber
 
 ![](pic/linien.png)
 
-Wird der Damm ausgewählt, kann dieser gezeichnet werden. Dabei wird die Höhenlinie des Startpunkts hervorgehoben. Im nächsten Schritt werden die relevanten Daten erfasst um die Abflussbreite zu berechnen. 
+Wird der Damm ausgewählt, kann dieser gezeichnet werden. Dabei wird die Höhenlinie des Startpunkts hervorgehoben. 
+Um den Flussverlauf zu bearbeiten, muss der Layer „Fluss” als GPKG exportiert werden. Anschliessend ist der temporäre Layer „Fluss” zu löschen und der exportierte Layer „Fluss” zu importieren. Dieser kann anschliessend angepasst werden. 
+Im nächsten Schritt werden die relevanten Daten erfasst um die Abflussbreite zu berechnen. 
 
 ![](pic/Breschenkonfigurator2.png)
 
@@ -35,7 +37,9 @@ Zur Berechnung des Abflusses in der Bresche steht Ihnen der Breschentyp zur Verf
 
 Mit der Option ![](pic/Abfrage.png) können die berechneten Werte abgefragt werden.
 
-
+## 3D Ansicht 
+Eigentlich selbsterklärend
+![](pic/3D.png)
 
 
 

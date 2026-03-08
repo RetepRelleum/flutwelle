@@ -161,6 +161,7 @@ class DammL(Layer):
         request = QgsFeatureRequest().setFilterExpression(expression)
         ret = ''
         for fi in self.damm.getFeatures(request):
+            ret += f'Schnitt {self.sep(int(fi['laenge']))} m\n'
             ret += f'v {round(fi['v'], 2)} m/s\n'
             ret += f'q {round(fi['q'], 2)} m3/s\n'
             ret += f't {fi['t']}\n'
@@ -170,6 +171,13 @@ class DammL(Layer):
 
             break
         return ret
+    
+    def sep(self, s):
+        ret = ''
+        while s > 0:
+            ret = f"{s % 1000}'{ret}"
+            s = s//1000
+        return ret[:-1]
 
     def insertData(self, ppa: QgsGeometry,
                    type: QVariant.String,

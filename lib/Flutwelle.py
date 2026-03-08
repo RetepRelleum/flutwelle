@@ -239,8 +239,9 @@ class Flutwelle:
         s.setValue("flutwelle/tiffPath", path)
 
     def querschnitt3D(self):
-        Querschnitt3D(self.dlg.lx.value(), self.dlg.la.value(
-        ), self.dlg.q_bruecke.value(), self.dlg.mQgsFileWidget.filePath())
+        Querschnitt3D(self.dlg.lx.value(), self.dlg.la.value(),
+                      self.dlg.q_bruecke.value(), self.dlg.mQgsFileWidget.filePath(),
+                      self.dlg.lineEditProjetName.text())
 
     def run(self):
         """Run method that performs all the real work"""
