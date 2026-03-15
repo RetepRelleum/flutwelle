@@ -50,13 +50,13 @@ class Layer:
     If the group does not exist, it creates a new one at the root level.
 
     Args:
-        projektGroup (QMetaType.String): The name of the project group to retrieve or create.
+        projektGroup (QMetaType.QString): The name of the project group to retrieve or create.
 
     Returns:
         QgsLayerTreeGroup: The layer group object with the specified name.
     """
 
-    def getProjektGroup(self, projektGroup: QMetaType.String):
+    def getProjektGroup(self, projektGroup: QMetaType.QString):
         root = QgsProject.instance().layerTreeRoot()
         myOriginalGroup = root.findGroup(projektGroup)
 
@@ -66,25 +66,26 @@ class Layer:
 
 
 class DgmL(Layer):
-    def __init__(self, projektGroup: QMetaType.String):
+    def __init__(self, projektGroup: QMetaType.QString):
 
-        self.dgm = QgsProject.instance().mapLayersByName("Gebiet")
-        if not self.dgm:
-            self.dgm = QgsVectorLayer(
-                "MultiPolygon?crs=epsg:2056", "Gebiet", "memory")
-            self.dgm.updateFields()
-            QgsProject.instance().addMapLayer(self.dgm, False)
-            rndr = self.dgm.renderer()
-            sym = rndr.symbol()                  # object to change the symbology of layer
-            syms = sym[0]                           # use first layer in QGIS tree
-            syms.setColor(QColor(255, 255, 255, 200))      # remove the fill colour
-            syms.setStrokeColor(QColor("green"))
-            syms.setStrokeWidth(0.5)
-            rndr = QgsInvertedPolygonRenderer().convertFromRenderer(rndr)
-            self.dgm.setRenderer(rndr)
-            self.getProjektGroup(projektGroup).addLayer(self.dgm)
-        else:
-            self.dgm = self.dgm[0]
+        gebiet = QgsProject.instance().mapLayersByName("Gebiet")
+        p = QgsProject.instance()
+        if gebiet:
+            p.removeMapLayer(gebiet[0].id())
+
+        self.dgm = QgsVectorLayer(
+            "MultiPolygon?crs=epsg:2056", "Gebiet", "memory")
+        self.dgm.updateFields()
+        QgsProject.instance().addMapLayer(self.dgm, False)
+        rndr = self.dgm.renderer()
+        sym = rndr.symbol()                  # object to change the symbology of layer
+        syms = sym[0]                           # use first layer in QGIS tree
+        syms.setColor(QColor(255, 255, 255, 200))      # remove the fill colour
+        syms.setStrokeColor(QColor("green"))
+        syms.setStrokeWidth(0.5)
+        rndr = QgsInvertedPolygonRenderer().convertFromRenderer(rndr)
+        self.dgm.setRenderer(rndr)
+        self.getProjektGroup(projektGroup).addLayer(self.dgm)
 
     def insertData(self, ppa: QgsGeometry):
         feature = QgsFeature()
@@ -132,14 +133,14 @@ class DammL(Layer):
             poly(): Creates a small square polygon from a point
     """
 
-    def __init__(self, projektGroup: QMetaType.String):
+    def __init__(self, projektGroup: QMetaType.QString):
 
         self.damm = QgsProject.instance().mapLayersByName("Damm")
         if not self.damm:
             self.damm = QgsVectorLayer(
                 "MultiPolygonZ?crs=epsg:2056", "Damm", "memory")
             pr = self.damm.dataProvider()
-            pr.addAttributes([QgsField("type", QMetaType.String)])
+            pr.addAttributes([QgsField("type", QMetaType.QString)])
             pr.addAttributes([QgsField("flaecheS", QMetaType.Double)])
             pr.addAttributes([QgsField("flaecheM", QMetaType.Double)])
             pr.addAttributes([QgsField("volumen", QMetaType.Double)])
@@ -147,7 +148,7 @@ class DammL(Layer):
             pr.addAttributes([QgsField("laenge", QMetaType.Double)])
             pr.addAttributes([QgsField("breiteU", QMetaType.Double)])
             pr.addAttributes([QgsField("hoehe", QMetaType.Double)])
-            pr.addAttributes([QgsField("type_b", QMetaType.String)])
+            pr.addAttributes([QgsField("type_b", QMetaType.QString)])
             pr.addAttributes([QgsField("q", QMetaType.Double)])
             pr.addAttributes([QgsField("u", QMetaType.Double)])
             pr.addAttributes([QgsField("xvo", QMetaType.Double)])
@@ -157,7 +158,7 @@ class DammL(Layer):
             pr.addAttributes([QgsField("v", QMetaType.Double)])
             pr.addAttributes([QgsField("quote", QMetaType.Double)])
             pr.addAttributes([QgsField("energielinienhoehe", QMetaType.Double)])
-            pr.addAttributes([QgsField("t", QMetaType.String)])
+            pr.addAttributes([QgsField("t", QMetaType.QString)])
 
             self.damm.updateFields()
             colors = ["#4778E2", "#57565C", "#4bebe3",
@@ -210,7 +211,7 @@ class DammL(Layer):
         return ret[:-1]
 
     def insertData(self, ppa: QgsGeometry,
-                   type: QMetaType.String,
+                   type: QMetaType.QString,
                    flaecheS: QMetaType.Double = 0,
                    flaecheM: QMetaType.Double = 0,
                    volumen: QMetaType.Double = 0,
@@ -218,7 +219,7 @@ class DammL(Layer):
                    laenge: QMetaType.Double = 0,
                    breiteU: QMetaType.Double = 0,
                    hoehe: QMetaType.Double = 0,
-                   type_b: QMetaType.String = '',
+                   type_b: QMetaType.QString = '',
                    q: QMetaType.Double = 0,
                    u: QMetaType.Double = 0,
                    xvo: QMetaType.Double = 0,
@@ -403,13 +404,13 @@ class DammL(Layer):
 
 
 class FlussL(Layer):
-    def __init__(self, projektGroup: QMetaType.String):
+    def __init__(self, projektGroup: QMetaType.QString):
         self.fluss = QgsProject.instance().mapLayersByName("Fluss")
         if not self.fluss:
             self.fluss = QgsVectorLayer(
                 "LineStringZM?crs=epsg:2056", "Fluss", "memory")
             pr = self.fluss.dataProvider()
-            pr.addAttributes([QgsField("type", QMetaType.String)])
+            pr.addAttributes([QgsField("type", QMetaType.QString)])
             self.fluss.updateFields()
             self.fluss.startEditing()
             self.fluss.renderer().symbol().setColor(QColor("blue"))
@@ -447,7 +448,7 @@ class FlussL(Layer):
 
 
 class IntL(Layer):
-    def __init__(self, projektGroup: QMetaType.String):
+    def __init__(self, projektGroup: QMetaType.QString):
         self.intensitaet = QgsProject.instance().mapLayersByName("Intensitaet")
         if not self.intensitaet:
             self.intensitaet = QgsVectorLayer(

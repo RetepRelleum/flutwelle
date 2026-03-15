@@ -64,6 +64,7 @@ class DammZeichnen(QgsMapTool):
         fluss_layer = QgsProject.instance().mapLayersByName("Fluss")
         see_layer = QgsProject.instance().mapLayersByName("See")
         int_layer = QgsProject.instance().mapLayersByName("Intensitaet")
+        gebiet = QgsProject.instance().mapLayersByName("Gebiet")
         p = QgsProject.instance()
         if damm_layer:
             p.removeMapLayer(damm_layer[0].id())
@@ -73,6 +74,8 @@ class DammZeichnen(QgsMapTool):
             p.removeMapLayer(see_layer[0].id())
         if int_layer:
             p.removeMapLayer(int_layer[0].id())
+        if gebiet:
+            p.removeMapLayer(gebiet[0].id())
 
     def canvasPressEvent(self, event):
         if event.button() == Qt.LeftButton:

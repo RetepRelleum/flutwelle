@@ -137,13 +137,13 @@ class Querschnitt3D:
                     label='Bruecke', color='gray')
 
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',
-                size=12,  color='blue', ha='right', va='top')
+                size=12,  color='blue', ha='right', va='center')
         ax.text(llx/2, 0, np.nanmax(Z),  projekt,
                 size=16,  color='blue', ha='center', va='bottom')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right', va='bottom')
         ax.text(llx, 0, np.nanmin(Z),  'Flussbett',
-                size=12, color='green', ha='right', va='bottom')
+                size=12, color='green', ha='right', va='top')
 
         text = 'Koordinaten\n'
         text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
