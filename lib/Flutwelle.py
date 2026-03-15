@@ -40,6 +40,7 @@ from .Damm_Zeichnen import DammZeichnen
 from .Layer import DammL, FlussL
 from .Querschnitt_Zeichnen import Querschnitt
 from .Querschnitt3D import Querschnitt3D
+from .Dgm import Dgm
 from ..resources import *
 
 
@@ -142,29 +143,22 @@ class Flutwelle:
             added to self.actions list.
         :rtype: QAction
         """
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
-
         if status_tip is not None:
             action.setStatusTip(status_tip)
-
         if whats_this is not None:
             action.setWhatsThis(whats_this)
-
         if add_to_toolbar:
             # Adds plugin icon to Plugins toolbar
             self.iface.addToolBarIcon(action)
-
         if add_to_menu:
             self.iface.addPluginToMenu(
                 self.menu,
                 action)
-
         self.actions.append(action)
-
         return action
 
     def initGui(self):
@@ -201,9 +195,11 @@ class Flutwelle:
         gr.setExpanded(True)
         self.dlg.tabWidget.setCurrentIndex(2)
 
-    def fileChanged(self):
+    def fileChanged(self, path):
         self.dlg.pushButton.setEnabled(True)
-        print(self.dlg.mQgsFileWidget.filePath())
+        s = QgsSettings()
+        s.setValue("flutwelle/tiffPath", path)
+        Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
 
     def check_button(self):
         h = self.dlg.spBh.value()
@@ -234,10 +230,6 @@ class Flutwelle:
             self.dlg.pushButton_2.setEnabled(False)
             self.dlg.pushButton_3.setEnabled(False)
 
-    def safeTiffPath(self, path):
-        s = QgsSettings()
-        s.setValue("flutwelle/tiffPath", path)
-
     def querschnitt3D(self):
         Querschnitt3D(self.dlg.lx.value(), self.dlg.la.value(),
                       self.dlg.q_bruecke.value(), self.dlg.mQgsFileWidget.filePath(),
@@ -264,11 +256,9 @@ class Flutwelle:
         self.dlg.spBbu.valueChanged.connect(self.check_button)
         self.dlg.spBl.valueChanged.connect(self.check_button)
         self.dlg.sBv.valueChanged.connect(self.check_button)
-        self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
-        self.dlg.pushButton.setEnabled(False)
+
         self.dlg.pushButton_2.setEnabled(False)
-        self.dlg.mQgsFileWidget.setFilePath(fp)
-        self.dlg.mQgsFileWidget.fileChanged.connect(self.safeTiffPath)
+
         self.dlg.tabWidget.setCurrentIndex(0)
         relief = QgsProject.instance().mapLayersByName("Relief")
         if not relief:
@@ -294,6 +284,9 @@ class Flutwelle:
             )
             rlayer = QgsRasterLayer(urlWithParams, 'Landeskarte', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
+        self.dlg.mQgsFileWidget.setFilePath(fp)
+        self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
+        Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
 
         # show the dialog
         self.dlg.show()

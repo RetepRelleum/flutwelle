@@ -77,6 +77,8 @@ class CreateFluss(QgsTask):
 
     def run(self):
         self.raster.setVisibility(True)
+        if self.p1.z() == 0:
+            return False
         minPoint, dirPD, h, pl, pr = self.addDammLayer(self.p1, self.p2)
         self.raster.setVisibility(False)
         p10 = self.addFluss(minPoint)
