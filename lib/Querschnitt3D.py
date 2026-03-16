@@ -182,6 +182,9 @@ class Querschnitt3D:
         Zq[2][1] = p3
         Zq[2][2] = p5
         return Zq
+    
+    def getImage(path, zoom=1):
+        return 
 
     def setMarker(self, pk, col):
         pnt = QgsPointXY(pk.x(), pk.y())

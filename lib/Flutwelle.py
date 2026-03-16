@@ -189,6 +189,7 @@ class Flutwelle:
     def buttonPressed2(self):
         self.tool2 = Querschnitt(self.dlg)
         self.tool2.run()
+
         # self.__task2=QgsApplication.taskManager().addTask(self.tool2)
         root = QgsProject.instance().layerTreeRoot()
         gr = root.findGroup(self.dlg.lineEditProjetName.text())

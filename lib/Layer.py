@@ -29,7 +29,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import (QgsProject, QgsVectorLayer, QgsField,
                        QgsRendererCategory, QgsFillSymbol,
                        QgsCategorizedSymbolRenderer)
@@ -50,13 +50,13 @@ class Layer:
     If the group does not exist, it creates a new one at the root level.
 
     Args:
-        projektGroup (QMetaType.QString): The name of the project group to retrieve or create.
+        projektGroup (QVariant.String): The name of the project group to retrieve or create.
 
     Returns:
         QgsLayerTreeGroup: The layer group object with the specified name.
     """
 
-    def getProjektGroup(self, projektGroup: QMetaType.QString):
+    def getProjektGroup(self, projektGroup: QVariant.String):
         root = QgsProject.instance().layerTreeRoot()
         myOriginalGroup = root.findGroup(projektGroup)
 
@@ -66,7 +66,7 @@ class Layer:
 
 
 class DgmL(Layer):
-    def __init__(self, projektGroup: QMetaType.QString):
+    def __init__(self, projektGroup: QVariant.String):
 
         gebiet = QgsProject.instance().mapLayersByName("Gebiet")
         p = QgsProject.instance()
@@ -133,32 +133,32 @@ class DammL(Layer):
             poly(): Creates a small square polygon from a point
     """
 
-    def __init__(self, projektGroup: QMetaType.QString):
+    def __init__(self, projektGroup: QVariant.String):
 
         self.damm = QgsProject.instance().mapLayersByName("Damm")
         if not self.damm:
             self.damm = QgsVectorLayer(
                 "MultiPolygonZ?crs=epsg:2056", "Damm", "memory")
             pr = self.damm.dataProvider()
-            pr.addAttributes([QgsField("type", QMetaType.QString)])
-            pr.addAttributes([QgsField("flaecheS", QMetaType.Double)])
-            pr.addAttributes([QgsField("flaecheM", QMetaType.Double)])
-            pr.addAttributes([QgsField("volumen", QMetaType.Double)])
-            pr.addAttributes([QgsField("breite", QMetaType.Double)])
-            pr.addAttributes([QgsField("laenge", QMetaType.Double)])
-            pr.addAttributes([QgsField("breiteU", QMetaType.Double)])
-            pr.addAttributes([QgsField("hoehe", QMetaType.Double)])
-            pr.addAttributes([QgsField("type_b", QMetaType.QString)])
-            pr.addAttributes([QgsField("q", QMetaType.Double)])
-            pr.addAttributes([QgsField("u", QMetaType.Double)])
-            pr.addAttributes([QgsField("xvo", QMetaType.Double)])
-            pr.addAttributes([QgsField("jkk", QMetaType.Double)])
-            pr.addAttributes([QgsField("um", QMetaType.Double)])
-            pr.addAttributes([QgsField("ueberlauf", QMetaType.Bool)])
-            pr.addAttributes([QgsField("v", QMetaType.Double)])
-            pr.addAttributes([QgsField("quote", QMetaType.Double)])
-            pr.addAttributes([QgsField("energielinienhoehe", QMetaType.Double)])
-            pr.addAttributes([QgsField("t", QMetaType.QString)])
+            pr.addAttributes([QgsField("type", QVariant.String)])
+            pr.addAttributes([QgsField("flaecheS", QVariant.Double)])
+            pr.addAttributes([QgsField("flaecheM", QVariant.Double)])
+            pr.addAttributes([QgsField("volumen", QVariant.Double)])
+            pr.addAttributes([QgsField("breite", QVariant.Double)])
+            pr.addAttributes([QgsField("laenge", QVariant.Double)])
+            pr.addAttributes([QgsField("breiteU", QVariant.Double)])
+            pr.addAttributes([QgsField("hoehe", QVariant.Double)])
+            pr.addAttributes([QgsField("type_b", QVariant.String)])
+            pr.addAttributes([QgsField("q", QVariant.Double)])
+            pr.addAttributes([QgsField("u", QVariant.Double)])
+            pr.addAttributes([QgsField("xvo", QVariant.Double)])
+            pr.addAttributes([QgsField("jkk", QVariant.Double)])
+            pr.addAttributes([QgsField("um", QVariant.Double)])
+            pr.addAttributes([QgsField("ueberlauf", QVariant.Bool)])
+            pr.addAttributes([QgsField("v", QVariant.Double)])
+            pr.addAttributes([QgsField("quote", QVariant.Double)])
+            pr.addAttributes([QgsField("energielinienhoehe", QVariant.Double)])
+            pr.addAttributes([QgsField("t", QVariant.String)])
 
             self.damm.updateFields()
             colors = ["#4778E2", "#57565C", "#4bebe3",
@@ -211,25 +211,25 @@ class DammL(Layer):
         return ret[:-1]
 
     def insertData(self, ppa: QgsGeometry,
-                   type: QMetaType.QString,
-                   flaecheS: QMetaType.Double = 0,
-                   flaecheM: QMetaType.Double = 0,
-                   volumen: QMetaType.Double = 0,
-                   breite: QMetaType.Double = 0,
-                   laenge: QMetaType.Double = 0,
-                   breiteU: QMetaType.Double = 0,
-                   hoehe: QMetaType.Double = 0,
-                   type_b: QMetaType.QString = '',
-                   q: QMetaType.Double = 0,
-                   u: QMetaType.Double = 0,
-                   xvo: QMetaType.Double = 0,
-                   ki: QMetaType.Double = 0,
-                   um: QMetaType.Double = 0,
-                   ueberlauf: QMetaType.Bool = False,
-                   v: QMetaType.Double = 0,
-                   quote: QMetaType.Double = 0,
-                   energielinienhoehe: QMetaType.Double = 0,
-                   t: QMetaType.Double = 0
+                   type: QVariant.String,
+                   flaecheS: QVariant.Double = 0,
+                   flaecheM: QVariant.Double = 0,
+                   volumen: QVariant.Double = 0,
+                   breite: QVariant.Double = 0,
+                   laenge: QVariant.Double = 0,
+                   breiteU: QVariant.Double = 0,
+                   hoehe: QVariant.Double = 0,
+                   type_b: QVariant.String = '',
+                   q: QVariant.Double = 0,
+                   u: QVariant.Double = 0,
+                   xvo: QVariant.Double = 0,
+                   ki: QVariant.Double = 0,
+                   um: QVariant.Double = 0,
+                   ueberlauf: QVariant.Bool = False,
+                   v: QVariant.Double = 0,
+                   quote: QVariant.Double = 0,
+                   energielinienhoehe: QVariant.Double = 0,
+                   t: QVariant.Double = 0
                    ):
 
         for __f in self.damm.getFeatures():
@@ -404,13 +404,13 @@ class DammL(Layer):
 
 
 class FlussL(Layer):
-    def __init__(self, projektGroup: QMetaType.QString):
+    def __init__(self, projektGroup: QVariant.String):
         self.fluss = QgsProject.instance().mapLayersByName("Fluss")
         if not self.fluss:
             self.fluss = QgsVectorLayer(
                 "LineStringZM?crs=epsg:2056", "Fluss", "memory")
             pr = self.fluss.dataProvider()
-            pr.addAttributes([QgsField("type", QMetaType.QString)])
+            pr.addAttributes([QgsField("type", QVariant.String)])
             self.fluss.updateFields()
             self.fluss.startEditing()
             self.fluss.renderer().symbol().setColor(QColor("blue"))
@@ -448,19 +448,19 @@ class FlussL(Layer):
 
 
 class IntL(Layer):
-    def __init__(self, projektGroup: QMetaType.QString):
+    def __init__(self, projektGroup: QVariant.String):
         self.intensitaet = QgsProject.instance().mapLayersByName("Intensitaet")
         if not self.intensitaet:
             self.intensitaet = QgsVectorLayer(
                 "PointZM?crs=epsg:2056", "Intensitaet", "memory")
             pr = self.intensitaet.dataProvider()
-            pr.addAttributes([QgsField("Intensitaet", QMetaType.Double)])
-            pr.addAttributes([QgsField("v", QMetaType.Double)])
-            pr.addAttributes([QgsField("h", QMetaType.Double)])
-            pr.addAttributes([QgsField("type", QMetaType.Double)])
-            pr.addAttributes([QgsField("pos", QMetaType.Double)])
-            pr.addAttributes([QgsField("quote", QMetaType.Double)])
-            pr.addAttributes([QgsField("energielinienhoehe", QMetaType.Double)])
+            pr.addAttributes([QgsField("Intensitaet", QVariant.Double)])
+            pr.addAttributes([QgsField("v", QVariant.Double)])
+            pr.addAttributes([QgsField("h", QVariant.Double)])
+            pr.addAttributes([QgsField("type", QVariant.Double)])
+            pr.addAttributes([QgsField("pos", QVariant.Double)])
+            pr.addAttributes([QgsField("quote", QVariant.Double)])
+            pr.addAttributes([QgsField("energielinienhoehe", QVariant.Double)])
             self.intensitaet.updateFields()
             QgsProject.instance().addMapLayer(self.intensitaet, False)
             self.getProjektGroup(projektGroup).addLayer(self.intensitaet)
@@ -517,11 +517,11 @@ class IntL(Layer):
 
         return p1, p2
 
-    def insertData(self, ls: QgsPoint, inten: QMetaType.Double = 0,
-                   v: QMetaType.Double = 0, h: QMetaType.Double = 0,
-                   type: QMetaType.Double = 0, pos: QMetaType.Double = 0,
-                   quote: QMetaType.Double = 0,
-                   energielinienhoehe: QMetaType.Double = 0):
+    def insertData(self, ls: QgsPoint, inten: QVariant.Double = 0,
+                   v: QVariant.Double = 0, h: QVariant.Double = 0,
+                   type: QVariant.Double = 0, pos: QVariant.Double = 0,
+                   quote: QVariant.Double = 0,
+                   energielinienhoehe: QVariant.Double = 0):
         feature = QgsFeature()
         feature.setGeometry(ls)
         feature.setAttributes(

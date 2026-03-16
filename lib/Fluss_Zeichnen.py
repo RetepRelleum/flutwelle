@@ -71,7 +71,6 @@ class CreateFluss(QgsTask):
             self.dlg.sBQb.setValue(qb)
             if l_ > 0 and v_ > 0 and qb > 0:
                 self.dlg.pushButton_2.setEnabled(True)
-
         else:
             print("Finished Function False ")
 
