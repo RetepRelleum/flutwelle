@@ -63,33 +63,48 @@ class Querschnitt3D:
         Z = X.copy()
         Z1 = X.copy()
         Z2 = X.copy()
+        Z3 = X.copy()
         for x in Y1:
             for y in X1:
                 x_ = px.x()-dx_*x+y*dy_
                 y_ = px.y()-dy_*x-y*dx_
-                if y < 20:
+                if y <= 20:
                     pk = QgsPoint(x_, y_)
                     z_ = self.raster.getValue(pk)
                     if y <= 10:
                         h1 = p1.z()+(p3.z()-p1.z())/10*y
                         h2 = p1.m()+(p3.m()-p1.m())/10*y
+                        h3 = qb-0.4
                     else:
                         h1 = p3.z()+(p5.z()-p3.z())/10*(y-10)
                         h2 = p3.m()+(p5.m()-p3.m())/10*(y-10)
+                        h3 = qb-0.4
+                    if y == 0:
+                        h3 = qb
+                    if y == 20:
+                        h3 = qb
                     if z_ <= h1 and x > la/2 and x < llx-la/2:
                         z1 = h1
                         z2 = h2
+                        z3 = h3
                     else:
                         z1 = np.nan
                         z2 = np.nan
+                        z3 = np.nan
+                    if z_ <= h3:
+                        z3 = h3
+                    else:
+                        z3 = np.nan
 # self.setMarker( pk,2)
                 else:
                     z_ = np.nan
                     z1 = np.nan
                     z2 = np.nan
+                    z3 = np.nan
                 Z[int(x*2)][int(y*2)] = z_
                 Z1[int(x*2)][int(y*2)] = z1
                 Z2[int(x*2)][int(y*2)] = z2
+                Z3[int(x*2)][int(y*2)] = z3
         for x in X1:
             h3 = 100000
             for y in Y1:
@@ -111,9 +126,11 @@ class Querschnitt3D:
         ax.plot_surface(Y, X, Z2, alpha=0.2, color='red',
                         label='Energielinienhoehe', linewidth=0.25, edgecolor='black')
         x = [0, 10, 20]
+        xb = [20, 10, 0, 0, 10, 20, 20]
         y = [p1.z(), p3.z(), p5.z()]
         y1 = [p1.m(), p3.m(), p5.m()]
-        y2 = [qb, qb, qb]
+        y2 = [qb-0.4, qb-0.4, qb-0.4, qb, qb, qb, qb-0.4]
+
         ax.plot(x, y, zs=-llx/100*5, zdir='x',
                 label='Quote Abfluss', color='blue')
         ax.plot(x, y, zs=llx+llx/100*5, zdir='x',
@@ -127,14 +144,16 @@ class Querschnitt3D:
         ax.plot(x3, y3, zs=llx+llx/100*5, zdir='x',
                 label='Gelaende', color='limegreen')
         if qb > 0:
-            ax.plot_surface(Yq, Xq, Zb, alpha=0.3, color='gray',
+            ax.plot_surface(Yq, Xq, Zb, alpha=0.4, color='gray',
                             label='Bruecke', linewidth=0.25, edgecolor='gray')
             ax.text(llx, 0, qb,  'Brücke', size=12, color='gray',
                     ha='right', va='center_baseline')
-            ax.plot(x, y2, zs=-llx/100.0*5.0, zdir='x',
+            ax.plot(xb, y2, zs=-llx/100.0*5.0, zdir='x',
                     label='Bruecke', color='gray')
-            ax.plot(x, y2, zs=llx+llx/100.0*5.0, zdir='x',
+            ax.plot(xb, y2, zs=llx+llx/100.0*5.0, zdir='x',
                     label='Bruecke', color='gray')
+            ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray',
+                    label='Bruecke', linewidth=0.25, edgecolor='black')
 
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',
                 size=12,  color='blue', ha='right', va='center')

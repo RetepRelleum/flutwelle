@@ -236,13 +236,16 @@ class Flutwelle:
                       self.dlg.q_bruecke.value(), self.dlg.mQgsFileWidget.filePath(),
                       self.dlg.lineEditProjetName.text())
 
+    def on_change(self):
+        Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
+
     def run(self):
         """Run method that performs all the real work"""
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         s = QgsSettings()
-        fp = s.value("flutwelle/tiffPath", "default text")
+        self.fp = s.value("flutwelle/tiffPath", "default text")
         self.dlg = FlutwelleDialog(qgis.utils.iface.mainWindow())
         self.dlg.pushButton.clicked.connect(self.buttonPressed)
         self.dlg.pushButton_2.clicked.connect(self.buttonPressed2)
@@ -257,6 +260,7 @@ class Flutwelle:
         self.dlg.spBbu.valueChanged.connect(self.check_button)
         self.dlg.spBl.valueChanged.connect(self.check_button)
         self.dlg.sBv.valueChanged.connect(self.check_button)
+        self.dlg.checkBoxPerimeter.stateChanged.connect(self.on_change)
 
         self.dlg.pushButton_2.setEnabled(False)
 
@@ -285,9 +289,8 @@ class Flutwelle:
             )
             rlayer = QgsRasterLayer(urlWithParams, 'Landeskarte', 'wms')
             QgsProject.instance().addMapLayer(rlayer)
-        self.dlg.mQgsFileWidget.setFilePath(fp)
+        self.dlg.mQgsFileWidget.setFilePath(self.fp)
         self.dlg.mQgsFileWidget.fileChanged.connect(self.fileChanged)
-        Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
 
         # show the dialog
         self.dlg.show()
