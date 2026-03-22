@@ -97,7 +97,7 @@ class DammZeichnen(QgsMapTool):
                     QGuiApplication.setOverrideCursor(Qt.ArrowCursor)
                     self.c_run = CreateFluss(
                         self.p1, self.p2, self.raster, self.dlg)
-                # self.c_run.run()
+                    #self.c_run.run()
                     self.__task = QgsApplication.taskManager().addTask(self.c_run)
                 except Exception as inst:
                     print(type(inst))    # the exception type

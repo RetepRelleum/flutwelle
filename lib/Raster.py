@@ -161,9 +161,6 @@ class Mupe:
     def __init__(self, raster: Raster):
         self.raster = raster
 
-    def qgsDisXy(self, p1: QgsPoint, p2: QgsPoint) -> float:
-        return math.sqrt((p1.x()-p2.x())**2+(p1.y()-p2.y())**2)
-
     def qgsVecDirNorm(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
         dirP = QgsPoint(p1.x()-p2.x(), p1.y()-p2.y(), p1.z()-p2.z())
         dirP = QgsPoint(dirP.y()/math.sqrt(dirP.x()**2+dirP.y()**2), -

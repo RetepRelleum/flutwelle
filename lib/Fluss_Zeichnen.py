@@ -40,6 +40,7 @@ from .Raster import Raster, Mupe
 from .Layer import DammL, FlussL
 
 import numpy as np
+import math as math
 
 
 class CreateFluss(QgsTask):
@@ -102,13 +103,13 @@ class CreateFluss(QgsTask):
                         0, pl.distance(minPoint), 0, 0)
         return
 
-    def add_see(self, dirPD: QgsPoint, h, pl: QgsPoint, pr: QgsPoint, p10, seeFlaeche: QgsMultiPolygon):
+    def add_see(self, dirPD: QgsPoint, h, pl: QgsPoint, pr: QgsPoint, p10: QgsPoint, seeFlaeche: QgsMultiPolygon):
         qp = QgsGeometryParameters()
         qp.setGridSize(1)
         ishOk = True
         p1 = self.mupe.qgsVecAdd(pl, dirPD)
         p2 = self.mupe.qgsVecAddM(pl, dirPD)
-        if self.mupe.qgsDisXy(p10, p1) < self.mupe.qgsDisXy(p10, p2):
+        if p10.distance(p1) < p10.distance(p2):
             p3 = p2
             dp = dirPD.clone()
         else:
@@ -132,7 +133,7 @@ class CreateFluss(QgsTask):
         while weiter or p5.z() < h:
             if self.isCanceled():
                 return pl, pr, 0, 0, False, seeFlaeche
-            if self.mupe.qgsDisXy(p5, pr) < 2:
+            if p5.distance(pr) < 2:
                 weiter = False
             p5 = self.mupe.qgsVec90addM(p5, dp)
             if p5.z() == 0:
@@ -202,15 +203,31 @@ class CreateFluss(QgsTask):
         lsx.addVertex(ls.startPoint().clone())
         for p in ls:
             while True:
-                l__ = self.mupe.qgsDisXy(p, lsx.endPoint())
+                l__ = p.distance(lsx.endPoint())
                 if l__ > 10:
                     x = lsx.endPoint().x() + (p.x() - lsx.endPoint().x()) / l__ * 10
                     y = lsx.endPoint().y() + (p.y() - lsx.endPoint().y()) / l__ * 10
                     z = self.raster.getValue(QgsPoint(x, y, 0))
-                    dl = self.mupe.qgsDisXy(stp, QgsPoint(x, y, z))
-                    dh = stp.z() - z
-                    m = dh / dl
-                    px = QgsPoint(x, y, z, m)
+                    if z > lsx.endPoint().z():
+                        min__ = l__
+                        co = 16
+                        for i in range(co):
+                            theta = i * (2.0 * math.pi / co)
+                            x1 = lsx.endPoint().x() + 10 * math.cos(theta)
+                            y1 = lsx.endPoint().y() + 10 * math.sin(theta)
+                            z1 = self.raster.getValue(QgsPoint(x1, y1, 0))
+                           # self.setMarker(QgsPoint(x1, y1, 0), 2)
+                            if z1 <= lsx.endPoint().z()+0.1:
+                                if min__ > p.distance(QgsPoint(x1, y1, z1, 0)):
+                                    pa = QgsPoint(x1, y1, z1, 0)
+                                    min__ = pa.distance(lsx.endPoint())
+                        if min__ < l__:
+                            x = pa.x()
+                            y = pa.y()
+                            z = lsx.endPoint().z()
+                        else:
+                            z = lsx.endPoint().z()
+                    px = QgsPoint(x, y, z, 0)
                     lsx.addVertex(px)
                 else:
                     break
@@ -239,7 +256,8 @@ class CreateFluss(QgsTask):
                 minPoint = p.clone()
             if zStart >= p.z():
                 lsa.addVertex(p)
-                lsb.addVertex(QgsPoint(p1.x() + i, p1.y() + p.z() - p1.z(), p.z()))
+                lsb.addVertex(
+                    QgsPoint(p1.x() + i, p1.y() + p.z() - p1.z(), p.z()))
                 valh += p.z()
             else:
                 break

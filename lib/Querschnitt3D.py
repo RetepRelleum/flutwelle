@@ -64,6 +64,7 @@ class Querschnitt3D:
         Z1 = X.copy()
         Z2 = X.copy()
         Z3 = X.copy()
+        Z4 = X.copy()
         for x in Y1:
             for y in X1:
                 x_ = px.x()-dx_*x+y*dy_
@@ -75,10 +76,12 @@ class Querschnitt3D:
                         h1 = p1.z()+(p3.z()-p1.z())/10*y
                         h2 = p1.m()+(p3.m()-p1.m())/10*y
                         h3 = qb-0.4
+                        h4 = qb
                     else:
                         h1 = p3.z()+(p5.z()-p3.z())/10*(y-10)
                         h2 = p3.m()+(p5.m()-p3.m())/10*(y-10)
                         h3 = qb-0.4
+                        h4 = qb
                     if y == 0:
                         h3 = qb
                     if y == 20:
@@ -86,7 +89,6 @@ class Querschnitt3D:
                     if z_ <= h1 and x > la/2 and x < llx-la/2:
                         z1 = h1
                         z2 = h2
-                        z3 = h3
                     else:
                         z1 = np.nan
                         z2 = np.nan
@@ -95,16 +97,22 @@ class Querschnitt3D:
                         z3 = h3
                     else:
                         z3 = np.nan
+                    if z_ <= h4:
+                        z4 = h4
+                    else:
+                        z4 = np.nan
 # self.setMarker( pk,2)
                 else:
                     z_ = np.nan
                     z1 = np.nan
                     z2 = np.nan
                     z3 = np.nan
+                    z4 = np.nan
                 Z[int(x*2)][int(y*2)] = z_
                 Z1[int(x*2)][int(y*2)] = z1
                 Z2[int(x*2)][int(y*2)] = z2
                 Z3[int(x*2)][int(y*2)] = z3
+                Z4[int(x*2)][int(y*2)] = z4
         for x in X1:
             h3 = 100000
             for y in Y1:
@@ -144,15 +152,15 @@ class Querschnitt3D:
         ax.plot(x3, y3, zs=llx+llx/100*5, zdir='x',
                 label='Gelaende', color='limegreen')
         if qb > 0:
-            ax.plot_surface(Yq, Xq, Zb, alpha=0.4, color='gray',
-                            label='Bruecke', linewidth=0.25, edgecolor='gray')
-            ax.text(llx, 0, qb,  'Brücke', size=12, color='gray',
+            ax.text(llx, 0, qb,  'Brücke', size=12, color='black',
                     ha='right', va='center_baseline')
             ax.plot(xb, y2, zs=-llx/100.0*5.0, zdir='x',
                     label='Bruecke', color='gray')
             ax.plot(xb, y2, zs=llx+llx/100.0*5.0, zdir='x',
                     label='Bruecke', color='gray')
             ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray',
+                    label='Bruecke', linewidth=0.25, edgecolor='black')
+            ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray',
                     label='Bruecke', linewidth=0.25, edgecolor='black')
 
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',

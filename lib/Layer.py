@@ -80,11 +80,9 @@ class DgmL(Layer):
         rndr = self.dgm.renderer()
         sym = rndr.symbol()                  # object to change the symbology of layer
         syms = sym[0]                           # use first layer in QGIS tree
-        syms.setColor(QColor(255, 255, 255, 200))      # remove the fill colour
+        syms.setColor(QColor(255, 0, 255, 0))      # remove the fill colour
         syms.setStrokeColor(QColor("green"))
         syms.setStrokeWidth(0.5)
-        rndr = QgsInvertedPolygonRenderer().convertFromRenderer(rndr)
-        self.dgm.setRenderer(rndr)
         self.getProjektGroup(projektGroup).addLayer(self.dgm)
 
     def insertData(self, ppa: QgsGeometry):

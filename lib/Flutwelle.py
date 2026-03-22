@@ -237,7 +237,14 @@ class Flutwelle:
                       self.dlg.lineEditProjetName.text())
 
     def on_change(self):
-        Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
+        if self.dlg.checkBoxPerimeter.isChecked():
+            Dgm(self.dlg.mQgsFileWidget.filePath(), self.iface)
+        else:
+            gebiet = QgsProject.instance().mapLayersByName("Gebiet")
+            p = QgsProject.instance()
+            if gebiet:
+                p.removeMapLayer(gebiet[0].id())
+                self.iface.mapCanvas().refreshAllLayers()
 
     def run(self):
         """Run method that performs all the real work"""
