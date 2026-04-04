@@ -51,9 +51,7 @@ class Querschnitt3D:
         lx = p1.distance(p2)
         dx_ = (p1.x()-p2.x())/lx
         dy_ = (p1.y()-p2.y())/lx
-
         px = QgsPoint(p1.x()+dx_*la, p1.y()+dy_*la, 0)
-
         llx = int((lx+2*la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
@@ -123,8 +121,6 @@ class Querschnitt3D:
 
         Y1 = np.array([0, llx/2, llx])
         X1 = np.array([0, 10, 20])
-        Xq, Yq = np.meshgrid(X1, Y1)
-        Zb = self.CreateZ(qb, qb, qb, Xq)
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
         ax.plot_surface(Y, X, Z, alpha=0.5, color='limegreen',
@@ -158,11 +154,8 @@ class Querschnitt3D:
                     label='Bruecke', color='gray')
             ax.plot(xb, y2, zs=llx+llx/100.0*5.0, zdir='x',
                     label='Bruecke', color='gray')
-            ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray',
-                    label='Bruecke', linewidth=0.25, edgecolor='black')
-            ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray',
-                    label='Bruecke', linewidth=0.25, edgecolor='black')
-
+            ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
+            ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',
                 size=12,  color='blue', ha='right', va='center')
         ax.text(llx/2, 0, np.nanmax(Z),  projekt,
@@ -196,19 +189,6 @@ class Querschnitt3D:
             ret = f"{s % 1000}'{ret}"
             s = s//1000
         return ret[:-1]
-
-    def CreateZ(self, p1, p3, p5, Xq):
-        Zq = Xq.copy()
-        Zq[0][0] = p1
-        Zq[0][1] = p3
-        Zq[0][2] = p5
-        Zq[1][0] = p1
-        Zq[1][1] = p3
-        Zq[1][2] = p5
-        Zq[2][0] = p1
-        Zq[2][1] = p3
-        Zq[2][2] = p5
-        return Zq
 
     def setMarker(self, pk, col):
         pnt = QgsPointXY(pk.x(), pk.y())

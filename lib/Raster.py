@@ -37,19 +37,7 @@ from qgis.core import QgsSingleBandPseudoColorRenderer
 import glob
 
 
-class Raster():
-    """
-    A class for managing raster layers in QGIS projects.
-    This class handles loading, visibility control, and value sampling from raster layers
-    organized within a "Raster" group in the QGIS layer tree. It supports dynamic loading
-    of raster files based on geographic coordinates and provides functionality for visualizing
-    specific elevation ranges.
-    Attributes:
-        rg (QgsLayerTreeGroup): The "Raster" group in the QGIS layer tree.
-        tiffPath (str): The base path where raster TIFF files are stored.
-        r_layer (QgsRasterLayer): The currently loaded raster layer.
-    """
-
+class Raster:
     def __init__(self, path):
         root = QgsProject.instance().layerTreeRoot()
         self.rg = root.findGroup("Raster")
@@ -67,6 +55,7 @@ class Raster():
         if r_layer == 0:
             return 0
         val, res = r_layer.dataProvider().sample(QgsPointXY(p.x(), p.y()), 1)
+
         if res:
             return val
         else:
@@ -122,41 +111,6 @@ class Raster():
 
 
 class Mupe:
-    """
-    A utility class for performing geometric and raster-based operations on QGIS point objects.
-
-    This class provides methods for calculating distances, vector operations, and retrieving
-    point values from a raster dataset. It serves as a helper for 3D raster manipulations.
-
-    Attributes:
-        raster (Raster): The raster dataset to query for point values.
-
-    Methods:
-        qgsDisXy(p1, p2) -> float:
-            Calculate the Euclidean distance between two points in the XY plane.
-
-        qgsVecDirNorm(p1, p2) -> QgsPoint:
-            Compute the normalized direction vector from p2 to p1 in 3D space.
-
-        qgsVecAdd(p1, p2) -> QgsPoint:
-            Add two points' XY coordinates and set Z from raster value.
-
-        qgsVecAddM(p1, p2) -> QgsPoint:
-            Subtract p2's XY coordinates from p1's and set Z from raster value.
-
-        qgsVec90add(p1, p2) -> QgsPoint:
-            Add p1 to p2 rotated 90 degrees counterclockwise and set Z from raster.
-
-        qgsVec90addM(p1, p2) -> QgsPoint:
-            Subtract p2 rotated 90 degrees counterclockwise from p1 and set Z from raster.
-
-        getPoint(x, y) -> QgsPoint:
-            Create a QgsPoint from various input formats with Z value from raster.
-            Supports float coordinates, QgsPointXY, or QgsPoint as input.
-
-        getPointXY(p) -> QgsPointXY:
-            Convert a QgsPoint to a QgsPointXY (2D projection).
-    """
 
     def __init__(self, raster: Raster):
         self.raster = raster

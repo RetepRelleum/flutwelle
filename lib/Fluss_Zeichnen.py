@@ -169,36 +169,58 @@ class CreateFluss(QgsTask):
             m.setFillColor(QColor(0, 200, 200))
 
     def addFluss(self, minPoint: QgsPoint) -> QgsPoint:
-        stp = minPoint.clone()
         ls = QgsLineString()
         ls.addVertex(minPoint)
-        id = [-1.5, -1, -0.5, 0.5, 1, 1.5]
         notEnd = True
-        min = 5000
         i = 1
+        pmin = minPoint.clone()
+
         while notEnd:
             if self.isCanceled():
                 return False
-            id.append(np.min(id) - 0.5 * i)
-            id.append(np.max(id) + 0.5 * i)
-            i = i * 1.25
-            for xi in id:
-                for yi in id:
-                    p = self.mupe.qgsVecAdd(minPoint, QgsPoint(xi, yi, 0))
-                    if p.z() == 0 or len(id) > 100:
-                        notEnd = False
-                        break
-                    if min > p.z():
-                        min = p.z() - 0.002
-                        p.setZ(min)
-                        pmin = p.clone()
-            if minPoint.z() > min:
+            i = i + 0.5
+
+            co = math.ceil(i*math.pi*4)
+
+            min = 10000
+            for la in range(co):
+                theta = la * (2.0 * math.pi / co)
+                x1 = ls.endPoint().x() + i * math.cos(theta)
+                y1 = ls.endPoint().y() + i * math.sin(theta)
+                pp = QgsPoint(x1, y1, 0)
+                pz = self.raster.getValue(pp)
+                if min > pz:
+                    pmin = QgsPoint(x1, y1, pz)
+                    min = pz
+
+            if pmin.z() == 0 or i > 1000:
+                notEnd = False
+                break
+
+            if ls.endPoint().z()-0.005 > pmin.z():
                 ls.addVertex(pmin)
+              #  self.setMarker(QgsPoint(pmin.x(), pmin.y(), 0), 2)
                 if ls.startPoint().distance(ls.endPoint()) > self.fllae * 1000:
                     break
-                minPoint = pmin
-                id = [-1.5, -1, -0.5, 0.5, 1, 1.5]
                 i = 1
+
+            if ((ls.endPoint().z() + 0.1) > pmin.z() and i > 30 and ls.startPoint().distance(ls.endPoint()) < ls.startPoint().distance(pmin)):
+                pmin.setZ(ls.endPoint().z())
+                ls.addVertex(pmin)
+            #    self.setMarker(QgsPoint(pmin.x(), pmin.y(), 0), 1)
+                if ls.startPoint().distance(ls.endPoint()) > self.fllae * 1000:
+                    break
+                i = 1
+            elif i > 40:
+                i += 10
+
+        g = QgsGeometry(ls)
+
+        g = g.smooth(4, maxAngle=90)
+        g = g.simplify(0.5)
+        g = g.smooth(4, maxAngle=60)
+        ls = g.constGet()
+
         lsx = QgsLineString()
         lsx.addVertex(ls.startPoint().clone())
         for p in ls:
@@ -208,25 +230,6 @@ class CreateFluss(QgsTask):
                     x = lsx.endPoint().x() + (p.x() - lsx.endPoint().x()) / l__ * 10
                     y = lsx.endPoint().y() + (p.y() - lsx.endPoint().y()) / l__ * 10
                     z = self.raster.getValue(QgsPoint(x, y, 0))
-                    if z > lsx.endPoint().z():
-                        min__ = l__
-                        co = 16
-                        for i in range(co):
-                            theta = i * (2.0 * math.pi / co)
-                            x1 = lsx.endPoint().x() + 10 * math.cos(theta)
-                            y1 = lsx.endPoint().y() + 10 * math.sin(theta)
-                            z1 = self.raster.getValue(QgsPoint(x1, y1, 0))
-                           # self.setMarker(QgsPoint(x1, y1, 0), 2)
-                            if z1 <= lsx.endPoint().z()+0.1:
-                                if min__ > p.distance(QgsPoint(x1, y1, z1, 0)):
-                                    pa = QgsPoint(x1, y1, z1, 0)
-                                    min__ = pa.distance(lsx.endPoint())
-                        if min__ < l__:
-                            x = pa.x()
-                            y = pa.y()
-                            z = lsx.endPoint().z()
-                        else:
-                            z = lsx.endPoint().z()
                     px = QgsPoint(x, y, z, 0)
                     lsx.addVertex(px)
                 else:
