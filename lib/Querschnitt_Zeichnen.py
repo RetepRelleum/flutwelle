@@ -187,11 +187,11 @@ class Querschnitt(QgsTask):
                     dq = qm2 / 100 * 20
                     dy = (niveauHoehe - hmin) / 100 * 20
                     dP = 0.15
-                    if (fmaxR-dq * dP) <= qm2 <= (fmaxR + dq) and \
+                    if (fmaxR - dq * dP) <= qm2 <= (fmaxR + dq) and \
                             (ymaxR - dy * dP) <= (niveauHoehe - hmin) <= (ymaxR + dy):
                         typq = 'Rechteck'
                         break
-                    if (fmaxD-dq * dP) <= qm2 <= (fmaxD + dq) and \
+                    if (fmaxD - dq * dP) <= qm2 <= (fmaxD + dq) and \
                             (ymaxD - dy * dP) <= (niveauHoehe - hmin) <= (ymaxD + dy):
                         typq = 'Dreieck'
                         break
@@ -220,7 +220,7 @@ class Querschnitt(QgsTask):
                 polygonL = QgsPolygon(lsp)
                 v = qmm / fmaxR
                 t += 10 / v
-                el = niveauHoehe + (v ** 2)/(2 * 9.81)
+                el = niveauHoehe + (v ** 2) / (2 * 9.81)
                 if i > 0 and v > 0:
                     if typq == 'Rechteck':
                         self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i * 10, 0, ymaxR, typq, qmm, 0,
@@ -250,7 +250,7 @@ class Querschnitt(QgsTask):
                         intens = abs((niveauHoehe - p.z()) * v)
                         if ueberlauf:
                             intens = intens * -1
-                        h = niveauHoehe-p.z()
+                        h = niveauHoehe - p.z()
                         self.intL.insertData(
                             p, intens, v, h, i * 10, p.m(), niveauHoehe, el)
             self.raster.setVisibility(False)
@@ -276,7 +276,7 @@ class Querschnitt(QgsTask):
             dh = 0.001
         dmax = qmm / (k * dh ** (1 / 2) * lae ** (8 / 3))
         if dmax <= 10 ** (-3):
-            ymax = lae*dmax ** (3 / 5)
+            ymax = lae * dmax ** (3 / 5)
         elif dmax > 100:
             ymax = 1.59 * lae * dmax
         else:
@@ -313,7 +313,7 @@ class Querschnitt(QgsTask):
         dmax = qmm * (1 + m ** 2) ** (1 / 3) / \
             (k * dh ** (1 / 2) * m ** (5 / 3))
         if dmax <= 10 ** (-3):
-            ymax = 1.2 * dmax ** (3/8)
+            ymax = 1.2 * dmax ** (3 / 8)
         elif dmax > 100:
             ymax = 1.2 * dmax ** (3 / 8)
         else:
@@ -339,7 +339,7 @@ class Querschnitt(QgsTask):
         dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm * m ** (5/3) / (k * dh ** (1 / 2) * lae ** (8 / 3))
+        dmax = qmm * m ** (5 / 3) / (k * dh ** (1 / 2) * lae ** (8 / 3))
         if dmax <= 10 ** (-3):
             ymax = lae / m * dmax ** (3 / 5)
         elif dmax > 100:
@@ -367,7 +367,7 @@ class Querschnitt(QgsTask):
         dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm/(k * dh ** (1/2) * p ** (16 / 3))
+        dmax = qmm / (k * dh ** (1 / 2) * p ** (16 / 3))
         if dmax <= 10 ** (-3):
             ymax = 1.37 * p * p * dmax ** (0.46)
         elif dmax > 100:
@@ -388,7 +388,7 @@ class Querschnitt(QgsTask):
                     umx = self.interpolation(i, dmax, dm, um)
                     break
             ymax = p * p * umx
-        return ymax, 2/3 * p * ymax, umx
+        return ymax, 2 / 3 * p * ymax, umx
 
     def setMarker(self, pk, col):
         pnt = QgsPointXY(pk.x(), pk.y())
@@ -411,8 +411,8 @@ class Querschnitt(QgsTask):
     def qmax_div_qb(self, x, vo, j, k):
         jkk = abs(j) * k ** 2
         xvo = x / vo ** (1 / 3)
-        fxx = [[0, 0.1, 0.5,   1,    2,    5,   10,     20,   50,      80],
-               [0,  1,  1,  1,   1,  1,   1,      1,   1,       1],
+        fxx = [[0, 0.1, 0.5, 1, 2, 5, 10, 20, 50, 80],
+               [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                [2, 0.7, 0.8, 0.8, 0.85, 0.9, 0.95, 0.98844, 0.99, 0.992232],
                [4, 0.4, 0.57, 0.7, 0.78, 0.85, 0.9, 0.97696, 0.97, 0.984528],
                [6, 0.29, 0.43, 0.6, 0.72, 0.8, 0.85, 0.96556, 0.96, 0.976888],
