@@ -35,6 +35,7 @@ import math
 from qgis.core import QgsProject, QgsRasterLayer, QgsPoint, QgsPointXY, QgsColorRampShader, QgsMapLayer, QgsRasterShader
 from qgis.core import QgsSingleBandPseudoColorRenderer
 import glob
+import numpy as np
 
 
 class Raster:
@@ -49,6 +50,23 @@ class Raster:
 
     def setVisibility(self, vis: bool):
         self.rg.setItemVisibilityChecked(vis)
+
+    def getValue2(self, p: QgsPoint):
+        r_layer = self.getR_Layer(p)
+        if r_layer == 0:
+            return 0
+        resa = []
+        dataProvider = r_layer.dataProvider()
+        for x in range(3):
+            for y in range(3):
+                val, res = dataProvider.sample(
+                    QgsPointXY(p.x()-0.5+x*0.5, p.y()-0.5+y*0.5), 1)
+                if res:
+                    resa.append(val)
+        if len(resa) > 0:
+            return np.mean(resa)
+        else:
+            return 0
 
     def getValue(self, p: QgsPoint):
         r_layer = self.getR_Layer(p)
