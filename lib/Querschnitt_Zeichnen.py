@@ -122,16 +122,16 @@ class Querschnitt(QgsTask):
             ls = self.fluss.getFluss()
             t = 0
             self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
-            for i in range(ls.vertexCount()-2):
-                self.dlg.progressBar.setValue(i+1)
+            for i in range(ls.vertexCount() - 2):
+                self.dlg.progressBar.setValue(i + 1)
                 lsl = QgsLineString()
                 lsr = QgsLineString()
                 lsx = QgsLineString()
                 lsp = QgsLineString()
-                point0l = ls.pointN(i+1)
-                point0l.setX(point0l.x()-0.001)
+                point0l = ls.pointN(i + 1)
+                point0l.setX(point0l.x() - 0.001)
                 point0r = point0l.clone()
-                point0r.setX(point0r.x()+0.001)
+                point0r.setX(point0r.x() + 0.001)
                 hmin = point0l.z()
                 lsl.addVertex(point0l)
                 lsx.addVertex(
@@ -165,11 +165,11 @@ class Querschnitt(QgsTask):
                     lt = 0
                     for h_ in lsr:
                         qm2 += abs(niveauHoehe-h_.z())
-                        if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
+                        if h_.z() < (hmin+(niveauHoehe-hmin) * 0.85):
                             lt += 1
                     for h_ in lsl:
                         qm2 += abs(niveauHoehe-h_.z())
-                        if h_.z() < (hmin+(niveauHoehe-hmin)*0.85):
+                        if h_.z() < (hmin+(niveauHoehe-hmin) * 0.85):
                             lt += 1
                     laenge_ = lsl.endPoint().distance(lsr.endPoint())
                     if lt > laenge_:
@@ -185,7 +185,7 @@ class Querschnitt(QgsTask):
                     ymaxP, fmaxP, umP = self.p_ymax(
                         ls, i, self.k, qmm, laenge_)
                     dq = qm2/100*20
-                    dy = (niveauHoehe-hmin)/100*20
+                    dy = (niveauHoehe-hmin)/100 * 20
                     dP = 0.15
                     if (fmaxR-dq*dP) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*dP) <= (niveauHoehe-hmin) <= (ymaxR+dy):
                         typq = 'Rechteck'
@@ -199,7 +199,7 @@ class Querschnitt(QgsTask):
                     if (fmaxP-dq*dP) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*dP) <= (niveauHoehe-hmin) <= (ymaxP+dy):
                         typq = 'Parabel'
                         break
-                    if qm2 > 1.5*fmaxR or qm2 > 3*fmaxP:
+                    if qm2 > 1.5 * fmaxR or qm2 > 3 * fmaxP:
                         typq = 'Unbekannt'
                         break
                 for p in lsr:
@@ -207,28 +207,31 @@ class Querschnitt(QgsTask):
                 for p in lsl.reversed():
                     lsp.addVertex(p)
                 querStr = 'Querschnitt'
-                if lsr.endPoint().z() < (niveauHoehe-3*deltaHoehe) or lsl.endPoint().z() < (niveauHoehe-3*deltaHoehe):
+                lsrZ = lsr.endPoint().z()
+                lslZ = lsl.endPoint().z()
+
+                if lsrZ < (niveauHoehe - 3 * deltaHoehe) or lslZ < (niveauHoehe - 3 * deltaHoehe):
                     ueberlauf = True
                     querStr = 'Ueberlauf'
                 polygonL = QgsPolygon(lsp)
                 v = qmm/fmaxR
                 t += 10/v
-                el = niveauHoehe+(v**2)/(2*9.81)
+                el = niveauHoehe+(v ** 2)/(2 * 9.81)
                 if i > 0 and v > 0:
                     if typq == 'Rechteck':
-                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR, typq, qmm, 0, xvo,
-                                             ki, umR, ueberlauf, v, niveauHoehe, el, t)
+                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i * 10, 0, ymaxR, typq, qmm, 0,
+                                             xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                     elif typq == 'Dreieck':
-                        self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i*10, 0, ymaxD,
+                        self.damm.insertData(polygonL, querStr, 0, fmaxD, 0, laenge_, i * 10, 0, ymaxD,
                                              typq, qmm, 0, xvo, ki, umD, ueberlauf, v, niveauHoehe, el, t)
                     elif typq == 'Trapez':
-                        self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, laenge_, i*10, 0, ymaxT,
+                        self.damm.insertData(polygonL, querStr, 0, fmaxT, 0, laenge_, i * 10, 0, ymaxT,
                                              typq, qmm, 0, xvo, ki, umT, ueberlauf, v, niveauHoehe, el, t)
                     elif typq == 'Parabel':
-                        self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, laenge_, i*10, 0, ymaxP,
+                        self.damm.insertData(polygonL, querStr, 0, fmaxP, 0, laenge_, i * 10, 0, ymaxP,
                                              typq, qmm, 0, xvo, ki, umP, ueberlauf, v, niveauHoehe, el, t)
                     else:
-                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i*10, 0, ymaxR,
+                        self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i * 10, 0, ymaxR,
                                              typq, qmm, 0, xvo, ki, umR, ueberlauf, v, niveauHoehe, el, t)
                     min_p = 0
                     max_p = 0
@@ -240,12 +243,12 @@ class Querschnitt(QgsTask):
                     for p in lsx:
                         if p.m() == min_p or p.m() == max_p and not ueberlauf:
                             p.setZ(niveauHoehe)
-                        intens = abs((niveauHoehe-p.z())*v)
+                        intens = abs((niveauHoehe-p.z()) * v)
                         if ueberlauf:
-                            intens = intens*-1
+                            intens = intens * -1
                         h = niveauHoehe-p.z()
                         self.intL.insertData(
-                            p, intens, v, h, i*10, p.m(), niveauHoehe, el)
+                            p, intens, v, h, i * 10, p.m(), niveauHoehe, el)
             self.raster.setVisibility(False)
         except Exception as X:
             print(X)
@@ -256,22 +259,22 @@ class Querschnitt(QgsTask):
         else:
             point0l_ = self.mupe.qgsVecAdd(point0l_, dirV)
         px = point0l_.clone()
-        px.setX(px.x()+dirV.y()*(px.z()-hmin))
-        px.setY(px.y()-dirV.x()*(px.z()-hmin))
+        px.setX(px.x() + dirV.y() * (px.z() - hmin))
+        px.setY(px.y() - dirV.x() * (px.z() - hmin))
         lsl_.addVertex(px)
         lsx_.addVertex(QgsPoint(point0l_.x(), point0l_.y(), point0l_.z(), pi))
         return point0l_
 
     def r_ymax(self, ls, i, k, qmm, lae):
         umx = 0
-        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm/(k*dh**(1/2)*lae**(8/3))
-        if dmax <= 10**(-3):
-            ymax = lae*dmax**(3/5)
+        dmax = qmm / (k * dh ** (1 / 2) * lae ** (8 / 3))
+        if dmax <= 10 ** (-3):
+            ymax = lae*dmax ** (3 / 5)
         elif dmax > 100:
-            ymax = 1.59*lae*dmax
+            ymax = 1.59 * lae * dmax
         else:
             dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                   0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
@@ -287,27 +290,28 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = lae*umx
-        return ymax, lae*ymax, umx
+            ymax = lae * umx
+        return ymax, lae * ymax, umx
 
     def interpolation(self, i, dmax, dm, um):
         umx1 = um[i]
         dm1 = dm[i]
-        umx2 = um[i-1]
-        dm2 = dm[i-1]
-        umx = umx2+(umx1-umx2)/(dm1-dm2)*(dm1-dmax)
+        umx2 = um[i - 1]
+        dm2 = dm[i - 1]
+        umx = umx2 + (umx1 - umx2) / (dm1 - dm2) * (dm1 - dmax)
         return umx
 
     def d_ymax(self, ls, i, k, qmm, m):
         umx = 0
-        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm*(1+m**2)**(1/3)/(k*dh**(1/2)*m**(5/3))
-        if dmax <= 10**(-3):
-            ymax = 1.2*dmax**(3/8)
+        dmax = qmm * (1 + m ** 2) ** (1 / 3) / \
+            (k * dh ** (1 / 2) * m ** (5 / 3))
+        if dmax <= 10 ** (-3):
+            ymax = 1.2 * dmax ** (3/8)
         elif dmax > 100:
-            ymax = 1.2*dmax**(3/8)
+            ymax = 1.2 * dmax ** (3 / 8)
         else:
             dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                   0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
@@ -323,19 +327,19 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = 10*umx
-        return ymax, m*ymax**2, umx
+            ymax = 10 * umx
+        return ymax, m * ymax ** 2, umx
 
     def t_ymax(self, ls, i, k, qmm, m, lae):
         umx = 0
-        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm*m**(5/3)/(k*dh**(1/2)*lae**(8/3))
-        if dmax <= 10**(-3):
-            ymax = lae/m*dmax**(3/5)
+        dmax = qmm * m ** (5/3) / (k * dh ** (1 / 2) * lae ** (8 / 3))
+        if dmax <= 10 ** (-3):
+            ymax = lae / m * dmax ** (3 / 5)
         elif dmax > 100:
-            ymax = 1.3*dmax**(3/8)
+            ymax = 1.3 * dmax ** (3 / 8)
         else:
             dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                   0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
@@ -351,19 +355,19 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = lae/m*umx
-        return ymax, lae*ymax+m*ymax**2, umx
+            ymax = lae / m * umx
+        return ymax, lae * ymax + m * ymax ** 2, umx
 
     def p_ymax(self, ls, i, k, qmm, p):
         umx = 0
-        dh = (ls.pointN(i-2).z()-ls.pointN(i+2).z())/40
+        dh = (ls.pointN(i - 2).z() - ls.pointN(i + 2).z()) / 40
         if dh <= 0.001:
             dh = 0.001
-        dmax = qmm/(k*dh**(1/2)*p**(16/3))
-        if dmax <= 10**(-3):
-            ymax = 1.37*p*p*dmax**(0.46)
+        dmax = qmm/(k * dh ** (1/2) * p ** (16 / 3))
+        if dmax <= 10 ** (-3):
+            ymax = 1.37 * p * p * dmax ** (0.46)
         elif dmax > 100:
-            ymax = 1.86*p*p*dmax**(0.55)
+            ymax = 1.86 * p * p * dmax ** (0.55)
         else:
             dm = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009,
                   0.010, 0.020, 0.030, 0.040, 0.050, 0.060, 0.070, 0.080, 0.090,
@@ -379,8 +383,8 @@ class Querschnitt(QgsTask):
                 if dmax < dm[i]:
                     umx = self.interpolation(i, dmax, dm, um)
                     break
-            ymax = p*p*umx
-        return ymax, 2/3*p*ymax, umx
+            ymax = p * p * umx
+        return ymax, 2/3 * p * ymax, umx
 
     def setMarker(self, pk, col):
         pnt = QgsPointXY(pk.x(), pk.y())
@@ -401,8 +405,8 @@ class Querschnitt(QgsTask):
             m.setFillColor(QColor(0, 200, 200))
 
     def qmax_div_qb(self, x, vo, j, k):
-        jkk = abs(j)*k**2
-        xvo = x/vo**(1/3)
+        jkk = abs(j) * k ** 2
+        xvo = x / vo ** (1 / 3)
         fxx = [[0, 0.1, 0.5,   1,    2,    5,   10,     20,   50,      80],
                [0,  1,  1,  1,   1,  1,   1,      1,   1,       1],
                [2, 0.7, 0.8, 0.8, 0.85, 0.9, 0.95, 0.98844, 0.99, 0.992232],
@@ -438,12 +442,13 @@ class Querschnitt(QgsTask):
         if yi == 16:
             yi = 15
         f1 = fxx[yi][xi]
-        f2 = fxx[yi][xi-1]
-        f3 = f1+(f2-f1)/(fxx[0][xi-1]-fxx[0][xi])*(jkk-fxx[0][xi])
+        f2 = fxx[yi][xi - 1]
+        f3 = f1 + (f2 - f1) / (fxx[0][xi - 1] -
+                               fxx[0][xi]) * (jkk - fxx[0][xi])
         f1 = fxx[yi][xi]
-        f2 = fxx[yi-1][xi]
-        f4 = f1+(f2-f1)/(fxx[yi-1][0]-fxx[yi][0])*(xvo-fxx[yi][0])
-        fr = (f3+f4)/2
+        f2 = fxx[yi - 1][xi]
+        f4 = f1+(f2 - f1) / (fxx[yi - 1][0] - fxx[yi][0]) * (xvo - fxx[yi][0])
+        fr = (f3+f4) / 2
         if fr > 1:
             fr = 1
         return fr, jkk, xvo
