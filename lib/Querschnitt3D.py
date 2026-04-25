@@ -106,11 +106,11 @@ class Querschnitt3D:
                     z2 = np.nan
                     z3 = np.nan
                     z4 = np.nan
-                Z[int(x*2)][int(y * 2)] = z_
-                Z1[int(x*2)][int(y * 2)] = z1
-                Z2[int(x*2)][int(y * 2)] = z2
-                Z3[int(x*2)][int(y * 2)] = z3
-                Z4[int(x*2)][int(y * 2)] = z4
+                Z[int(x * 2)][int(y * 2)] = z_
+                Z1[int(x * 2)][int(y * 2)] = z1
+                Z2[int(x * 2)][int(y * 2)] = z2
+                Z3[int(x * 2)][int(y * 2)] = z3
+                Z4[int(x * 2)][int(y * 2)] = z4
         for x in X1:
             h3 = 100000
             for y in Y1:
@@ -148,7 +148,7 @@ class Querschnitt3D:
         ax.plot(x3, y3, zs=llx + llx / 100 * 5, zdir='x',
                 label='Gelaende', color='limegreen')
         if qb > 0:
-            ax.text(llx, 0, qb,  'Brücke', size=12, color='black',
+            ax.text(llx, 0, qb, 'Brücke', size=12, color='black',
                     ha='right', va='center_baseline')
             ax.plot(xb, y2, zs=-llx / 100.0 * 5.0, zdir='x',
                     label='Bruecke', color='gray')
@@ -159,12 +159,12 @@ class Querschnitt3D:
             ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray',
                             label='Bruecke', linewidth=0.25, edgecolor='black')
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',
-                size=12,  color='blue', ha='right', va='center')
-        ax.text(llx/2, 0, np.nanmax(Z),  projekt,
-                size=16,  color='blue', ha='center', va='bottom')
+                size=12, color='blue', ha='right', va='center')
+        ax.text(llx / 2, 0, np.nanmax(Z), projekt,
+                size=16, color='blue', ha='center', va='bottom')
         ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
                 size=12, color='red', ha='right', va='bottom')
-        ax.text(llx, 0, np.nanmin(Z),  'Flussbett',
+        ax.text(llx, 0, np.nanmin(Z), 'Flussbett',
                 size=12, color='green', ha='right', va='top')
 
         text = 'Koordinaten\n'

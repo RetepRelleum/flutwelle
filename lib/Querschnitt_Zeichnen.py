@@ -121,7 +121,7 @@ class Querschnitt(QgsTask):
             self.intL = IntL(self.proName)
             ls = self.fluss.getFluss()
             t = 0
-            self.dlg.progressBar.setRange(0, ls.vertexCount()-2)
+            self.dlg.progressBar.setRange(0, ls.vertexCount() - 2)
             for i in range(ls.vertexCount() - 2):
                 self.dlg.progressBar.setValue(i + 1)
                 lsl = QgsLineString()
@@ -138,7 +138,7 @@ class Querschnitt(QgsTask):
                     QgsPoint(point0l.x(), point0l.y(), point0l.z(), 0))
                 dirV = self.mupe.qgsVecDirNorm(point0l, ls.pointN(i))
                 deltaHoehe = 0.01
-                niveauHoehe = hmin+deltaHoehe
+                niveauHoehe = hmin + deltaHoehe
                 qm2 = 0
                 weiter = True
                 h1 = ls.startPoint().z()
@@ -164,12 +164,12 @@ class Querschnitt(QgsTask):
                     qm2 = 0
                     lt = 0
                     for h_ in lsr:
-                        qm2 += abs(niveauHoehe-h_.z())
+                        qm2 += abs(niveauHoehe - h_.z())
                         if h_.z() < (hmin+(niveauHoehe-hmin) * 0.85):
                             lt += 1
                     for h_ in lsl:
-                        qm2 += abs(niveauHoehe-h_.z())
-                        if h_.z() < (hmin+(niveauHoehe-hmin) * 0.85):
+                        qm2 += abs(niveauHoehe - h_.z())
+                        if h_.z() < (hmin + (niveauHoehe - hmin) * 0.85):
                             lt += 1
                     laenge_ = lsl.endPoint().distance(lsr.endPoint())
                     if lt > laenge_:
@@ -245,7 +245,7 @@ class Querschnitt(QgsTask):
                     for p in lsx:
                         if p.m() == min_p or p.m() == max_p and not ueberlauf:
                             p.setZ(niveauHoehe)
-                        intens = abs((niveauHoehe-p.z()) * v)
+                        intens = abs((niveauHoehe - p.z()) * v)
                         if ueberlauf:
                             intens = intens * -1
                         h = niveauHoehe-p.z()
