@@ -51,7 +51,7 @@ class Querschnitt3D:
         lx = p1.distance(p2)
         dx_ = (p1.x() - p2.x()) / lx
         dy_ = (p1.y() - p2.y()) / lx
-        px = QgsPoint(p1.x() + dx_ * la, p1.y() + dy_*  la, 0)
+        px = QgsPoint(p1.x() + dx_ * la, p1.y() + dy_ * la, 0)
         llx = int((lx + 2 * la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
@@ -106,20 +106,20 @@ class Querschnitt3D:
                     z2 = np.nan
                     z3 = np.nan
                     z4 = np.nan
-                Z[int(x*2)][int(y*2)] = z_
-                Z1[int(x*2)][int(y*2)] = z1
-                Z2[int(x*2)][int(y*2)] = z2
-                Z3[int(x*2)][int(y*2)] = z3
-                Z4[int(x*2)][int(y*2)] = z4
+                Z[int(x*2)][int(y * 2)] = z_
+                Z1[int(x*2)][int(y * 2)] = z1
+                Z2[int(x*2)][int(y * 2)] = z2
+                Z3[int(x*2)][int(y * 2)] = z3
+                Z4[int(x*2)][int(y * 2)] = z4
         for x in X1:
             h3 = 100000
             for y in Y1:
-                if h3 > Z[int(y*2)][int(x*2)]:
-                    h3 = Z[int(y*2)][int(x*2)]
+                if h3 > Z[int(y * 2)][int(x * 2)]:
+                    h3 = Z[int(y * 2)][int(x * 2)]
             if x < 20:
-                y3[int(x*2)] = h3
+                y3[int(x * 2)] = h3
 
-        Y1 = np.array([0, llx/2, llx])
+        Y1 = np.array([0, llx / 2, llx])
         X1 = np.array([0, 10, 20])
         plt.style.use('_mpl-gallery')
         fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -154,8 +154,10 @@ class Querschnitt3D:
                     label='Bruecke', color='gray')
             ax.plot(xb, y2, zs=llx + llx / 100.0 * 5.0, zdir='x',
                     label='Bruecke', color='gray')
-            ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
-            ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
+            ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray',
+                            label='Bruecke', linewidth=0.25, edgecolor='black')
+            ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray',
+                            label='Bruecke', linewidth=0.25, edgecolor='black')
         ax.text(llx, 0, p1.z(), 'Quote Abfluss',
                 size=12,  color='blue', ha='right', va='center')
         ax.text(llx/2, 0, np.nanmax(Z),  projekt,

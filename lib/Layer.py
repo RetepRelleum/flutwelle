@@ -364,7 +364,8 @@ class DammL(Layer):
         p.setY(p.y() - h)
         ls.addVertex(p)
         pol = QgsPolygon(ls)
-        qb = 0.93 * bu * (h ** (3 / 2)) + 0.72 * ((b - bu) / 2) / h * (h ** (5 / 2))
+        qb = 0.93 * bu * (h ** (3 / 2)) + 0.72 * \
+            ((b - bu) / 2) / h * (h ** (5 / 2))
         f = h * bu + h * (b - bu) / 2
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, bu, h, 'Trapez', qb_, u)

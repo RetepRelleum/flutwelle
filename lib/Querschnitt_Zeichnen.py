@@ -144,8 +144,8 @@ class Querschnitt(QgsTask):
                 h1 = ls.startPoint().z()
                 h2 = point0l.z()
                 qm_qb, xvo, ki = self.qmax_div_qb(
-                    10*i+10, self.vo, (h1-h2)/(10*i+10), self.k)
-                qmm = self.qb_*qm_qb
+                    10 * i + 10, self.vo, (h1 - h2) / (10 * i + 10), self.k)
+                qmm = self.qb_ * qm_qb
                 typq = ''
                 pil = 1
                 pir = -1
@@ -179,24 +179,26 @@ class Querschnitt(QgsTask):
                     ymaxR, fmaxR, umR = self.r_ymax(
                         ls, i, self.k, qmm, laenge_)
                     ymaxD, fmaxD, umD = self.d_ymax(
-                        ls, i, self.k, qmm, (laenge_/2)/(niveauHoehe-hmin))
+                        ls, i, self.k, qmm, (laenge_ / 2) / (niveauHoehe - hmin))
                     ymaxT, fmaxT, umT = self.t_ymax(
-                        ls, i, self.k, qmm, ((laenge_-lt)/2)/(niveauHoehe-hmin), lt)
+                        ls, i, self.k, qmm, ((laenge_-lt) / 2)/(niveauHoehe - hmin), lt)
                     ymaxP, fmaxP, umP = self.p_ymax(
                         ls, i, self.k, qmm, laenge_)
-                    dq = qm2/100*20
+                    dq = qm2 / 100 * 20
                     dy = (niveauHoehe-hmin)/100 * 20
                     dP = 0.15
-                    if (fmaxR-dq*dP) <= qm2 <= (fmaxR+dq) and (ymaxR-dy*dP) <= (niveauHoehe-hmin) <= (ymaxR+dy):
+                    if (fmaxR-dq * dP) <= qm2 <= (fmaxR + dq) and (ymaxR-dy * dP) <= (niveauHoehe-hmin) <= (ymaxR + dy):
                         typq = 'Rechteck'
                         break
-                    if (fmaxD-dq*dP) <= qm2 <= (fmaxD+dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD+dy):
+                    if (fmaxD-dq*dP) <= qm2 <= (fmaxD + dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD + dy):
                         typq = 'Dreieck'
                         break
-                    if (fmaxT-dq*dP) <= qm2 <= (fmaxT+dq) and (ymaxT-dy*dP) <= (niveauHoehe-hmin) <= (ymaxT+dy):
+                    if (fmaxT - dq * dP) <= qm2 <= (fmaxT + dq) and \
+                            (ymaxT - dy * dP) <= (niveauHoehe-hmin) <= (ymaxT + dy):
                         typq = 'Trapez'
                         break
-                    if (fmaxP-dq*dP) <= qm2 <= (fmaxP+dq) and (ymaxP-dy*dP) <= (niveauHoehe-hmin) <= (ymaxP+dy):
+                    if (fmaxP - dq * dP) <= qm2 <= (fmaxP + dq) and \
+                            (ymaxP - dy * dP) <= (niveauHoehe - hmin) <= (ymaxP + dy):
                         typq = 'Parabel'
                         break
                     if qm2 > 1.5 * fmaxR or qm2 > 3 * fmaxP:
