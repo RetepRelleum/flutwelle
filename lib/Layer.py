@@ -310,7 +310,7 @@ class DammL(Layer):
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+b / 2)
+        p.setX(p.x() + b / 2)
         ls.addVertex(p)
         p = p.clone()
         p.setY(p.y() + h)
@@ -323,7 +323,7 @@ class DammL(Layer):
         ls.addVertex(p)
         pol = QgsPolygon(ls)
         qb = 0.93 * b * (h ** (3 / 2))
-        f = h*b
+        f = h * b
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b,
                         0, b, h, 'Rechteck', qb_, u)
@@ -393,9 +393,9 @@ class DammL(Layer):
         segments = 120
         for i in range(segments):
             theta = i * (2.0 * math.pi / segments)
-            if theta < a*2:
-                p = QgsPoint(pt.x() + radius * math.cos(theta-math.pi / 2 - a),
-                             pt.y() + radius * math.sin(theta-math.pi / 2 - a))
+            if theta < a * 2:
+                p = QgsPoint(pt.x() + radius * math.cos(theta - math.pi / 2 - a),
+                             pt.y() + radius * math.sin(theta - math.pi / 2 - a))
             ls.addVertex(p)
         return ls
 
@@ -482,7 +482,7 @@ class IntL(Layer):
             # QgsRendererRange(untere_grenze, obere_grenze, symbol, label)
             range1 = QgsRendererRange(0, 0.5, symbol1, 'gering 0.0 - 0.5')
             range2 = QgsRendererRange(0.5, 1, symbol2, 'mässig 0.5 - 1.0')
-            range3 = QgsRendererRange(1, 2, symbol3,   'mittel 1.0 - 2.0')
+            range3 = QgsRendererRange(1, 2, symbol3, 'mittel 1.0 - 2.0')
             range4 = QgsRendererRange(2, 1000, symbol4, 'hoch   2.0 - ...')
             renderer = QgsGraduatedSymbolRenderer(
                 field, [range1, range2, range3, range4])

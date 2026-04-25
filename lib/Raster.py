@@ -60,7 +60,7 @@ class Raster:
         for x in range(3):
             for y in range(3):
                 val, res = dataProvider.sample(
-                    QgsPointXY(p.x()-0.5+x*0.5, p.y()-0.5+y*0.5), 1)
+                    QgsPointXY(p.x() - 0.5 + x * 0.5, p.y() - 0.5 + y * 0.5), 1)
                 if res:
                     resa.append(val)
         if len(resa) > 0:
@@ -80,7 +80,7 @@ class Raster:
             return 0
 
     def getR_Layer(self, p: QgsPoint):
-        lname = f"{int(p.x()//1000)}-{int(p.y()//1000)}"
+        lname = f"{int(p.x() // 1000)}-{int(p.y() // 1000)}"
         if lname == self.r_layer.name():
             return self.r_layer
         r_layer = QgsProject.instance().mapLayersByName(lname)
@@ -112,7 +112,7 @@ class Raster:
         for layerx in layers:
             layerType = layerx.type()
             if layerType == QgsMapLayer.RasterLayer:
-                if layerx.name() in f'{int(point.x()//1000)}-{int(point.y())//1000}':
+                if layerx.name() in f'{int(point.x() // 1000)}-{int(point.y()) // 1000}':
                     shader = QgsRasterShader()
                     shader.setRasterShaderFunction(fcn)
                     renderer = QgsSingleBandPseudoColorRenderer(
@@ -134,28 +134,28 @@ class Mupe:
         self.raster = raster
 
     def qgsVecDirNorm(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
-        dirP = QgsPoint(p1.x()-p2.x(), p1.y()-p2.y(), p1.z()-p2.z())
-        dirP = QgsPoint(dirP.y()/math.sqrt(dirP.x()**2+dirP.y()**2), -
-                        dirP.x()/math.sqrt(dirP.x()**2+dirP.y()**2), dirP.z())
+        dirP = QgsPoint(p1.x() - p2.x(), p1.y() - p2.y(), p1.z() - p2.z())
+        dirP = QgsPoint(dirP.y() / math.sqrt(dirP.x() ** 2+dirP.y() ** 2), -
+                        dirP.x() / math.sqrt(dirP.x() ** 2+dirP.y() ** 2), dirP.z())
         return dirP
 
     def qgsVecAdd(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
-        p = QgsPoint(p1.x()+p2.x(), p1.y()+p2.y(), 0)
+        p = QgsPoint(p1.x() + p2.x(), p1.y() + p2.y(), 0)
         p.setZ(self.raster.getValue(p))
         return p
 
     def qgsVecAddM(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
-        p = QgsPoint(p1.x()-p2.x(), p1.y()-p2.y(), 0)
+        p = QgsPoint(p1.x() - p2.x(), p1.y() - p2.y(), 0)
         p.setZ(self.raster.getValue(p))
         return p
 
     def qgsVec90add(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
-        p = QgsPoint(p1.x()+p2.y(), p1.y()-p2.x(), 0)
+        p = QgsPoint(p1.x() + p2.y(), p1.y() - p2.x(), 0)
         p.setZ(self.raster.getValue(p))
         return p
 
     def qgsVec90addM(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
-        p = QgsPoint(p1.x()-p2.y(), p1.y()+p2.x(), 0)
+        p = QgsPoint(p1.x() - p2.y(), p1.y() + p2.x(), 0)
         p.setZ(self.raster.getValue(p))
         return p
 

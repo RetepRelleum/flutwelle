@@ -41,18 +41,18 @@ from qgis.PyQt.QtGui import QColor
 
 class Querschnitt3D:
     def __init__(self, laenge, la, qb, path, projekt=''):
-        laenge = round(laenge/10)*10
+        laenge = round(laenge / 10) * 10
         self.raster = Raster(path)
         self.inten = IntL(path)
         self.damm = DammL(path)
         p1, p2 = self.inten.getPlPr(laenge)
-        p3, p4 = self.inten.getPlPr(laenge-10)
-        p5, p6 = self.inten.getPlPr(laenge-20)
+        p3, p4 = self.inten.getPlPr(laenge - 10)
+        p5, p6 = self.inten.getPlPr(laenge - 20)
         lx = p1.distance(p2)
-        dx_ = (p1.x()-p2.x())/lx
-        dy_ = (p1.y()-p2.y())/lx
-        px = QgsPoint(p1.x()+dx_*la, p1.y()+dy_*la, 0)
-        llx = int((lx+2*la))
+        dx_ = (p1.x() - p2.x()) / lx
+        dy_ = (p1.y() - p2.y()) / lx
+        px = QgsPoint(p1.x() + dx_ * la, p1.y() + dy_*  la, 0)
+        llx = int((lx + 2 * la))
         X1 = np.arange(0, llx, 0.5)
         Y1 = np.arange(0, llx, 0.5)
         x3 = np.arange(0, 20, 0.5)
@@ -65,26 +65,26 @@ class Querschnitt3D:
         Z4 = X.copy()
         for x in Y1:
             for y in X1:
-                x_ = px.x()-dx_*x+y*dy_
-                y_ = px.y()-dy_*x-y*dx_
+                x_ = px.x() - dx_ * x + y * dy_
+                y_ = px.y() - dy_ * x - y * dx_
                 if y <= 20:
                     pk = QgsPoint(x_, y_)
                     z_ = self.raster.getValue(pk)
                     if y <= 10:
-                        h1 = p1.z()+(p3.z()-p1.z())/10*y
-                        h2 = p1.m()+(p3.m()-p1.m())/10*y
-                        h3 = qb-0.4
+                        h1 = p1.z() + (p3.z() - p1.z()) / 10 * y
+                        h2 = p1.m() + (p3.m() - p1.m()) / 10 * y
+                        h3 = qb - 0.4
                         h4 = qb
                     else:
-                        h1 = p3.z()+(p5.z()-p3.z())/10*(y-10)
-                        h2 = p3.m()+(p5.m()-p3.m())/10*(y-10)
-                        h3 = qb-0.4
+                        h1 = p3.z() + (p5.z() - p3.z()) / 10 * (y - 10)
+                        h2 = p3.m() + (p5.m() - p3.m()) / 10 * (y - 10)
+                        h3 = qb - 0.4
                         h4 = qb
                     if y == 0:
                         h3 = qb
                     if y == 20:
                         h3 = qb
-                    if z_ <= h1 and x > la/2 and x < llx-la/2:
+                    if z_ <= h1 and x > la / 2 and x < llx - la / 2:
                         z1 = h1
                         z2 = h2
                     else:
@@ -133,26 +133,26 @@ class Querschnitt3D:
         xb = [20, 10, 0, 0, 10, 20, 20]
         y = [p1.z(), p3.z(), p5.z()]
         y1 = [p1.m(), p3.m(), p5.m()]
-        y2 = [qb-0.4, qb-0.4, qb-0.4, qb, qb, qb, qb-0.4]
+        y2 = [qb - 0.4, qb - 0.4, qb - 0.4, qb, qb, qb, qb - 0.4]
 
-        ax.plot(x, y, zs=-llx/100*5, zdir='x',
+        ax.plot(x, y, zs=-llx / 100 * 5, zdir='x',
                 label='Quote Abfluss', color='blue')
-        ax.plot(x, y, zs=llx+llx/100*5, zdir='x',
+        ax.plot(x, y, zs=llx + llx / 100 * 5, zdir='x',
                 label='Quote Abfluss)', color='blue')
-        ax.plot(x, y1, zs=-llx/100*5, zdir='x',
+        ax.plot(x, y1, zs=-llx / 100 * 5, zdir='x',
                 label='Energielinienhoehe', color='red')
-        ax.plot(x, y1, zs=llx+llx/100*5, zdir='x',
+        ax.plot(x, y1, zs=llx + llx / 100 * 5, zdir='x',
                 label='Energielinienhoehe', color='red')
-        ax.plot(x3, y3, zs=-llx/100*5, zdir='x',
+        ax.plot(x3, y3, zs=-llx / 100 * 5, zdir='x',
                 label='Gelaende', color='limegreen')
-        ax.plot(x3, y3, zs=llx+llx/100*5, zdir='x',
+        ax.plot(x3, y3, zs=llx + llx / 100 * 5, zdir='x',
                 label='Gelaende', color='limegreen')
         if qb > 0:
             ax.text(llx, 0, qb,  'Brücke', size=12, color='black',
                     ha='right', va='center_baseline')
-            ax.plot(xb, y2, zs=-llx/100.0*5.0, zdir='x',
+            ax.plot(xb, y2, zs=-llx / 100.0 * 5.0, zdir='x',
                     label='Bruecke', color='gray')
-            ax.plot(xb, y2, zs=llx+llx/100.0*5.0, zdir='x',
+            ax.plot(xb, y2, zs=llx + llx / 100.0 * 5.0, zdir='x',
                     label='Bruecke', color='gray')
             ax.plot_surface(Y, X, Z3, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
             ax.plot_surface(Y, X, Z4, alpha=0.4, color='gray', label='Bruecke', linewidth=0.25, edgecolor='black')
@@ -166,19 +166,19 @@ class Querschnitt3D:
                 size=12, color='green', ha='right', va='top')
 
         text = 'Koordinaten\n'
-        text += f'{self.sep(int(p1.x()))}/{self.sep(int(p1.y()))}\n'
+        text += f'{self.sep(int(p1.x()))} / {self.sep(int(p1.y()))}\n'
         text += self.damm.getData(laenge)
-        ax.text(0, 0, np.nanmin(Z)+(np.nanmax(Z)-np.nanmin(Z))/4, text,
+        ax.text(0, 0, np.nanmin(Z) + (np.nanmax(Z) - np.nanmin(Z)) / 4, text,
                 size=10, color='black', ha='left', va='center_baseline', wrap=True)
 
-        ax.text(llx/2, llx, np.nanmax(Z), 'erstell mit Qgis Plugin Flutwelle gemäss CTGREF',
+        ax.text(llx / 2, llx, np.nanmax(Z), 'erstell mit Qgis Plugin Flutwelle gemäss CTGREF',
                 size=7, color='grey', ha='center', va='center_baseline')
         ax.set_xlabel('m')
         ax.set_ylabel('m')
         ax.set_zlabel('mü.M.')
 
-        ax.set_xlim(int(-llx/100.0*5.0), int(llx+llx/100.0*5.0))
-        ax.set_ylim(int(-llx/100*5.0), int(llx+llx/100.0*5.0))
+        ax.set_xlim(int(-llx / 100.0 * 5.0), int(llx + llx / 100.0 * 5.0))
+        ax.set_ylim(int(-llx / 100.0 * 5.0), int(llx + llx / 100.0 * 5.0))
 
         plt.show()
         self.raster.setVisibility(False)
@@ -187,7 +187,7 @@ class Querschnitt3D:
         ret = ''
         while s > 0:
             ret = f"{s % 1000}'{ret}"
-            s = s//1000
+            s = s // 1000
         return ret[:-1]
 
     def setMarker(self, pk, col):
