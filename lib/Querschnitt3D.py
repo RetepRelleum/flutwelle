@@ -162,7 +162,7 @@ class Querschnitt3D:
                 size=12, color='blue', ha='right', va='center')
         ax.text(llx / 2, 0, np.nanmax(Z), projekt,
                 size=16, color='blue', ha='center', va='bottom')
-        ax.text(llx, 0, p1.m(),  'Energielinienhöhe',
+        ax.text(llx, 0, p1.m(), 'Energielinienhöhe',
                 size=12, color='red', ha='right', va='bottom')
         ax.text(llx, 0, np.nanmin(Z), 'Flussbett',
                 size=12, color='green', ha='right', va='top')

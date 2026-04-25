@@ -165,7 +165,7 @@ class Querschnitt(QgsTask):
                     lt = 0
                     for h_ in lsr:
                         qm2 += abs(niveauHoehe - h_.z())
-                        if h_.z() < (hmin+(niveauHoehe-hmin) * 0.85):
+                        if h_.z() < (hmin + (niveauHoehe - hmin) * 0.85):
                             lt += 1
                     for h_ in lsl:
                         qm2 += abs(niveauHoehe - h_.z())
@@ -181,20 +181,22 @@ class Querschnitt(QgsTask):
                     ymaxD, fmaxD, umD = self.d_ymax(
                         ls, i, self.k, qmm, (laenge_ / 2) / (niveauHoehe - hmin))
                     ymaxT, fmaxT, umT = self.t_ymax(
-                        ls, i, self.k, qmm, ((laenge_-lt) / 2)/(niveauHoehe - hmin), lt)
+                        ls, i, self.k, qmm, ((laenge_ - lt) / 2) / (niveauHoehe - hmin), lt)
                     ymaxP, fmaxP, umP = self.p_ymax(
                         ls, i, self.k, qmm, laenge_)
                     dq = qm2 / 100 * 20
-                    dy = (niveauHoehe-hmin)/100 * 20
+                    dy = (niveauHoehe - hmin) / 100 * 20
                     dP = 0.15
-                    if (fmaxR-dq * dP) <= qm2 <= (fmaxR + dq) and (ymaxR-dy * dP) <= (niveauHoehe-hmin) <= (ymaxR + dy):
+                    if (fmaxR-dq * dP) <= qm2 <= (fmaxR + dq) and \
+                            (ymaxR - dy * dP) <= (niveauHoehe - hmin) <= (ymaxR + dy):
                         typq = 'Rechteck'
                         break
-                    if (fmaxD-dq*dP) <= qm2 <= (fmaxD + dq) and (ymaxD-dy*dP) <= (niveauHoehe-hmin) <= (ymaxD + dy):
+                    if (fmaxD-dq * dP) <= qm2 <= (fmaxD + dq) and \
+                            (ymaxD - dy * dP) <= (niveauHoehe - hmin) <= (ymaxD + dy):
                         typq = 'Dreieck'
                         break
                     if (fmaxT - dq * dP) <= qm2 <= (fmaxT + dq) and \
-                            (ymaxT - dy * dP) <= (niveauHoehe-hmin) <= (ymaxT + dy):
+                            (ymaxT - dy * dP) <= (niveauHoehe - hmin) <= (ymaxT + dy):
                         typq = 'Trapez'
                         break
                     if (fmaxP - dq * dP) <= qm2 <= (fmaxP + dq) and \
@@ -216,9 +218,9 @@ class Querschnitt(QgsTask):
                     ueberlauf = True
                     querStr = 'Ueberlauf'
                 polygonL = QgsPolygon(lsp)
-                v = qmm/fmaxR
-                t += 10/v
-                el = niveauHoehe+(v ** 2)/(2 * 9.81)
+                v = qmm / fmaxR
+                t += 10 / v
+                el = niveauHoehe + (v ** 2)/(2 * 9.81)
                 if i > 0 and v > 0:
                     if typq == 'Rechteck':
                         self.damm.insertData(polygonL, querStr, 0, fmaxR, 0, laenge_, i * 10, 0, ymaxR, typq, qmm, 0,
