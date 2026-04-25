@@ -37,7 +37,6 @@ from qgis.core import (QgsTextFormat, QgsVectorLayerSimpleLabeling,
                        QgsFeatureRequest, QgsGeometry, QgsFeature,
                        QgsPoint, QgsLineString)
 from qgis.core import QgsPalLayerSettings, QgsPolygon, QgsSymbol, QgsRendererRange, QgsGraduatedSymbolRenderer
-from qgis.core import QgsInvertedPolygonRenderer
 from qgis.PyQt.QtGui import QColor
 import math
 
@@ -205,7 +204,7 @@ class DammL(Layer):
         ret = ''
         while s > 0:
             ret = f"{s % 1000}'{ret}"
-            s = s//1000
+            s = s // 1000
         return ret[:-1]
 
     def insertData(self, ppa: QgsGeometry,
@@ -270,7 +269,7 @@ class DammL(Layer):
                 u = 0.6
             if u > 1.4:
                 u = 1.4
-            qb = u*qb
+            qb = u * qb
         return qb, u
 
     def poly(p: QgsPoint) -> QgsPolygon:
@@ -286,44 +285,44 @@ class DammL(Layer):
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+h)
+        p.setX(p.x() + h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+h)
-        p.setY(p.y()+h)
+        p.setX(p.x() + h)
+        p.setY(p.y() + h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()-4*h)
+        p.setX(p.x() - 4 * h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+h)
-        p.setY(p.y()-h)
+        p.setX(p.x() + h)
+        p.setY(p.y() - h)
         ls.addVertex(p)
         pol = QgsPolygon(ls)
-        qb = 0.93*2*h*(h**(3/2))+0.72*(h**(5/2))
-        f = h*h*3
+        qb = 0.93 * 2 * h * (h ** (3 / 2)) + 0.72 * (h ** (5 / 2))
+        f = h * h * 3
         qb_, u = self.__u(lx, v, qb, f)
-        self.insertData(pol, 'Bresche', 0, f, 0, 4*h,
-                        0, 2*h, h, 'Standart', qb_, u)
+        self.insertData(pol, 'Bresche', 0, f, 0, 4 * h,
+                        0, 2 * h, h, 'Standart', qb_, u)
         return qb_, f
 
     def r_b(self, p: QgsPoint, h: float, b: float, lx: float, v: float) -> tuple[float, float]:
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+b/2)
+        p.setX(p.x()+b / 2)
         ls.addVertex(p)
         p = p.clone()
-        p.setY(p.y()+h)
+        p.setY(p.y() + h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()-b)
+        p.setX(p.x() - b)
         ls.addVertex(p)
         p = p.clone()
-        p.setY(p.y()-h)
+        p.setY(p.y() - h)
         ls.addVertex(p)
         pol = QgsPolygon(ls)
-        qb = 0.93*b*(h**(3/2))
+        qb = 0.93 * b * (h ** (3 / 2))
         f = h*b
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b,
@@ -334,15 +333,15 @@ class DammL(Layer):
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+b/2)
-        p.setY(p.y()+h)
+        p.setX(p.x() + b / 2)
+        p.setY(p.y() + h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()-b)
+        p.setX(p.x() - b)
         ls.addVertex(p)
         pol = QgsPolygon(ls)
-        qb = 0.72*(b/2)/h*(h**(5/2))
-        f = h*b/2
+        qb = 0.72 * (b / 2) / h * (h ** (5 / 2))
+        f = h * b / 2
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Dreieck', qb_, u)
         return qb_, f
@@ -351,40 +350,40 @@ class DammL(Layer):
         ls = QgsLineString()
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+bu/2)
+        p.setX(p.x() + bu / 2)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+(b-bu)/2)
-        p.setY(p.y()+h)
+        p.setX(p.x() + (b - bu) / 2)
+        p.setY(p.y() + h)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()-b)
+        p.setX(p.x() - b)
         ls.addVertex(p)
         p = p.clone()
-        p.setX(p.x()+(b-bu)/2)
-        p.setY(p.y()-h)
+        p.setX(p.x() + (b - bu) / 2)
+        p.setY(p.y() - h)
         ls.addVertex(p)
         pol = QgsPolygon(ls)
-        qb = 0.93*bu*(h**(3/2))+0.72*((b-bu)/2)/h*(h**(5/2))
-        f = h*bu+h*(b-bu)/2
+        qb = 0.93 * bu * (h ** (3 / 2)) + 0.72 * ((b - bu) / 2) / h * (h ** (5 / 2))
+        f = h * bu + h * (b - bu) / 2
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, bu, h, 'Trapez', qb_, u)
         return qb_, f
 
     def p_b(self, px: QgsPoint, h: float, b: float, lx: float, v: float) -> tuple[float, float]:
         p = px.clone()
-        r = (4*h**2+b**2)/(8*h)
-        p.setY(p.y()+r)
+        r = (4 * h ** 2 + b ** 2) / (8 * h)
+        p.setY(p.y() + r)
 
-        a = math.acos(1-h/r)
+        a = math.acos(1 - h / r)
 
         ls = QgsLineString()
 
         ls = self.circle_geometry(p, ls, r, a)
 
         pol = QgsPolygon(ls)
-        qb = 0.58*b*h**(3/2)
-        f = 2/3*b*h
+        qb = 0.58 * b * h ** (3 / 2)
+        f = 2 / 3 * b * h
         qb_, u = self.__u(lx, v, qb, f)
         self.insertData(pol, 'Bresche', 0, f, 0, b, 0, 0, h, 'Parabel', qb_, u)
         return qb_, f
@@ -395,8 +394,8 @@ class DammL(Layer):
         for i in range(segments):
             theta = i * (2.0 * math.pi / segments)
             if theta < a*2:
-                p = QgsPoint(pt.x() + radius * math.cos(theta-math.pi/2-a),
-                             pt.y() + radius * math.sin(theta-math.pi/2-a))
+                p = QgsPoint(pt.x() + radius * math.cos(theta-math.pi / 2 - a),
+                             pt.y() + radius * math.sin(theta-math.pi / 2 - a))
             ls.addVertex(p)
         return ls
 

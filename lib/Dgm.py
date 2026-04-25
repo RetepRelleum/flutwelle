@@ -4,7 +4,6 @@ from .Layer import DgmL
 
 
 class Dgm:
-    """Handles DGM (Digital Elevation Model) layer creation from Swiss GeoTIFF files.""" 
     def __init__(self, path, iface):
         pata = glob.glob(path+'/swiss*.tif')
         dgm = DgmL('Perimeter')

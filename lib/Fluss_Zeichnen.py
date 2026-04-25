@@ -180,7 +180,7 @@ class CreateFluss(QgsTask):
                 return False
             i = i + 0.5
 
-            co = math.ceil(i*math.pi*4)
+            co = math.ceil(i * math.pi * 4)
 
             min = 10000
             pminA = []
@@ -193,11 +193,11 @@ class CreateFluss(QgsTask):
                 pz = self.raster.getValue2(pp)
                 if pz == 0:
                     break
-                if ls.endPoint().z()+0.1 > pz:
+                if ls.endPoint().z() + 0.1 > pz:
                     papp = QgsPoint(x1, y1, pz)
                     pminA.append(papp)
 
-                min = ls.endPoint().z()+5
+                min = ls.endPoint().z() + 5
 
                 for p in pminA:
                     if min > p.z():
@@ -208,8 +208,8 @@ class CreateFluss(QgsTask):
                 notEnd = False
                 break
 
-            if ls.endPoint().z()-0.001 > pmin.z():
-                if azimuth == 0 or abs(abs(azimuth)-abs(ls.endPoint().azimuth(pmin))) < 80:
+            if ls.endPoint().z() - 0.001 > pmin.z():
+                if azimuth == 0 or abs(abs(azimuth) - abs(ls.endPoint().azimuth(pmin))) < 80:
                     azimuth = ls.endPoint().azimuth(pmin)
 
                     ls.addVertex(pmin)
