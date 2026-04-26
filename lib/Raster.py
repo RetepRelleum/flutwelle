@@ -102,9 +102,9 @@ class Raster:
         fcn = QgsColorRampShader()
         fcn.setColorRampType(QgsColorRampShader.Interpolated)
         fcn.setClassificationMode(QgsColorRampShader.Continuous)
-        lst = [QgsColorRampShader.ColorRampItem(val-1.5, QColor(0, 0, 0, 0)),
+        lst = [QgsColorRampShader.ColorRampItem(val - 1.5, QColor(0, 0, 0, 0)),
                QgsColorRampShader.ColorRampItem(val, QColor(0, 255, 255)),
-               QgsColorRampShader.ColorRampItem(val+1.5, QColor(0, 0, 0, 0))]
+               QgsColorRampShader.ColorRampItem(val + 1.5, QColor(0, 0, 0, 0))]
         fcn.setColorRampItemList(lst)
 
         layers = QgsProject.instance().mapLayers().values()
@@ -135,8 +135,8 @@ class Mupe:
 
     def qgsVecDirNorm(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:
         dirP = QgsPoint(p1.x() - p2.x(), p1.y() - p2.y(), p1.z() - p2.z())
-        dirP = QgsPoint(dirP.y() / math.sqrt(dirP.x() ** 2+dirP.y() ** 2), -
-                        dirP.x() / math.sqrt(dirP.x() ** 2+dirP.y() ** 2), dirP.z())
+        dirP = QgsPoint(dirP.y() / math.sqrt(dirP.x() ** 2 + dirP.y() ** 2),
+                        -dirP.x() / math.sqrt(dirP.x() ** 2 + dirP.y() ** 2), dirP.z())
         return dirP
 
     def qgsVecAdd(self, p1: QgsPoint, p2: QgsPoint) -> QgsPoint:

@@ -6,7 +6,7 @@
 name=Flutwelle
 qgisMinimumVersion=3.0
 description=Schätzt eine Flutwelle gemäss CTGREF
-version=0.9.7
+version=0.9.8
 author=retep relleum
 email=retep.relleum@bluewin.ch
 
@@ -20,7 +20,7 @@ repository=https://github.com/RetepRelleum/flutwelle
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog= neu mit 3d Ansicht des Querschnitts, Fluss kann als GPKG gespeichert werden und somit geändert. 
+changelog= neu mit 3d Ansicht des Querschnitts, Fluss kann als GPKG gespeichert werden und somit geändert. Neu mit verbessertem Alg. für breite flache Flüsse 
 
 # Tags are comma separated with spaces allowed
 tags=bresche,see,damm,talsperre,staumauer,bfe,river,fluss,CTGREF,beffa,energiewirtschaft,energielinienhöhe

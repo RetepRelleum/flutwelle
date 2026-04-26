@@ -156,10 +156,17 @@ class Querschnitt(QgsTask):
                         point0l = self.insertPoint(
                             lsl, lsx, point0l, hmin, dirV, pil)
                         pil += 1
+                        niveauHoehe -= deltaHoehe
+                        if (niveauHoehe - hmin)==0:
+                            niveauHoehe += deltaHoehe
                     if point0r.z() <= niveauHoehe and point0r.z() != 0.0:
                         point0r = self.insertPoint(
                             lsr, lsx, point0r, hmin, dirV, pir)
                         pir -= 1
+                        niveauHoehe -= deltaHoehe
+                        if (niveauHoehe - hmin)==0:
+                            niveauHoehe += deltaHoehe
+
                     niveauHoehe += deltaHoehe
                     qm2 = 0
                     lt = 0
@@ -184,8 +191,8 @@ class Querschnitt(QgsTask):
                         ls, i, self.k, qmm, ((laenge_ - lt) / 2) / (niveauHoehe - hmin), lt)
                     ymaxP, fmaxP, umP = self.p_ymax(
                         ls, i, self.k, qmm, laenge_)
-                    dq = qm2 / 100 * 20
-                    dy = (niveauHoehe - hmin) / 100 * 20
+                    dq = qm2 / 100 * 15
+                    dy = (niveauHoehe - hmin) / 100 * 15
                     dP = 0.15
                     if (fmaxR - dq * dP) <= qm2 <= (fmaxR + dq) and \
                             (ymaxR - dy * dP) <= (niveauHoehe - hmin) <= (ymaxR + dy):
@@ -447,12 +454,11 @@ class Querschnitt(QgsTask):
             yi = 15
         f1 = fxx[yi][xi]
         f2 = fxx[yi][xi - 1]
-        f3 = f1 + (f2 - f1) / (fxx[0][xi - 1] -
-                               fxx[0][xi]) * (jkk - fxx[0][xi])
+        f3 = f1 + (f2 - f1) / (fxx[0][xi - 1] - fxx[0][xi]) * (jkk - fxx[0][xi])
         f1 = fxx[yi][xi]
         f2 = fxx[yi - 1][xi]
-        f4 = f1+(f2 - f1) / (fxx[yi - 1][0] - fxx[yi][0]) * (xvo - fxx[yi][0])
-        fr = (f3+f4) / 2
+        f4 = f1 + (f2 - f1) / (fxx[yi - 1][0] - fxx[yi][0]) * (xvo - fxx[yi][0])
+        fr = (f3 + f4) / 2
         if fr > 1:
             fr = 1
         return fr, jkk, xvo
