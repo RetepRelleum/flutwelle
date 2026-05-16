@@ -235,7 +235,7 @@ class CreateFluss(QgsTask):
                     break
             if ls.startPoint().distance(ls.endPoint()) > self.fllae * 1000:
                 break
-            if ls.vertexCount() > ls.startPoint().distance(ls.endPoint()) and ls.vertexCount() > 20:
+            if ls.vertexCount() > (2 * ls.startPoint().distance(ls.endPoint())) and ls.vertexCount() > 20:
                 break
 
         g = QgsGeometry(ls)
