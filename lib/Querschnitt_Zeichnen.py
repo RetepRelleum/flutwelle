@@ -454,7 +454,7 @@ class Querschnitt(QgsTask):
             yi = 15
         f1 = fxx[yi][xi]
         f2 = fxx[yi][xi - 1]
-        f3 = f1 + (f2 - f1) / (fxx[0][xi - 1] -
+        f3 = f1 + (f2 - f1) / (fxx[0][xi - 1] - 
                                fxx[0][xi]) * (jkk - fxx[0][xi])
         f1 = fxx[yi][xi]
         f2 = fxx[yi - 1][xi]
